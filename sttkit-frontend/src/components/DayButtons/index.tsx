@@ -25,7 +25,7 @@ const DayButtons = forwardRef(({ select }: {select: (index: number) => void}, re
     {daysShort.map((day, index) => <span
       key={day}
       className={classNames(
-        'border-[3px] rounded-full w-10 md:w-auto p-2 h-10 flex justify-center items-center border-gold-200  transition duration-300 hover:scale-[1.1]',
+        'border-[3px] rounded-full w-10 md:w-auto p-2 h-10 flex justify-center items-center border-gold-200 transition duration-300 hover:scale-[1.1] shadow-lg shadow-gold-200/10',
         selected === index
           ? 'bg-gold-200 text-cinder-950'
           : 'hover:bg-gold-200 hover:text-cinder-950'
