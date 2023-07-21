@@ -1,19 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
 import AddBellButton from 'AddBellButton'
+import Bell from 'Bell'
+import CursorState from 'CursorState'
 import DayButtons from 'DayButtons'
 import Divider from 'Divider'
 import Header from 'Header'
+import Plus from 'Plus'
+import Time from 'Time'
 import classNames from 'classNames'
 import lerp from 'lerp'
-import useStateRef from 'utils/useStateRef'
-
-enum CursorState {
-  Normal,
-  Plus,
-  Cross,
-  Light,
-  Hidden
-}
+import useStateRef from 'useStateRef'
 
 const App = () => {
   let mousePosition = {
@@ -27,6 +23,7 @@ const App = () => {
         plus = useRef<SVGSVGElement>(null),
         [ selected, setSelected, selectedRef ] = useStateRef(-1),
         [ cursorState, setCursorState ] = useState(CursorState.Normal),
+        [ bells, setBells ] = useState<Time[]>([]),
         mouse = (event: MouseEvent): void => {
           lastMouseActivity = Date.now()
           setCursorState(CursorState.Normal)
@@ -93,15 +90,29 @@ const App = () => {
       <Divider />
       <div className='flex h-full gap-4'>
         <div className='flex flex-col items-center gap-4'>
-          <span className='text-gold-200 leading-none text-2xl [writing-mode:vertical-lr] md:[writing-mode:horizontal-tb]'>
+          <span className='text-gold-200 leading-none text-2xl [writing-mode:vertical-lr] md:[writing-mode:horizontal-tb] flex flex-col items-center md:py-5'>
             BELLS
           </span>
           <span className='w-[3px] bg-gold-100 h-full rounded-t-full shadow shadow-gold-200/20'></span>
         </div>
-        <AddBellButton click={() => {
-          if (selected === -1)
-            return
-        }} ref={addBellButton} disabled={selected === -1} />
+        <div className='flex flex-col grow basis-auto shrink-0'>
+          <AddBellButton
+            click={() => {
+              if (selected === -1)
+                return
+
+              setBells([ ...bells, {
+                hour  : 12,
+                minute: 34
+              } ])
+            }}
+            ref={addBellButton}
+            disabled={selected === -1}
+          />
+          <ul className='flex flex-col grow basis-auto shrink-0'>
+            {bells.map((time, index) => <Bell number={index + 1} time={time} key={index} />)}
+          </ul>
+        </div>
       </div>
     </div>
     <div
@@ -136,12 +147,11 @@ const App = () => {
         ref={plus}
       >
         <g>
-          <path d='M5.42969 11.4648C5.42969 10.8984 5.82031 10.5176 6.37695 10.5176L10.5078 10.5176L10.5078 6.37695C10.5078 5.83008 10.8887 5.42969 11.4258 5.42969C11.9824 5.42969 12.373 5.82031 12.373 6.37695L12.373 10.5176L16.5137 10.5176C17.0703 10.5176 17.4609 10.8984 17.4609 11.4648C17.4609 12.002 17.0605 12.373 16.5137 12.373L12.373 12.373L12.373 16.5234C12.373 17.0703 11.9824 17.4609 11.4258 17.4609C10.8887 17.4609 10.5078 17.0605 10.5078 16.5234L10.5078 12.373L6.37695 12.373C5.83008 12.373 5.42969 12.002 5.42969 11.4648Z' className={classNames(
-            'transition duration-300',
+          <Plus fill={
             cursorState === CursorState.Cross
               ? 'fill-red-500'
               : 'fill-gold-500'
-          )} />
+          } />
         </g>
       </svg>
     </div>

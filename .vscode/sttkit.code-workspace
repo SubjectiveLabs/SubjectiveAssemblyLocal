@@ -7,5 +7,7 @@
 			"path": "../sttkit-frontend"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"editor.tabSize": 2
+	}
 }

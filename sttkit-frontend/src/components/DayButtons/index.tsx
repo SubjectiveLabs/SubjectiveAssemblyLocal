@@ -1,5 +1,5 @@
 import { ForwardedRef, forwardRef, useState } from 'react'
-import classNames from 'utils/classNames'
+import classNames from 'classNames'
 
 const DayButtons = forwardRef(({ select }: {select: (index: number) => void}, ref: ForwardedRef<HTMLDivElement>) => {
   const dayEndings = [
