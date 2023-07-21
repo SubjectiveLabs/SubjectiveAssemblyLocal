@@ -1,7 +1,7 @@
-import { ForwardedRef, forwardRef } from 'react'
+import { ForwardedRef, forwardRef, useState } from 'react'
 import classNames from 'utils/classNames'
 
-const DayButtons = forwardRef((_props, ref: ForwardedRef<HTMLDivElement>) => {
+const DayButtons = forwardRef(({ select }: {select: (index: number) => void}, ref: ForwardedRef<HTMLDivElement>) => {
   const dayEndings = [
     'onday',
     'esday',
@@ -19,12 +19,20 @@ const DayButtons = forwardRef((_props, ref: ForwardedRef<HTMLDivElement>) => {
           'F',
           'Sa',
           'Su'
-        ]
+        ],
+        [ selected, setSelected ] = useState(-1)
   return <div className='text-gold-100 flex justify-between grow shrink-0 basis-auto ps-4' ref={ref}>
     {daysShort.map((day, index) => <span
       key={day}
-      className={classNames('border-[3px] rounded-full w-10 md:w-auto p-2 h-10 flex justify-center items-center border-gold-200 hover:bg-gold-200 hover:text-cinder-950 transition duration-300 hover:scale-[1.1]')}
+      className={classNames(
+        'border-[3px] rounded-full w-10 md:w-auto p-2 h-10 flex justify-center items-center border-gold-200  transition duration-300 hover:scale-[1.1]',
+        selected === index
+          ? 'bg-gold-200 text-cinder-950'
+          : 'hover:bg-gold-200 hover:text-cinder-950'
+      )}
       onClick={() => {
+        setSelected(index)
+        select(index)
       }}
     >
       {day}

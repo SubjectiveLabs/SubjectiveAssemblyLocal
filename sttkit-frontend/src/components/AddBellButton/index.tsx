@@ -1,6 +1,6 @@
 import { ForwardedRef, forwardRef } from 'react'
 
-const AddBellButton = forwardRef(({ click }: { click: () => void}, ref: ForwardedRef<HTMLDivElement>) => <div className='flex flex-col grow relative w-full h-16 group' onClick={click} ref={ref}>
+const AddBellButton = forwardRef(({ click, disabled }: { click: () => void, disabled: boolean}, ref: ForwardedRef<HTMLDivElement>) => <div className={'flex flex-col grow relative w-full h-16 group'} onClick={click} ref={ref}>
   <svg viewBox='0 0 300 100' preserveAspectRatio='none' className='absolute top-0 left-0 h-full w-full p-px'>
     <rect
       width={300}

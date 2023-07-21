@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import AddBellButton from 'AddBellButton'
 import DayButtons from 'DayButtons'
 import Divider from 'Divider'
@@ -6,18 +6,28 @@ import Header from 'Header'
 import classNames from 'classNames'
 import lerp from 'lerp'
 
+enum CursorState {
+  Normal,
+  Plus,
+  Cross,
+  Light,
+  Hidden
+}
+
 const App = () => {
   let mousePosition = {
     xPosition: 0,
     yPosition: 0
   },
-      lastMouseMove = 0
+      lastMouseActivity = 0
   const addBellButton = useRef<HTMLDivElement>(null),
         cursor = useRef<HTMLDivElement>(null),
         dayButtons = useRef<HTMLDivElement>(null),
         plus = useRef<SVGSVGElement>(null),
-        mouseMove = (event: MouseEvent): void => {
-          lastMouseMove = Date.now()
+        [ cursorState, setCursorState ] = useState(CursorState.Normal),
+        mouse = (event: MouseEvent): void => {
+          lastMouseActivity = Date.now()
+          setCursorState(CursorState.Normal)
           if (!plus.current)
             return
           if (!cursor.current)
@@ -29,6 +39,7 @@ const App = () => {
           }
 
           if (addBellButton.current?.matches(':hover')) {
+            setCursorState(CursorState.Plus)
             plus.current.classList.add('scale-[1.5]')
             plus.current.classList.remove('scale-0')
             cursor.current.classList.add('scale-[1.5]')
@@ -41,13 +52,15 @@ const App = () => {
           }
 
           if (dayButtons.current?.children && Array.from(dayButtons.current?.children).some(child => child.matches(':hover'))) {
-            cursor.current.classList.add('border-8', 'blur', 'scale-[1.5]', 'bg-gold-200/30')
+            setCursorState(CursorState.Light)
+            cursor.current.classList.add('blur-[4px]', 'scale-[1.5]', 'bg-gold-200/30')
             cursor.current.classList.remove('bg-gold-200/20', 'backdrop-blur-sm', 'border-t')
           } else {
             cursor.current.classList.add('bg-gold-200/20', 'backdrop-blur-sm', 'border-t')
-            cursor.current.classList.remove('border-8', 'blur', 'bg-gold-200/30')
+            cursor.current.classList.remove('blur-[4px]', 'bg-gold-200/30')
           }
-        }
+        },
+        [ selected, setSelected ] = useState(-1)
   useEffect(() => {
     const interval = setInterval(() => {
       if (!cursor.current)
@@ -59,7 +72,7 @@ const App = () => {
       cursor.current.style.left = `${lerp(previousX, targetX, 0.2)}px`
       cursor.current.style.top = `${lerp(previousY, targetY, 0.2)}px`
 
-      if (Date.now() - lastMouseMove > 1000) {
+      if (Date.now() - lastMouseActivity > 3000) {
         cursor.current.classList.add('opacity-0')
         cursor.current.classList.remove('opacity-100')
       } else {
@@ -68,9 +81,11 @@ const App = () => {
       }
     }, 5)
 
-    document.querySelector('html')?.addEventListener('mousemove', mouseMove)
+    document.querySelector('html')?.addEventListener('mousemove', mouse)
+    document.querySelector('html')?.addEventListener('mousedown', mouse)
     return () => {
-      document.querySelector('html')?.removeEventListener('mousemove', mouseMove)
+      document.querySelector('html')?.removeEventListener('mousemove', mouse)
+      document.querySelector('html')?.removeEventListener('mousedown', mouse)
       clearInterval(interval)
     }
   }, [])
@@ -82,7 +97,9 @@ const App = () => {
         <span className='text-gold-200 leading-none text-2xl [writing-mode:vertical-lr]'>
           DAYS
         </span>
-        <DayButtons ref={dayButtons} />
+        <DayButtons select={index => {
+          setSelected(index)
+        }} ref={dayButtons} />
       </div>
       <Divider />
       <div className='flex h-full gap-4'>
@@ -92,7 +109,10 @@ const App = () => {
           </span>
           <span className='w-[3px] bg-gold-100 h-full rounded-t-full'></span>
         </div>
-        <AddBellButton click={() => {}} ref={addBellButton} />
+        <AddBellButton click={() => {
+          if (selected === -1)
+            return
+        }} ref={addBellButton} disabled={selected === -1} />
       </div>
     </div>
     <div
