@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import AddBellButton from 'AddBellButton'
 import Bell from 'Bell'
+import { BellTimes } from 'BellTimes'
 import CursorState from 'CursorState'
+import { DateTime } from 'luxon'
 import DayButtons from 'DayButtons'
 import Divider from 'Divider'
 import Header from 'Header'
 import Plus from 'Plus'
-import Time from 'Time'
 import classNames from 'classNames'
 import lerp from 'lerp'
 import useStateRef from 'useStateRef'
@@ -21,9 +22,9 @@ const App = () => {
         cursor = useRef<HTMLDivElement>(null),
         dayButtons = useRef<HTMLDivElement>(null),
         plus = useRef<SVGSVGElement>(null),
-        [ selected, setSelected, selectedRef ] = useStateRef(-1),
+        [ selectedDay, setSelectedDay, selectedDayRef ] = useStateRef(-1),
         [ cursorState, setCursorState ] = useState(CursorState.Normal),
-        [ bells, setBells ] = useState<Time[]>([]),
+        [ bellTimes, setBellTimes ] = useState<BellTimes>(Array.from({ length: 7 }, () => [])),
         mouse = (event: MouseEvent): void => {
           lastMouseActivity = Date.now()
           setCursorState(CursorState.Normal)
@@ -38,7 +39,7 @@ const App = () => {
           }
 
           if (addBellButton.current?.matches(':hover'))
-            if (selectedRef.current === -1)
+            if (selectedDayRef.current === -1)
               setCursorState(CursorState.Cross)
             else
               setCursorState(CursorState.Plus)
@@ -84,7 +85,7 @@ const App = () => {
           DAYS
         </span>
         <DayButtons select={index => {
-          setSelected(index)
+          setSelectedDay(index)
         }} ref={dayButtons} />
       </div>
       <Divider />
@@ -98,19 +99,22 @@ const App = () => {
         <div className='flex flex-col grow basis-auto shrink-0'>
           <AddBellButton
             click={() => {
-              if (selected === -1)
+              if (selectedDay === -1)
                 return
 
-              setBells([ ...bells, {
-                hour  : 12,
-                minute: 34
-              } ])
+              setBellTimes(bellTimes => {
+                const localBellTimes = [...bellTimes]
+                localBellTimes[selectedDay].push(DateTime.now())
+                return localBellTimes
+              })
             }}
             ref={addBellButton}
-            disabled={selected === -1}
+            disabled={selectedDay === -1}
           />
           <ul className='flex flex-col grow basis-auto shrink-0'>
-            {bells.map((time, index) => <Bell number={index + 1} time={time} key={index} />)}
+            {selectedDay === -1
+              ? null
+              : bellTimes[selectedDay].map((time, index) => <Bell number={index + 1} time={time} key={index} />)}
           </ul>
         </div>
       </div>

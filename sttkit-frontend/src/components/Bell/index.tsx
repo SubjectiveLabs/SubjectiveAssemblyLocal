@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import Time from 'Time'
+import { DateTime } from 'luxon'
 import classNames from 'classNames'
 
-const Bell = ({ number, time }: { number: number, time: Time }) => {
+const Bell = ({ number, time }: { number: number, time: DateTime }) => {
   const [ rendered, setRendered ] = useState(false)
   useEffect(() => {
     setRendered(true)
@@ -13,7 +13,12 @@ const Bell = ({ number, time }: { number: number, time: Time }) => {
       ? 'scale-100'
       : 'scale-0'
   )}>
-    BELL {number} {time.hour}: {time.minute}
+    <span>BELL{number}</span>
+    <span>{time.toLocaleString({
+      hour  : '2-digit',
+      hour12: false,
+      minute: '2-digit'
+    })}</span>
   </div>
 }
 export default Bell
