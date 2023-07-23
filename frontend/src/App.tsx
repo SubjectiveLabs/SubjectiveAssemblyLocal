@@ -116,7 +116,7 @@ const App = () => {
           <ul className='flex flex-col grow basis-auto shrink-0 gap-2'>
             {selectedDay === -1
               ? null
-              : bellTimes[selectedDay].map((time, index) => <Bell number={index + 1} time={time} key={index} />)}
+              : bellTimes[selectedDay].map((time, index) => <Bell number={index + 1} initialTime={time} key={index} />)}
           </ul>
         </div>
       </div>
