@@ -81,7 +81,7 @@ const App = () => {
       <Header />
       <Divider />
       <div className='flex items-center'>
-        <span className='text-gold-200 leading-none text-2xl [writing-mode:vertical-lr] md:[writing-mode:horizontal-tb]'>
+        <span className='text-gold-200 leading-none text-2xl [writing-mode:vertical-lr] md:[writing-mode:horizontal-tb] md:mx-10'>
           DAYS
         </span>
         <DayButtons select={index => {
@@ -91,7 +91,7 @@ const App = () => {
       <Divider />
       <div className='flex h-full gap-4'>
         <div className='flex flex-col items-center gap-4'>
-          <span className='text-gold-200 leading-none text-2xl [writing-mode:vertical-lr] md:[writing-mode:horizontal-tb] flex flex-col items-center md:py-5'>
+          <span className='text-gold-200 leading-none text-2xl [writing-mode:vertical-lr] md:[writing-mode:horizontal-tb] flex flex-col items-center md:py-5 md:mx-10'>
             BELLS
           </span>
           <span className='w-[3px] bg-gold-100 h-full rounded-t-full shadow shadow-gold-200/20'></span>
