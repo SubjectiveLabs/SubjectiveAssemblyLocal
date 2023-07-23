@@ -2,46 +2,10 @@ import { ForwardedRef, forwardRef } from 'react'
 import classNames from 'classNames'
 
 const AddBellButton = forwardRef(({ click, disabled }: { click: () => void, disabled: boolean}, ref: ForwardedRef<HTMLDivElement>) => <div
-  className={'flex flex-col relative h-16 group'}
+  className='flex flex-col relative h-16 group border-dashed border-gold-200 border-2 rounded-md'
   onClick={click}
   ref={ref}
 >
-  <svg viewBox='0 0 300 100' preserveAspectRatio='none' className='absolute top-0 left-0 h-full w-full p-px'>
-    <rect
-      width={300}
-      height={100}
-      rx='10'
-      ry='10'
-      vectorEffect='non-scaling-stroke'
-      className={classNames('fill-none stroke-1 [stroke-dasharray:8] [stroke-linecap:round] sm:hidden transition', disabled
-        ? 'stroke-red-400'
-        : 'stroke-gold-200')}
-    />
-  </svg>
-  <svg viewBox='0 0 700 100' preserveAspectRatio='none' className='absolute top-0 left-0 h-full w-full p-px'>
-    <rect
-      width={700}
-      height={100}
-      rx='10'
-      ry='10'
-      vectorEffect='non-scaling-stroke'
-      className={classNames('fill-none stroke-1 [stroke-dasharray:8] [stroke-linecap:round] hidden sm:block md:hidden transition', disabled
-        ? 'stroke-red-400'
-        : 'stroke-gold-200')}
-    />
-  </svg>
-  <svg viewBox='0 0 1000 100' preserveAspectRatio='none' className='absolute top-0 left-0 h-full w-full p-px'>
-    <rect
-      width={1000}
-      height={100}
-      rx='10'
-      ry='10'
-      vectorEffect='non-scaling-stroke'
-      className={classNames('fill-none stroke-1 [stroke-dasharray:8] [stroke-linecap:round] hidden md:block transition', disabled
-        ? 'stroke-red-400'
-        : 'stroke-gold-200')}
-    />
-  </svg>
   <div className='grid place-content-center h-full'>
     <span className={classNames(
       'flex gap-1 w-full p-2 rounded transition',

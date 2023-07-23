@@ -8,12 +8,12 @@ const Bell = ({ number, time }: { number: number, time: DateTime }) => {
     setRendered(true)
   }, [])
   return <div className={classNames(
-    'text-gold-200 transition duration-300 text-center',
+    'text-cinder-950 bg-gold-200 rounded-md transition duration-300 text-center flex justify-between py-2 px-4',
     rendered
       ? 'scale-100'
       : 'scale-0'
   )}>
-    <span>BELL{number}</span>
+    <span className='tracking-[5px]'>BELL {number}</span>
     <span>{time.toLocaleString({
       hour  : '2-digit',
       hour12: false,

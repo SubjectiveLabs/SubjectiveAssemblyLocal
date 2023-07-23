@@ -77,7 +77,7 @@ const App = () => {
   }, [])
 
   return <>
-    <div className='h-full bg-cinder-950 flex flex-col px-4 pt-4 gap-4 font-extrabold tracking-tighter selection:bg-gold-500 selection:text-gold-900 sm:cursor-none'>
+    <div className='h-full bg-cinder-950 flex flex-col px-4 pt-4 gap-4 font-extrabold tracking-tighter selection:bg-gold-500 selection:text-gold-900 sm:cursor-none overflow-y-auto'>
       <Header />
       <Divider />
       <div className='flex items-center'>
@@ -89,17 +89,19 @@ const App = () => {
         }} ref={dayButtons} />
       </div>
       <Divider />
-      <div className='flex h-full gap-4'>
+      <div className='flex gap-4 grow shrink-0 basis-auto'>
         <div className='flex flex-col items-center gap-4'>
           <span className='text-gold-200 leading-none text-2xl [writing-mode:vertical-lr] md:[writing-mode:horizontal-tb] flex flex-col items-center md:py-5 md:mx-10'>
             BELLS
           </span>
-          <span className='w-[3px] bg-gold-100 h-full rounded-t-full shadow shadow-gold-200/20'></span>
+          <span className='w-[3px] bg-gold-100 grow shrink-0 basis-auto rounded-t-full shadow shadow-gold-200/20'></span>
         </div>
-        <div className='flex flex-col grow basis-auto shrink-0'>
+        <div className='flex flex-col grow basis-auto shrink-0 gap-4'>
           <AddBellButton
             click={() => {
               if (selectedDay === -1)
+                return
+              if (bellTimes[selectedDay].length >= 20)
                 return
 
               setBellTimes(bellTimes => {
@@ -111,7 +113,7 @@ const App = () => {
             ref={addBellButton}
             disabled={selectedDay === -1}
           />
-          <ul className='flex flex-col grow basis-auto shrink-0'>
+          <ul className='flex flex-col grow basis-auto shrink-0 gap-2'>
             {selectedDay === -1
               ? null
               : bellTimes[selectedDay].map((time, index) => <Bell number={index + 1} time={time} key={index} />)}
