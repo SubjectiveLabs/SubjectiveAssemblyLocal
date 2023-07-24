@@ -1,13 +1,18 @@
 # Subjective Assembly
-Create, manage and host student timetables and school bell times for Subjective: the school-driven, student-centric iOS class and learning organisation app.
-<br>
-Start using Assembly at https://subjective.school or self-host for privacy and security using the open-source Assembly code.
+Create, manage and host student timetables and school bell times for Subjective: the **school-driven, student-centric** iOS class and learning organisation app.
+Use this repository to self-host Assembly with the source code.
 
-## Self-host Instructions
-1. Clone this repository
-2. Use Cargo and Vite to run Assembly front-end locally, or host the code using your own hardware/service. (Docker coming soon.)
-3. Configure your school in Assembly and publish.
-
-If your school is public on Subjective Discovery, changes to your school will be reflected to all students of your school.
-<br>
-If not, Assembly's generated share link can be inputted in Subjective to retrieve your school's timetable and bell time data.
+## Usage
+1. Clone this repository.
+2. Use Cargo and Vite to run Assembly's front-end and back-end servers locally, or host the code using your own hardware or service. (Docker image coming soon.)
+    ``` 
+    $ cd ./frontend
+    $ npm i
+    $ npm run build
+    $ cd ../backend
+    $ cargo run
+    ```
+    A `.sh` script should probably be used to do this. (tracked in #3)
+3. Connect to the server with Subjective.
+    If your school is public on Subjective Discovery, changes to your school'll be reflected to all students of your school on the next cache clear.
+    If not, Assembly's share link can be input in Subjective to retrieve your school's bell time data.
