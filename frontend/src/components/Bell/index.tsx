@@ -9,7 +9,7 @@ const Bell = ({ number, initialTime }: { number: number, initialTime: DateTime }
     setRendered(true)
   }, [])
   return <div className={classNames(
-    'text-black bg-gold-200 rounded-md transition duration-300 text-center flex justify-between p-2 sm:px-4',
+    'text-black bg-gold-200 rounded-xl transition duration-300 text-center flex justify-between p-2 sm:px-4',
     rendered
       ? 'scale-100'
       : 'scale-0'
