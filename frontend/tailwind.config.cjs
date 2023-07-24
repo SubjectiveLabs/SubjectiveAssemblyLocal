@@ -11,12 +11,12 @@ export default {
       divideWidth: { 3: '3px' },
       fontFamily : {
         sans: [
-          'Satoshi\\ Variable'
+          'RedHatDisplay'
         ]
       },
       colors: {
         gold: {
-          50 : '#ffe8bd',
+          50 : '#ffeddb',
           100: '#ffdeb0',
           200: '#ffd187',
           300: '#ffbf58',

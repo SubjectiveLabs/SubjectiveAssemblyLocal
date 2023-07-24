@@ -5,7 +5,6 @@ import { BellTimes } from 'BellTimes'
 import CursorState from 'CursorState'
 import { DateTime } from 'luxon'
 import DayButtons from 'DayButtons'
-import Divider from 'Divider'
 import Header from 'Header'
 import Plus from 'Plus'
 import classNames from 'classNames'
@@ -77,26 +76,23 @@ const App = () => {
   }, [])
 
   return <>
-    <div className='h-full bg-white flex flex-col px-4 pt-4 gap-4 font-bold selection:bg-gold-500 selection:text-gold-900 sm:cursor-none overflow-y-auto'>
+    <div className='h-full bg-gray-50 flex flex-col p-4 pt-4 gap-4 font-bold selection:bg-gold-500 selection:text-gold-900 sm:cursor-none overflow-y-auto'>
       <Header />
-      <Divider />
-      <div className='flex items-center'>
-        <span className='text-gold-300 leading-none text-2xl [writing-mode:vertical-lr] md:[writing-mode:horizontal-tb] md:mx-10'>
-          Days
+      <div className='flex items-center p-5 bg-white rounded-2xl shadow'>
+        <span className='text-gray-500 leading-none text-md [writing-mode:vertical-lr] md:[writing-mode:horizontal-tb] '>
+          DAYS
         </span>
-        <div className='overflow-x-scroll'>
+        <div className='overflow-x-scroll pl-5 p-1'>
           <DayButtons select={index => {
             setSelectedDay(index)
           }} ref={dayButtons} />
         </div>
       </div>
-      <Divider />
-      <div className='flex gap-4 grow shrink-0 basis-auto'>
+      <div className='flex gap-4 grow shrink-0 basis-auto p-5 bg-white rounded-2xl shadow'>
         <div className='flex flex-col items-center gap-4'>
-          <span className='text-gold-300 leading-none text-2xl [writing-mode:vertical-lr] md:[writing-mode:horizontal-tb] flex flex-col items-center md:py-5 md:mx-10'>
-            Bells
+          <span className='text-gray-500 leading-none text-md [writing-mode:vertical-lr] md:[writing-mode:horizontal-tb] flex flex-col items-center md:py-5'>
+            BELLS
           </span>
-          <span className='w-[3px] bg-gold-100 grow shrink-0 basis-auto rounded-t-full shadow shadow-gold-200/20'></span>
         </div >
         <div className='flex flex-col grow basis-auto shrink-0 gap-4'>
           <AddBellButton
