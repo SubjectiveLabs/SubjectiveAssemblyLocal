@@ -77,25 +77,27 @@ const App = () => {
   }, [])
 
   return <>
-    <div className='h-full bg-cinder-950 flex flex-col px-4 pt-4 gap-4 font-extrabold tracking-tighter selection:bg-gold-500 selection:text-gold-900 sm:cursor-none overflow-y-auto'>
+    <div className='h-full bg-white flex flex-col px-4 pt-4 gap-4 font-bold selection:bg-gold-500 selection:text-gold-900 sm:cursor-none overflow-y-auto'>
       <Header />
       <Divider />
       <div className='flex items-center'>
-        <span className='text-gold-200 leading-none text-2xl [writing-mode:vertical-lr] md:[writing-mode:horizontal-tb] md:mx-10'>
-          DAYS
+        <span className='text-gold-300 leading-none text-2xl [writing-mode:vertical-lr] md:[writing-mode:horizontal-tb] md:mx-10'>
+          Days
         </span>
-        <DayButtons select={index => {
-          setSelectedDay(index)
-        }} ref={dayButtons} />
+        <div className='overflow-x-scroll'>
+          <DayButtons select={index => {
+            setSelectedDay(index)
+          }} ref={dayButtons} />
+        </div>
       </div>
       <Divider />
       <div className='flex gap-4 grow shrink-0 basis-auto'>
         <div className='flex flex-col items-center gap-4'>
-          <span className='text-gold-200 leading-none text-2xl [writing-mode:vertical-lr] md:[writing-mode:horizontal-tb] flex flex-col items-center md:py-5 md:mx-10'>
-            BELLS
+          <span className='text-gold-300 leading-none text-2xl [writing-mode:vertical-lr] md:[writing-mode:horizontal-tb] flex flex-col items-center md:py-5 md:mx-10'>
+            Bells
           </span>
           <span className='w-[3px] bg-gold-100 grow shrink-0 basis-auto rounded-t-full shadow shadow-gold-200/20'></span>
-        </div>
+        </div >
         <div className='flex flex-col grow basis-auto shrink-0 gap-4'>
           <AddBellButton
             click={() => {
@@ -130,12 +132,12 @@ const App = () => {
           : 'p-2',
         cursorState === CursorState.Light
           ? 'blur p-6'
-          : 'backdrop-blur-sm border-t',
+          : 'backdrop-blur-sm',
         cursorState === CursorState.Cross
-          ? 'bg-red-500/20 border-red-500'
+          ? 'bg-gray-500/20'
           : cursorState === CursorState.Light
-            ? 'bg-gold-200/10 border-gold-300'
-            : 'bg-gold-200/20 border-gold-300'
+            ? 'bg-gold-200/10 '
+            : 'bg-gold-200/20'
       )}
     >
       <svg
@@ -155,7 +157,7 @@ const App = () => {
         <g>
           <Plus fill={
             cursorState === CursorState.Cross
-              ? 'fill-red-500'
+              ? 'fill-gray-500'
               : 'fill-gold-500'
           } />
         </g>

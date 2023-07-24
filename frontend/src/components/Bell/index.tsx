@@ -9,12 +9,12 @@ const Bell = ({ number, initialTime }: { number: number, initialTime: DateTime }
     setRendered(true)
   }, [])
   return <div className={classNames(
-    'text-cinder-950 bg-gold-200 rounded-md transition duration-300 text-center flex justify-between p-2 sm:px-4',
+    'text-black bg-gold-200 rounded-md transition duration-300 text-center flex justify-between p-2 sm:px-4',
     rendered
       ? 'scale-100'
       : 'scale-0'
   )}>
-    <span className='tracking-[5px]'>BELL {number}</span>
+    <span>Bell {number}</span>
     <span onClick={() => {
       setTime(DateTime.fromObject({
         hour  : Math.floor(Math.random() * 23),
