@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 @font-face {
-    font-family: "Satoshi Variable";
-    src: url("/fonts/Satoshi-Variable.ttf") format("truetype");
+  font-family: 'Red Hat Display Bold';
+  src: url('/fonts/RedHatDisplay.ttf');
+  font-weight: bold;
 }
