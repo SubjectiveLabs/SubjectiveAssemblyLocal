@@ -1,3 +1,4 @@
+import Footer from 'Footer'
 import config from 'config.json'
 
 type Notice = {
@@ -67,11 +68,7 @@ const App = () => {
           }
         </ul>
       </div>
-      <footer className='flex justify-center shrink grow-0 basis-auto items-center gap-1 pb-4'>
-        <span className='bg-gray-400 w-3 h-3 inline-flex rounded-full'></span>
-        <span className='bg-gray-400 w-3 h-3 inline-flex rounded-full'></span>
-        <span className='bg-gray-400 w-3 h-3 inline-flex rounded-full'></span>
-      </footer>
+      <Footer active={0}/>
     </div>
   </>
 }
