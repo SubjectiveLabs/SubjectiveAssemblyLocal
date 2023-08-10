@@ -124,7 +124,7 @@ const App = () => {
             <span className='text-gray-500'>Noticeboard</span>
             <span>{notices.length} notices</span>
           </div>
-          <ul className='flex flex-col gap-4 overflow-y-auto shadow-inner rounded-2xl'>
+          <ul className='flex flex-col gap-4 overflow-y-auto rounded-2xl'>
             {
               notices.map((notice, index) => <div className='border rounded-2xl p-4' key={index}>
                 <h2 className='font-bold flex gap-1 items-center'>
@@ -157,7 +157,7 @@ const App = () => {
               Showing Monday bell times.
             </span>
           </div>
-          <ul className='flex flex-col gap-4 overflow-y-auto shadow-inner rounded-2xl'>
+          <ul className='flex flex-col gap-4 overflow-y-auto rounded-2xl'>
             {
               bells.map((bell, index) => <div className='border rounded-2xl p-4 flex justify-between' key={index}>
                 <span>{bell.name}</span>
