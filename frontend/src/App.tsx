@@ -1,6 +1,7 @@
+import { useRef, useState } from 'react'
+import { DateTime } from 'luxon'
 import Footer from 'Footer'
 import config from 'config.json'
-import { useState } from 'react'
 
 type Notice = {
   content: string,
@@ -98,7 +99,8 @@ const App = () => {
             title   : 'Y9 2024 Subject Selection'
           }
         ],
-        [ active, setActive ] = useState(0)
+        [ active, setActive ] = useState(0),
+        scroll = useRef<HTMLDivElement>(null)
   return <>
     <div className='py-4 bg-gray-50 h-full flex flex-col gap-4 font-semibold tracking-tighter leading-none'>
       <header className='text-center flex flex-col shrink grow-0 basis-auto'>
@@ -112,11 +114,11 @@ const App = () => {
         const scroll = event.currentTarget.scrollLeft / event.currentTarget.scrollWidth * 2
         if (Math.abs(scroll - Math.round(scroll)) < 10)
           setActive(Math.round(scroll))
-      }}>
+      }} ref={scroll}>
         <div className='border shadow-lg rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full snap-center bg-white'>
           <div className='gap-2 items-center flex text-xl'>
             <span className='bg-black w-6 h-6 inline-flex rounded-full rounded-bl-none'></span>
-            Messaging
+            Messages
           </div>
           <div className='flex gap-1'>
             <span className='text-gray-500'>Noticeboard</span>
@@ -159,13 +161,19 @@ const App = () => {
             {
               bells.map((bell, index) => <div className='border rounded-2xl p-4 flex justify-between' key={index}>
                 <span>{bell.name}</span>
-                <span>{bell.time.hour}:{bell.time.minute}</span>
+                <span>{DateTime.fromObject(bell.time).toLocaleString({
+                  hour  : 'numeric',
+                  hour12: true,
+                  minute: 'numeric'
+                })}</span>
               </div>)
             }
           </ul>
         </div>
       </div>
-      <Footer active={active}/>
+      <Footer active={active} select={index => {
+        scroll.current?.children[index].scrollIntoView()
+      }} />
     </div>
   </>
 }

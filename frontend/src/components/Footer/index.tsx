@@ -1,6 +1,6 @@
 import classNames from 'classNames'
 
-const Footer = ({ active }: {active:number}) => <footer className='flex justify-center shrink grow-0 basis-auto items-center gap-2 p-4'>
+const Footer = ({ active, select }: {active:number, select: (index: number) => void}) => <footer className='flex justify-center shrink grow-0 basis-auto items-center gap-2 p-4'>
   {
     [...Array(2)].map((_value, index) => <span
       className={classNames(
@@ -10,6 +10,7 @@ const Footer = ({ active }: {active:number}) => <footer className='flex justify-
           : 'bg-gray-400'
       )}
       key={index}
+      onClick={() => select(index)}
     ></span>)
   }
 </footer>
