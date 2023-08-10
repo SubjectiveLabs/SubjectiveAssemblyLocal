@@ -110,7 +110,7 @@ const App = () => {
           {config.schoolName}
         </h1>
       </header>
-      <div className='flex h-full overflow-x-auto snap-mandatory snap-x scroll-smooth gap-8 p-4' onScroll={event => {
+      <div className='flex h-full overflow-x-auto snap-mandatory snap-x scroll-smooth gap-8 p-4 md:grid md:grid-cols-2' onScroll={event => {
         const scroll = event.currentTarget.scrollLeft / event.currentTarget.scrollWidth * 2
         if (Math.abs(scroll - Math.round(scroll)) < 10)
           setActive(Math.round(scroll))
@@ -171,9 +171,11 @@ const App = () => {
           </ul>
         </div>
       </div>
-      <Footer active={active} select={index => {
-        scroll.current?.children[index].scrollIntoView()
-      }} />
+      <div className='shrink grow-0 basis-auto md:hidden'>
+        <Footer active={active} select={index => {
+          scroll.current?.children[index].scrollIntoView()
+        }} />
+      </div>
     </div>
   </>
 }
