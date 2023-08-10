@@ -42,8 +42,8 @@ const App = () => {
       </header>
       <div className='flex h-full overflow-x-auto snap-mandatory snap-x scroll-smooth gap-8 p-4' onScroll={event => {
         const scroll = event.currentTarget.scrollLeft / event.currentTarget.scrollWidth * 2
-        if (scroll === Math.floor(scroll))
-          setActive(Math.floor(scroll))
+        if (Math.abs(scroll - Math.round(scroll)) < 10)
+          setActive(Math.round(scroll))
       }}>
         <div className='border shadow-lg rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full snap-center'>
           <div className='gap-2 items-center flex text-xl'>
