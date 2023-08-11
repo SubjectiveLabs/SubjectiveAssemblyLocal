@@ -1,4 +1,7 @@
 #![allow(clippy::no_effect_underscore_binding)]
+#![feature(iter_next_chunk, slice_take)]
+mod timetable;
+
 use rocket::fs::FileServer;
 
 #[macro_use]
