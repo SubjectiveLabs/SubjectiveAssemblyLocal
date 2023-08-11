@@ -102,7 +102,7 @@ const App = () => {
         [ active, setActive ] = useState(0),
         scroll = useRef<HTMLDivElement>(null)
   return <>
-    <div className='py-4 bg-gray-50 h-full flex flex-col gap-4 font-semibold tracking-tighter leading-none'>
+    <div className='py-4 bg-gray-50 h-full flex flex-col gap-4 font-semibold tracking-tighter leading-none md:pb-0'>
       <header className='text-center flex flex-col shrink grow-0 basis-auto'>
         <h1>Welcome to</h1>
         <h1 className='flex items-center text-xl gap-2 justify-center font-bold'>
@@ -110,7 +110,7 @@ const App = () => {
           {config.schoolName}
         </h1>
       </header>
-      <div className='flex h-full overflow-x-auto snap-mandatory snap-x scroll-smooth gap-8 p-4 md:grid md:grid-cols-2' onScroll={event => {
+      <div className='flex h-full overflow-x-auto snap-mandatory snap-x scroll-smooth gap-8 p-4 md:grid md:grid-cols-2 md:gap-4' onScroll={event => {
         const scroll = event.currentTarget.scrollLeft / event.currentTarget.scrollWidth * 2
         if (Math.abs(scroll - Math.round(scroll)) < 10)
           setActive(Math.round(scroll))
