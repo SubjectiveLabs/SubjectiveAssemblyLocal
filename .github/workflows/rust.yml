@@ -24,3 +24,7 @@ jobs:
       run: |
         cd backend
         cargo test --verbose
+    - name: Run clippy
+      run: |
+        cd backend
+        cargo clippy --verbose -- -W clippy::pedantic -W clippy::nursery
