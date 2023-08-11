@@ -140,7 +140,6 @@ module.exports = {
     'no-extra-bind'                    : 'error',
     'no-extra-boolean-cast'            : 'error',
     'no-extra-label'                   : 'error',
-    'no-extra-parens'                  : 'error',
     'no-extra-semi'                    : 'error',
     'no-fallthrough'                   : 'error',
     'no-floating-decimal'              : 'error',

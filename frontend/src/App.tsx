@@ -153,7 +153,16 @@ const App = () => {
           <div className='flex gap-1 justify-between items-center'>
             <span className='text-gray-500'>Today</span>
             <span className='bg-blue-500 p-2 rounded-full text-white flex items-center gap-2'>
-              <span className='bg-white w-4 h-4 inline-flex rounded-full'></span>
+              <svg viewBox='0 0 16 16' width={16} height={16}>
+                <circle cx={8} cy={8} r={8} className='fill-white' />
+                {[...Array(3)].map((_value, index, array) => <circle
+                  key={index}
+                  className='fill-blue-500'
+                  cx={(4 * Math.cos((2 * Math.PI / array.length * index) - (Math.PI / 2))) + 8}
+                  cy={(4 * Math.sin((2 * Math.PI / array.length * index) - (Math.PI / 2))) + 8}
+                  r={2.5}
+                />)}
+              </svg>
               Showing Monday bell times.
             </span>
           </div>
@@ -162,34 +171,31 @@ const App = () => {
               bells.map((bell, index) => <div className='border rounded-2xl p-4 flex justify-between items-center' key={index}>
                 <span>{bell.name}</span>
                 <div className='flex gap-1 items-center bg-gray-200 rounded-lg p-2'>
-                  <select className='appearance-none bg-gray-200'>
+                  <select className='appearance-none bg-gray-200' defaultValue={
+                    DateTime
+                      .fromObject(bell.time)
+                      .toLocaleString({ hour: 'numeric' })
+                      .split(' ')[0]
+                  }>
                     {
                       [...Array(12)].map((_value, index) => <option
                         key={index}
                         value={index + 1}
-                        selected={
-                          (index + 1).toString() === DateTime
-                            .fromObject(bell.time)
-                            .toLocaleString({ hour: 'numeric' })
-                            .split(' ')[0]
-                        }
                       >
                         {index + 1}
                       </option>)
                     }
                   </select>
                   :
-                  <select className='appearance-none bg-gray-200'>
+                  <select className='appearance-none bg-gray-200' defaultValue={
+                    DateTime
+                      .fromObject(bell.time)
+                      .toLocaleString({ minute: '2-digit' })
+                  }>
                     {
                       [...Array(60)].map((_value, index) => <option
                         key={index}
                         value={index}
-                        selected={
-                          index.toString() === DateTime
-                            .fromObject(bell.time)
-                            .toLocaleString({ minute: '2-digit' })
-                            .split(' ')[0]
-                        }
                       >
                         {index.toString().padStart(2, '0')}
                       </option>)
