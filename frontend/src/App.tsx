@@ -159,13 +159,43 @@ const App = () => {
           </div>
           <ul className='flex flex-col gap-4 overflow-y-auto rounded-2xl'>
             {
-              bells.map((bell, index) => <div className='border rounded-2xl p-4 flex justify-between' key={index}>
+              bells.map((bell, index) => <div className='border rounded-2xl p-4 flex justify-between items-center' key={index}>
                 <span>{bell.name}</span>
-                <span>{DateTime.fromObject(bell.time).toLocaleString({
-                  hour  : 'numeric',
-                  hour12: true,
-                  minute: 'numeric'
-                })}</span>
+                <div className='flex gap-1 items-center bg-gray-200 rounded-lg p-2'>
+                  <select className='appearance-none bg-gray-200'>
+                    {
+                      [...Array(12)].map((_value, index) => <option
+                        key={index}
+                        value={index + 1}
+                        selected={
+                          (index + 1).toString() === DateTime
+                            .fromObject(bell.time)
+                            .toLocaleString({ hour: 'numeric' })
+                            .split(' ')[0]
+                        }
+                      >
+                        {index + 1}
+                      </option>)
+                    }
+                  </select>
+                  :
+                  <select className='appearance-none bg-gray-200'>
+                    {
+                      [...Array(60)].map((_value, index) => <option
+                        key={index}
+                        value={index}
+                        selected={
+                          index.toString() === DateTime
+                            .fromObject(bell.time)
+                            .toLocaleString({ minute: '2-digit' })
+                            .split(' ')[0]
+                        }
+                      >
+                        {index.toString().padStart(2, '0')}
+                      </option>)
+                    }
+                  </select>
+                </div>
               </div>)
             }
           </ul>
