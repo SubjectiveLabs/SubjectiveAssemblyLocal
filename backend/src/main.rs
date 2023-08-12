@@ -62,7 +62,13 @@ fn update_timetable(new: &[u8]) -> &'static str {
         Timetable::serialise(&bytes)
     };
 
-    let total_minutes = timetable.timetable.get_mut(&update.bell_name).unwrap();
+    let total_minutes = if let Some(total_minutes) = timetable.timetable.get_mut(&update.bell_name)
+    {
+        total_minutes
+    } else {
+        timetable.timetable.insert(update.bell_name.clone(), 0);
+        timetable.timetable.get_mut(&update.bell_name).unwrap()
+    };
     let (hours, minutes) = (
         if update.update_unit.is_hour() {
             update.update_value
