@@ -21,8 +21,8 @@ impl Unit {
     }
 }
 
-pub struct Update {
+pub struct Patch {
     pub bell_name: String,
-    pub update_unit: Unit,
-    pub update_value: u8,
+    pub patch_unit: Unit,
+    pub patch_value: u8,
 }

@@ -2,17 +2,19 @@
 #![allow(clippy::no_effect_underscore_binding)]
 #![feature(iter_next_chunk, slice_take)]
 mod timetable;
-mod update;
+mod patch;
+mod post;
 
 use std::{
     fs::{write, File},
     io::Read,
 };
 
+use post::Post;
 use rand::seq::SliceRandom;
 use rocket::fs::FileServer;
 use timetable::Timetable;
-use update::{Unit, Update};
+use patch::{Unit, Patch};
 
 #[macro_use]
 extern crate rocket;
@@ -34,8 +36,49 @@ fn not_found() -> String {
     )
 }
 
+#[get("/timetable")]
+fn get_timetable() -> Vec<u8> {
+    let mut bytes = Vec::new();
+    File::open("static/timetable.stt")
+        .unwrap()
+        .read_to_end(&mut bytes)
+        .unwrap();
+    bytes
+}
+
 #[post("/timetable", data = "<new>")]
-fn update_timetable(new: &[u8]) -> &'static str {
+fn post_timetable(new: &[u8]) -> &'static str {
+    let post = {
+        let mut new = new.iter();
+        let name_len = new.next().unwrap();
+        let name =
+            String::from_utf8(new.by_ref().take(*name_len as usize).copied().collect()).unwrap();
+        let hours = *new.next().unwrap();
+        let minutes = *new.next().unwrap();
+        Post {
+            bell_name: name,
+            bell_time: u16::from(hours) * 60 + u16::from(minutes),
+        }
+    };
+
+    let mut timetable = {
+        let mut bytes = Vec::new();
+        File::open("static/timetable.stt")
+            .unwrap()
+            .read_to_end(&mut bytes)
+            .unwrap();
+        Timetable::serialise(&bytes)
+    };
+
+    timetable.timetable.insert(post.bell_name, post.bell_time);
+
+    write("static/timetable.stt", timetable.deserialise()).unwrap();
+
+    "done!"
+}
+
+#[patch("/timetable", data = "<new>")]
+fn patch_timetable(new: &[u8]) -> &'static str {
     let update = {
         let mut new = new.iter();
         let name_len = new.next().unwrap();
@@ -47,10 +90,10 @@ fn update_timetable(new: &[u8]) -> &'static str {
             _ => unreachable!(),
         };
         let value = *new.next().unwrap();
-        Update {
+        Patch {
             bell_name: name,
-            update_unit: unit,
-            update_value: value,
+            patch_unit: unit,
+            patch_value: value,
         }
     };
     let mut timetable = {
@@ -70,13 +113,13 @@ fn update_timetable(new: &[u8]) -> &'static str {
         timetable.timetable.get_mut(&update.bell_name).unwrap()
     };
     let (hours, minutes) = (
-        if update.update_unit.is_hour() {
-            update.update_value
+        if update.patch_unit.is_hour() {
+            update.patch_value
         } else {
             u8::try_from(total_minutes.div_euclid(60)).unwrap()
         },
-        if update.update_unit.is_minute() {
-            update.update_value
+        if update.patch_unit.is_minute() {
+            update.patch_value
         } else {
             u8::try_from(total_minutes.rem_euclid(60)).unwrap()
         },
@@ -95,7 +138,6 @@ fn rocket() -> _ {
     }
     rocket::build()
         .mount("/app/", FileServer::from("dist"))
-        .mount("/api/v1/", FileServer::from("static"))
-        .mount("/api/v1/", routes![update_timetable])
+        .mount("/api/v1/", routes![patch_timetable, get_timetable, post_timetable])
         .register("/", catchers![not_found])
 }

@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
 import { DateTime } from 'luxon'
 import Footer from 'Footer'
-import config from 'config.json'
+import Header from 'components/Header'
 
 type Notice = {
   content: string,
@@ -21,69 +21,44 @@ type Bell = {
 }
 
 const App = () => {
-  const [ bells, setBells ]: [Bell[], Dispatch<SetStateAction<Bell[]>>] = useState([
-    {
-      name: 'Period 1',
-      time: {
-        hour  : 8,
-        minute: 38
-      }
-    },
-    {
-      name: 'Period 2',
-      time: {
-        hour  : 9,
-        minute: 21
-      }
-    },
-    {
-      name: 'Recess',
-      time: {
-        hour  : 11,
-        minute: 20
-      }
-    },
-    {
-      name: 'Period 3',
-      time: {
-        hour  : 12,
-        minute: 34
-      }
-    },
-    {
-      name: 'Period 4',
-      time: {
-        hour  : 13,
-        minute: 5
-      }
-    },
-    {
-      name: 'Period 5',
-      time: {
-        hour  : 14,
-        minute: 34
-      }
-    },
-    {
-      name: 'Lunch',
-      time: {
-        hour  : 15,
-        minute: 0
-      }
-    },
-    {
-      name: 'Period 6',
-      time: {
-        hour  : 15,
-        minute: 38
-      }
-    }
-  ]),
+  const [ bells, setBells ]: [Bell[], Dispatch<SetStateAction<Bell[]>>] = useState<Bell[]>([]),
         [ notices, setNotices ]: [Notice[], Dispatch<SetStateAction<Notice[]>>] = useState<Notice[]>([]),
         [ active, setActive ] = useState(0),
         scroll = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    fetch('/api/v1/timetable').then(response => {
+      response.body?.getReader().read()
+        .then(value => {
+          if (!value.value)
+            return
+
+          let bytes = Array.from(value.value)
+          bytes = bytes.slice(3)
+          const bells = []
+          while (bytes.length > 0) {
+            const decoder = new TextDecoder(),
+                  name = decoder.decode(new Uint8ClampedArray(bytes.splice(0, bytes.shift()))),
+                  timeBytes = new Uint8ClampedArray(bytes.splice(0, 2))
+            let time = 0
+            timeBytes.forEach(byte => {
+              if (!byte)
+                return
+              time *= 0x100
+              time += byte
+            })
+
+            bells.push({
+              name,
+              time: {
+                hour  : Math.floor(time / 60),
+                minute: time % 60
+              }
+            })
+          }
+          setBells(bells)
+        })
+    })
     setNotices([
       {
         content : 'D13 & D14 classes will be running in B2 as carpets are replaced.',
@@ -107,13 +82,7 @@ const App = () => {
   }, [])
   return <>
     <div className='py-4 bg-gray-50 h-full flex flex-col gap-4 font-semibold tracking-tighter leading-none md:pb-0'>
-      <header className='text-center flex flex-col shrink grow-0 basis-auto'>
-        <h1>Welcome to</h1>
-        <h1 className='flex items-center text-xl gap-2 justify-center font-bold'>
-          <img src={config.schoolIconPath} alt={config.schoolName} className='h-6 ' />
-          {config.schoolName}
-        </h1>
-      </header>
+      <Header />
       <div className='flex h-full overflow-x-auto snap-mandatory snap-x scroll-smooth gap-8 p-4 md:grid md:grid-cols-2 md:gap-4' onScroll={event => {
         const scroll = event.currentTarget.scrollLeft / event.currentTarget.scrollWidth * 2
         if (Math.abs(scroll - Math.round(scroll)) < 10)
@@ -154,20 +123,98 @@ const App = () => {
             <span className='bg-black w-4 h-4 inline-flex rotate-45'></span>
             Bell Times
           </div>
-          <div className='flex gap-1 justify-between items-center'>
-            <span className='text-gray-500'>Today</span>
-            <span className='bg-blue-500 p-2 rounded-full text-white flex items-center gap-2'>
-              <svg viewBox='0 0 16 16' width={16} height={16}>
-                <circle cx={8} cy={8} r={8} className='fill-white' />
-                {[...Array(3)].map((_value, index, array) => <circle
-                  key={index}
-                  className='fill-blue-500'
-                  cx={(4 * Math.cos((2 * Math.PI / array.length * index) - (Math.PI / 2))) + 8}
-                  cy={(4 * Math.sin((2 * Math.PI / array.length * index) - (Math.PI / 2))) + 8}
-                  r={2.5}
-                />)}
-              </svg>
-              Showing Monday bell times.
+          <div className='flex gap-1 justify-between items-center border-b pb-2'>
+            <span className='flex items-center gap-2'>
+              <span className='text-gray-500'>Today</span>
+              <button
+                className='bg-black text-white flex p-2 pr-3 gap-2 items-center rounded-full'
+                onClick={() => {
+                  setBells(previous => {
+                    const bells = [...previous],
+                          // eslint-disable-next-line sort-vars
+                          bell = {
+                            name: `New Bell ${bells.length}`,
+                            time: {
+                              hour  : Math.floor(Math.random() * 24),
+                              minute: Math.floor(Math.random() * 60)
+                            }
+                          },
+                          byteArray = [],
+                          encoder = new TextEncoder()
+                    bells.push(bell)
+                    byteArray.push(encoder.encode(bell.name).length)
+                    byteArray.push(...encoder.encode(bell.name))
+                    byteArray.push(bell.time.hour)
+                    byteArray.push(bell.time.minute)
+
+                    fetch('/api/v1/timetable', {
+                      body  : new Uint8ClampedArray(byteArray),
+                      method: 'POST'
+                    })
+
+                    return bells
+                  })
+                }}
+              >
+                <svg viewBox='0 0 16 16' width={16} height={16}>
+                  <circle cx={8} cy={8} r={8} className='fill-white' />
+                  <path d='
+                    M 8 2.5
+                    q 1.25 0 1.25 1.25
+                    v 3
+                    h 3
+                    q 1.25 0 1.25 1.25
+                    t -1.25 1.25
+                    h -3
+                    v 3
+                    q 0 1.25 -1.25 1.25
+                    t -1.25 -1.25
+                    v -3
+                    h -3
+                    q -1.25 0 -1.25 -1.25
+                    t 1.25 -1.25
+                    h 3
+                    v -3
+                    q 0 -1.25 1.25 -1.25
+                    z'/>
+                </svg>
+                Add Bell
+              </button>
+            </span>
+            <span className='items-center flex gap-2'>
+              {
+                bells.length === 0
+                  ? <span className='bg-red-500 p-2 rounded-full text-white flex items-center gap-2'>
+                      <svg viewBox='0 0 16 16' width={16} height={16}>
+                        <circle cx={8} cy={8} r={8} className='fill-white' />
+                        <circle cx={8} cy={12} r={2} className='fill-red-500' />
+                        <path d='
+                          M 8 2
+                          q 2 0 2 2
+                          v 3
+                          q 0 2 -2 2
+                          t -2 -2
+                          v -3
+                          q 0 -2 2 -2
+                          z' className='fill-red-500'/>
+                      </svg>
+                      No bells found.
+                    </span>
+                  : null
+              }
+              <span className='bg-blue-500 p-2 rounded-full text-white flex items-center gap-2'>
+                <svg viewBox='0 0 16 16' width={16} height={16}>
+                  <circle cx={8} cy={8} r={8} className='fill-white' />
+                  {[...Array(3)].map((_value, index, array) => <circle
+                    key={index}
+                    className='fill-blue-500'
+                    cx={(4 * Math.cos((2 * Math.PI / array.length * index) - (Math.PI / 2))) + 8}
+                    cy={(4 * Math.sin((2 * Math.PI / array.length * index) - (Math.PI / 2))) + 8}
+                    r={2.5}
+                  />)}
+                </svg>
+                Showing Monday bell times.
+              </span>
             </span>
           </div>
           <ul className='flex flex-col gap-4 overflow-y-auto rounded-2xl'>
@@ -200,7 +247,7 @@ const App = () => {
 
                         fetch('/api/v1/timetable', {
                           body  : byteArray,
-                          method: 'POST'
+                          method: 'PATCH'
                         })
 
                         return next
@@ -208,11 +255,11 @@ const App = () => {
                     }}
                   >
                     {
-                      [...Array(12)].map((_value, index) => <option
+                      [...Array(24)].map((_value, index) => <option
                         key={index}
-                        value={index + 1}
+                        value={index}
                       >
-                        {index + 1}
+                        {index}
                       </option>)
                     }
                   </select>
@@ -241,7 +288,7 @@ const App = () => {
 
                         fetch('/api/v1/timetable', {
                           body  : byteArray,
-                          method: 'POST'
+                          method: 'PATCH'
                         })
 
                         return next
