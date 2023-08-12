@@ -1083,6 +1083,7 @@ dependencies = [
 name = "subjective-assembly"
 version = "0.1.0"
 dependencies = [
+ "rand",
  "rocket",
 ]
 

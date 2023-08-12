@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
 import { DateTime } from 'luxon'
 import Footer from 'Footer'
 import config from 'config.json'
@@ -21,7 +21,7 @@ type Bell = {
 }
 
 const App = () => {
-  const bells: Bell[] = [
+  const [ bells, setBells ]: [Bell[], Dispatch<SetStateAction<Bell[]>>] = useState([
     {
       name: 'Period 1',
       time: {
@@ -78,29 +78,33 @@ const App = () => {
         minute: 38
       }
     }
-  ],
-        notices: Notice[] = [
-          {
-            content : 'D13 & D14 classes will be running in B2 as carpets are replaced.',
-            priority: true,
-            time    : 'Today',
-            title   : 'D Block Room Changes'
-          },
-          {
-            content : 'French will be off today due to a Year 11 excursion occuring. See you next week!',
-            priority: false,
-            time    : 'Until 12th September',
-            title   : 'French Club'
-          },
-          {
-            content : 'Meeting tomorrow lunch in TLC for Year 9 will be running outlining the subject selection process for 2024.',
-            priority: false,
-            time    : 'Until tomorrow',
-            title   : 'Y9 2024 Subject Selection'
-          }
-        ],
+  ]),
+        [ notices, setNotices ]: [Notice[], Dispatch<SetStateAction<Notice[]>>] = useState<Notice[]>([]),
         [ active, setActive ] = useState(0),
         scroll = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    setNotices([
+      {
+        content : 'D13 & D14 classes will be running in B2 as carpets are replaced.',
+        priority: true,
+        time    : 'Today',
+        title   : 'D Block Room Changes'
+      },
+      {
+        content : 'French will be off today due to a Year 11 excursion occuring. See you next week!',
+        priority: false,
+        time    : 'Until 12th September',
+        title   : 'French Club'
+      },
+      {
+        content : 'Meeting tomorrow lunch in TLC for Year 9 will be running outlining the subject selection process for 2024.',
+        priority: false,
+        time    : 'Until tomorrow',
+        title   : 'Y9 2024 Subject Selection'
+      }
+    ])
+  }, [])
   return <>
     <div className='py-4 bg-gray-50 h-full flex flex-col gap-4 font-semibold tracking-tighter leading-none md:pb-0'>
       <header className='text-center flex flex-col shrink grow-0 basis-auto'>
@@ -171,12 +175,38 @@ const App = () => {
               bells.map((bell, index) => <div className='border rounded-2xl p-4 flex justify-between items-center' key={index}>
                 <span>{bell.name}</span>
                 <div className='flex gap-1 items-center bg-gray-200 rounded-lg p-2'>
-                  <select className='appearance-none bg-gray-200' defaultValue={
-                    DateTime
-                      .fromObject(bell.time)
-                      .toLocaleString({ hour: 'numeric' })
-                      .split(' ')[0]
-                  }>
+                  <select
+                    className='appearance-none bg-gray-200'
+                    defaultValue={
+                      DateTime
+                        .fromObject(bell.time)
+                        .toLocaleString({ hour: 'numeric' })
+                        .split(' ')[0]
+                    }
+                    onChange={event => {
+                      setBells(previous => {
+                        const bytes: number[] = [],
+                              encoder = new TextEncoder(),
+                              // eslint-disable-next-line sort-vars
+                              encodedName = encoder.encode(bells[index].name),
+                              next = [...previous]
+                        next[index].time.hour = parseInt(event.target.value, 10)
+                        bytes.push(encodedName.length)
+                        bytes.push(...encodedName)
+                        bytes.push(0)
+                        bytes.push(next[index].time.hour)
+                        // eslint-disable-next-line one-var
+                        const byteArray = new Uint8ClampedArray(bytes)
+
+                        fetch('/api/v1/timetable', {
+                          body  : byteArray,
+                          method: 'POST'
+                        })
+
+                        return next
+                      })
+                    }}
+                  >
                     {
                       [...Array(12)].map((_value, index) => <option
                         key={index}
@@ -187,11 +217,37 @@ const App = () => {
                     }
                   </select>
                   :
-                  <select className='appearance-none bg-gray-200' defaultValue={
-                    DateTime
-                      .fromObject(bell.time)
-                      .toLocaleString({ minute: '2-digit' })
-                  }>
+                  <select
+                    className='appearance-none bg-gray-200'
+                    defaultValue={
+                      DateTime
+                        .fromObject(bell.time)
+                        .toLocaleString({ minute: '2-digit' })
+                    }
+                    onChange={event => {
+                      setBells(previous => {
+                        const bytes: number[] = [],
+                              encoder = new TextEncoder(),
+                              // eslint-disable-next-line sort-vars
+                              encodedName = encoder.encode(bells[index].name),
+                              next = [...previous]
+                        next[index].time.minute = parseInt(event.target.value, 10)
+                        bytes.push(encodedName.length)
+                        bytes.push(...encodedName)
+                        bytes.push(1)
+                        bytes.push(next[index].time.minute)
+                        // eslint-disable-next-line one-var
+                        const byteArray = new Uint8ClampedArray(bytes)
+
+                        fetch('/api/v1/timetable', {
+                          body  : byteArray,
+                          method: 'POST'
+                        })
+
+                        return next
+                      })
+                    }}
+                  >
                     {
                       [...Array(60)].map((_value, index) => <option
                         key={index}

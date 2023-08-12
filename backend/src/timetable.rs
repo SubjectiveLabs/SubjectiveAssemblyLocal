@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 pub type BellName = String;
 pub type Time = u16;
-pub struct Timetable([u8; 3], HashMap<BellName, Time>);
+pub struct Timetable(pub [u8; 3], pub HashMap<BellName, Time>);
 
 impl Timetable {
     pub fn deserialise(&self) -> Vec<u8> {
