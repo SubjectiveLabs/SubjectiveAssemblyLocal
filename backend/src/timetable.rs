@@ -2,18 +2,23 @@ use std::collections::HashMap;
 
 pub type BellName = String;
 pub type Time = u16;
-pub struct Timetable(pub [u8; 3], pub HashMap<BellName, Time>);
+
+#[derive(Default, Debug, PartialEq, Eq)]
+pub struct Timetable {
+    pub version: [u8; 3],
+    pub timetable: HashMap<BellName, Time>,
+}
 
 impl Timetable {
     pub fn deserialise(&self) -> Vec<u8> {
         let mut bytes = Vec::new();
-        bytes.extend_from_slice(&self.0);
+        bytes.extend_from_slice(&self.version);
         assert!(self
-            .1
+            .timetable
             .keys()
             .all(|name| name.is_ascii() && u8::try_from(name.bytes().len()).is_ok()));
         let timetable = {
-            let mut pairs = self.1.iter().collect::<Vec<_>>();
+            let mut pairs = self.timetable.iter().collect::<Vec<_>>();
             pairs.sort_unstable_by_key(|(_, time)| **time);
             pairs
         };
@@ -36,7 +41,7 @@ impl Timetable {
             let time = u16::from_be_bytes(bytes.next_chunk().unwrap());
             timetable.insert(name, time);
         }
-        Self(version, timetable)
+        Self { version, timetable }
     }
 }
 
@@ -46,10 +51,13 @@ mod tests {
 
     #[test]
     fn test_deserialise() {
-        let mut timetable = Timetable([0; 3], HashMap::new());
-        timetable.1.insert("a".into(), 1);
-        timetable.1.insert("b".into(), 2);
-        timetable.1.insert("c".into(), 3);
+        let mut timetable = Timetable {
+            version: [0; 3],
+            timetable: HashMap::new(),
+        };
+        timetable.timetable.insert("a".into(), 1);
+        timetable.timetable.insert("b".into(), 2);
+        timetable.timetable.insert("c".into(), 3);
         let bytes = timetable.deserialise();
         assert_eq!(bytes, vec![0, 0, 0, 1, 97, 0, 1, 1, 98, 0, 2, 1, 99, 0, 3]);
     }
@@ -58,10 +66,10 @@ mod tests {
     fn test_serialise() {
         let bytes = vec![0, 1, 0, 1, 97, 0, 1, 1, 98, 0, 2, 1, 99, 0, 3];
         let timetable = Timetable::serialise(&bytes);
-        assert_eq!(timetable.0, [0, 1, 0]);
-        assert_eq!(timetable.1.len(), 3);
-        assert_eq!(timetable.1.get("a"), Some(&1));
-        assert_eq!(timetable.1.get("b"), Some(&2));
-        assert_eq!(timetable.1.get("c"), Some(&3));
+        assert_eq!(timetable.version, [0, 1, 0]);
+        assert_eq!(timetable.timetable.len(), 3);
+        assert_eq!(timetable.timetable.get("a"), Some(&1));
+        assert_eq!(timetable.timetable.get("b"), Some(&2));
+        assert_eq!(timetable.timetable.get("c"), Some(&3));
     }
 }
