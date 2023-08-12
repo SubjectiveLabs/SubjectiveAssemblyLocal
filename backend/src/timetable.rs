@@ -42,8 +42,6 @@ impl Timetable {
 
 #[cfg(test)]
 mod tests {
-    use std::fs::write;
-
     use super::*;
 
     #[test]
@@ -53,7 +51,6 @@ mod tests {
         timetable.1.insert("b".into(), 2);
         timetable.1.insert("c".into(), 3);
         let bytes = timetable.deserialise();
-        write("test_out/serialise", bytes.clone()).unwrap();
         assert_eq!(bytes, vec![0, 0, 0, 1, 97, 0, 1, 1, 98, 0, 2, 1, 99, 0, 3]);
     }
 
