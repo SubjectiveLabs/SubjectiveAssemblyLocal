@@ -20,7 +20,6 @@ const ERROR_MESSAGES: &[&str] = &[
 fn not_found() -> String {
     format!(
         "{}
-We couldn't find that page.
 (404 - Not Found)",
         ERROR_MESSAGES.choose(&mut rand::thread_rng()).unwrap()
     )
