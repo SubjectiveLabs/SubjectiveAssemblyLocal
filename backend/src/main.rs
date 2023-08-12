@@ -67,15 +67,15 @@ fn update_timetable(new: &[u8]) -> &'static str {
         if update.update_unit.is_hour() {
             update.update_value
         } else {
-            total_minutes.div_euclid(60) as u8
+            u8::try_from(total_minutes.div_euclid(60)).unwrap()
         },
         if update.update_unit.is_minute() {
             update.update_value
         } else {
-            total_minutes.rem_euclid(60) as u8
+            u8::try_from(total_minutes.rem_euclid(60)).unwrap()
         },
     );
-    *total_minutes = hours as u16 * 60 + minutes as u16;
+    *total_minutes = u16::from(hours) * 60 + u16::from(minutes);
 
     write("static/timetable.stt", timetable.deserialise()).unwrap();
 

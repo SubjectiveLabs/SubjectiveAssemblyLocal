@@ -8,7 +8,7 @@ impl Unit {
     ///
     /// [`Hour`]: Unit::Hour
     #[must_use]
-    pub fn is_hour(&self) -> bool {
+    pub const fn is_hour(&self) -> bool {
         matches!(self, Self::Hour)
     }
 
@@ -16,7 +16,7 @@ impl Unit {
     ///
     /// [`Minute`]: Unit::Minute
     #[must_use]
-    pub fn is_minute(&self) -> bool {
+    pub const fn is_minute(&self) -> bool {
         matches!(self, Self::Minute)
     }
 }
