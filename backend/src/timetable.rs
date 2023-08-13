@@ -11,7 +11,7 @@ pub struct Bell {
 
 impl PartialOrd for Bell {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.time.partial_cmp(&other.time)
+        Some(self.time.cmp(&other.time))
     }
 }
 
