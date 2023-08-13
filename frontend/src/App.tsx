@@ -44,11 +44,8 @@ const App = () => {
               time += byte
             })
 
-            if (!id)
-              return
-
             bells.push({
-              id,
+              id  : id as number,
               name,
               time: {
                 hour  : Math.floor(time / 60),
@@ -98,9 +95,7 @@ const App = () => {
             <span>{notices.length} notices</span>
           </div>
           <ul className='flex flex-col gap-4 overflow-y-auto rounded-2xl'>
-            {
-              notices.map((notice, index) => <Message key={index} notice={notice} />)
-            }
+            {notices.map((notice, index) => <Message key={index} notice={notice} />)}
           </ul>
         </div>
         <div className='border shadow-lg rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full snap-center bg-white'>
@@ -118,7 +113,8 @@ const App = () => {
                     const bells = [...previous],
                           // eslint-disable-next-line sort-vars
                           bell = {
-                            name: `New Bell ${bells.length}`,
+                            id  : bells.length,
+                            name: 'New Bell',
                             time: {
                               hour  : Math.floor(Math.random() * 24),
                               minute: Math.floor(Math.random() * 60)
@@ -128,6 +124,7 @@ const App = () => {
                           encoder = new TextEncoder()
                     bells.push(bell)
                     bells.sort((first, second) => (first.time.hour * 60) + first.time.minute - (second.time.hour * 60) - second.time.minute)
+                    byteArray.push(bell.id)
                     byteArray.push(encoder.encode(bell.name).length)
                     byteArray.push(...encoder.encode(bell.name))
                     byteArray.push(bell.time.hour)
@@ -205,10 +202,13 @@ const App = () => {
           </div>
           <ul className='flex flex-col gap-4 overflow-y-auto rounded-2xl'>
             {
-              bells.map((bell, index) => <div className='border rounded-2xl p-4 flex justify-between items-center' key={bell.name + bell.time + index}>
+              bells.map((bell, index) => <div className='border rounded-2xl p-4 flex justify-between items-center' key={bell.id}>
                 <span className='flex items-center gap-2'>
                   <button className='inline-flex border-red-300 border-2 bg-red-200 p-2 rounded-xl aspect-square'>&#128465;</button>
-                  <span>{bell.name}</span>
+                  <span className='flex flex-col'>
+                    <span className='text-gray-500 font-mono text-xs'>{bell.id}</span>
+                    {bell.name}
+                  </span>
                 </span>
                 <div className='flex gap-1 items-center bg-gray-200 rounded-lg p-2'>
                   <select
@@ -217,21 +217,17 @@ const App = () => {
                     onChange={event => {
                       setBells(previous => {
                         const bytes: number[] = [],
-                              encoder = new TextEncoder(),
-                              // eslint-disable-next-line sort-vars
-                              encodedName = encoder.encode(bells[index].name),
+                              encodedName = new TextEncoder().encode(bells[index].name),
                               next = [...previous]
                         next[index].time.hour = parseInt(event.target.value, 10)
+                        bytes.push(next[index].id)
                         next.sort((first, second) => (first.time.hour * 60) + first.time.minute - (second.time.hour * 60) - second.time.minute)
                         bytes.push(encodedName.length)
                         bytes.push(...encodedName)
-                        bytes.push(0)
                         bytes.push(next[index].time.hour)
-                        // eslint-disable-next-line one-var
-                        const byteArray = new Uint8ClampedArray(bytes)
 
                         fetch('/api/v1/timetable', {
-                          body  : byteArray,
+                          body  : new Uint8ClampedArray(bytes),
                           method: 'PATCH'
                         })
 
@@ -255,21 +251,17 @@ const App = () => {
                     onChange={event => {
                       setBells(previous => {
                         const bytes: number[] = [],
-                              encoder = new TextEncoder(),
-                              // eslint-disable-next-line sort-vars
-                              encodedName = encoder.encode(bells[index].name),
+                              encodedName = new TextEncoder().encode(bells[index].name),
                               next = [...previous]
                         next[index].time.minute = parseInt(event.target.value, 10)
+                        bytes.push(next[index].id)
                         next.sort((first, second) => (first.time.hour * 60) + first.time.minute - (second.time.hour * 60) - second.time.minute)
                         bytes.push(encodedName.length)
                         bytes.push(...encodedName)
-                        bytes.push(1)
-                        bytes.push(next[index].time.minute)
-                        // eslint-disable-next-line one-var
-                        const byteArray = new Uint8ClampedArray(bytes)
+                        bytes.push(next[index].time.minute + 0b1000_0000)
 
                         fetch('/api/v1/timetable', {
-                          body  : byteArray,
+                          body  : new Uint8ClampedArray(bytes),
                           method: 'PATCH'
                         })
 

@@ -5,5 +5,12 @@ export default {
     './src/**/*.tsx'
   ],
   plugins: [],
-  theme  : { extend: { fontFamily: { sans: "'Red Hat Display Bold'" } } }
+  theme  : {
+    extend: {
+      fontFamily: {
+        mono: "'Fira Code Retina'",
+        sans: "'Red Hat Display Bold'"
+      }
+    }
+  }
 }

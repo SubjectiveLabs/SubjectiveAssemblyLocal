@@ -6,3 +6,7 @@
   font-family: 'Red Hat Display Bold';
   src: url('/fonts/RedHatDisplay.ttf');
 }
+@font-face {
+  font-family: 'Fira Code Retina';
+  src: url('/fonts/FiraCodeRetina.ttf');
+}
