@@ -1,5 +1,4 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
-import { DateTime } from 'luxon'
 import Footer from 'Footer'
 import Header from 'components/Header'
 
@@ -142,6 +141,7 @@ const App = () => {
                           byteArray = [],
                           encoder = new TextEncoder()
                     bells.push(bell)
+                    bells.sort((first, second) => (first.time.hour * 60) + first.time.minute - (second.time.hour * 60) - second.time.minute)
                     byteArray.push(encoder.encode(bell.name).length)
                     byteArray.push(...encoder.encode(bell.name))
                     byteArray.push(bell.time.hour)
@@ -219,17 +219,12 @@ const App = () => {
           </div>
           <ul className='flex flex-col gap-4 overflow-y-auto rounded-2xl'>
             {
-              bells.map((bell, index) => <div className='border rounded-2xl p-4 flex justify-between items-center' key={index}>
+              bells.map((bell, index) => <div className='border rounded-2xl p-4 flex justify-between items-center' key={bell.name + bell.time + index}>
                 <span>{bell.name}</span>
                 <div className='flex gap-1 items-center bg-gray-200 rounded-lg p-2'>
                   <select
                     className='appearance-none bg-gray-200'
-                    defaultValue={
-                      DateTime
-                        .fromObject(bell.time)
-                        .toLocaleString({ hour: 'numeric' })
-                        .split(' ')[0]
-                    }
+                    defaultValue={bell.time.hour}
                     onChange={event => {
                       setBells(previous => {
                         const bytes: number[] = [],
@@ -238,6 +233,7 @@ const App = () => {
                               encodedName = encoder.encode(bells[index].name),
                               next = [...previous]
                         next[index].time.hour = parseInt(event.target.value, 10)
+                        next.sort((first, second) => (first.time.hour * 60) + first.time.minute - (second.time.hour * 60) - second.time.minute)
                         bytes.push(encodedName.length)
                         bytes.push(...encodedName)
                         bytes.push(0)
@@ -266,11 +262,7 @@ const App = () => {
                   :
                   <select
                     className='appearance-none bg-gray-200'
-                    defaultValue={
-                      DateTime
-                        .fromObject(bell.time)
-                        .toLocaleString({ minute: '2-digit' })
-                    }
+                    defaultValue={bell.time.minute}
                     onChange={event => {
                       setBells(previous => {
                         const bytes: number[] = [],
@@ -279,6 +271,7 @@ const App = () => {
                               encodedName = encoder.encode(bells[index].name),
                               next = [...previous]
                         next[index].time.minute = parseInt(event.target.value, 10)
+                        next.sort((first, second) => (first.time.hour * 60) + first.time.minute - (second.time.hour * 60) - second.time.minute)
                         bytes.push(encodedName.length)
                         bytes.push(...encodedName)
                         bytes.push(1)
