@@ -2,19 +2,14 @@
 #![allow(clippy::no_effect_underscore_binding)]
 #![feature(iter_next_chunk, slice_take)]
 mod timetable;
-mod patch;
-mod post;
 
+use rand::seq::SliceRandom;
+use rocket::fs::FileServer;
 use std::{
     fs::{write, File},
     io::Read,
 };
-
-use post::Post;
-use rand::seq::SliceRandom;
-use rocket::fs::FileServer;
-use timetable::Timetable;
-use patch::{Unit, Patch};
+use timetable::{Bell, Timetable};
 
 #[macro_use]
 extern crate rocket;
@@ -48,17 +43,21 @@ fn get_timetable() -> Vec<u8> {
 
 #[post("/timetable", data = "<new>")]
 fn post_timetable(new: &[u8]) -> &'static str {
-    let post = {
+    let request = {
         let mut new = new.iter();
+        let id = new.next().unwrap();
         let name_len = new.next().unwrap();
         let name =
             String::from_utf8(new.by_ref().take(*name_len as usize).copied().collect()).unwrap();
         let hours = *new.next().unwrap();
         let minutes = *new.next().unwrap();
-        Post {
-            bell_name: name,
-            bell_time: u16::from(hours) * 60 + u16::from(minutes),
-        }
+        (
+            *id,
+            Bell {
+                name,
+                time: u16::from(hours) * 60 + u16::from(minutes),
+            },
+        )
     };
 
     let mut timetable = {
@@ -70,7 +69,7 @@ fn post_timetable(new: &[u8]) -> &'static str {
         Timetable::serialise(&bytes)
     };
 
-    timetable.timetable.insert(post.bell_name, post.bell_time);
+    timetable.bells.insert(request.0, request.1);
 
     write("static/timetable.stt", timetable.deserialise()).unwrap();
 
@@ -81,20 +80,15 @@ fn post_timetable(new: &[u8]) -> &'static str {
 fn patch_timetable(new: &[u8]) -> &'static str {
     let update = {
         let mut new = new.iter();
+        let id = new.next().unwrap();
         let name_len = new.next().unwrap();
         let name =
             String::from_utf8(new.by_ref().take(*name_len as usize).copied().collect()).unwrap();
-        let unit = match new.next().unwrap() {
-            0 => Unit::Hour,
-            1 => Unit::Minute,
-            _ => unreachable!(),
+        let (unit, time) = {
+            let byte = new.next().unwrap();
+            (byte >> 7, byte & (!(1 << 7)))
         };
-        let value = *new.next().unwrap();
-        Patch {
-            bell_name: name,
-            patch_unit: unit,
-            patch_value: value,
-        }
+        (*id, name, unit, time)
     };
     let mut timetable = {
         let mut bytes = Vec::new();
@@ -105,26 +99,14 @@ fn patch_timetable(new: &[u8]) -> &'static str {
         Timetable::serialise(&bytes)
     };
 
-    let total_minutes = if let Some(total_minutes) = timetable.timetable.get_mut(&update.bell_name)
-    {
-        total_minutes
-    } else {
-        timetable.timetable.insert(update.bell_name.clone(), 0);
-        timetable.timetable.get_mut(&update.bell_name).unwrap()
+    let bell = timetable.bells.get_mut(&update.0).unwrap();
+    bell.name = update.1;
+    let (hours, minutes) = match update.2 {
+        0 => (update.3, u8::try_from(bell.time.rem_euclid(60)).unwrap()),
+        1 => (u8::try_from(bell.time.div_euclid(60)).unwrap(), update.3),
+        _ => unreachable!(),
     };
-    let (hours, minutes) = (
-        if update.patch_unit.is_hour() {
-            update.patch_value
-        } else {
-            u8::try_from(total_minutes.div_euclid(60)).unwrap()
-        },
-        if update.patch_unit.is_minute() {
-            update.patch_value
-        } else {
-            u8::try_from(total_minutes.rem_euclid(60)).unwrap()
-        },
-    );
-    *total_minutes = u16::from(hours) * 60 + u16::from(minutes);
+    bell.time = u16::from(hours) * 60 + u16::from(minutes);
 
     write("static/timetable.stt", timetable.deserialise()).unwrap();
 
@@ -138,6 +120,9 @@ fn rocket() -> _ {
     }
     rocket::build()
         .mount("/app/", FileServer::from("dist"))
-        .mount("/api/v1/", routes![patch_timetable, get_timetable, post_timetable])
+        .mount(
+            "/api/v1/",
+            routes![patch_timetable, get_timetable, post_timetable],
+        )
         .register("/", catchers![not_found])
 }

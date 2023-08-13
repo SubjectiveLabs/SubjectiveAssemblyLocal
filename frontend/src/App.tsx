@@ -1,13 +1,8 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
+import Message, { Notice } from 'Message'
 import Footer from 'Footer'
-import Header from 'components/Header'
+import Header from 'Header'
 
-type Notice = {
-  content: string,
-  priority: boolean,
-  time: string,
-  title: string,
-}
 
 type Time = {
   hour: number
@@ -15,6 +10,7 @@ type Time = {
 }
 
 type Bell = {
+  id: number,
   name: string,
   time: Time,
 }
@@ -37,6 +33,7 @@ const App = () => {
           const bells = []
           while (bytes.length > 0) {
             const decoder = new TextDecoder(),
+                  id = bytes.shift(),
                   name = decoder.decode(new Uint8ClampedArray(bytes.splice(0, bytes.shift()))),
                   timeBytes = new Uint8ClampedArray(bytes.splice(0, 2))
             let time = 0
@@ -47,7 +44,11 @@ const App = () => {
               time += byte
             })
 
+            if (!id)
+              return
+
             bells.push({
+              id,
               name,
               time: {
                 hour  : Math.floor(time / 60),
@@ -98,22 +99,7 @@ const App = () => {
           </div>
           <ul className='flex flex-col gap-4 overflow-y-auto rounded-2xl'>
             {
-              notices.map((notice, index) => <div className='border rounded-2xl p-4' key={index}>
-                <h2 className='font-bold flex gap-1 items-center'>
-                  {
-                    notice.priority && <span className='text-red-400 flex items-center gap-1'>
-                      <span className='font-extrabold text-xl'>!</span>
-                    Priority
-                    </span>
-                  }
-                  {notice.title}
-                </h2>
-                <p className='text-gray-600 text-xm'>{notice.content}</p>
-                <span className='text-gray-400 text-sm flex gap-1 items-center'>
-                  <span className='bg-gray-400 w-3 h-3 inline-flex rounded-full'></span>
-                  {notice.time}
-                </span>
-              </div>)
+              notices.map((notice, index) => <Message key={index} notice={notice} />)
             }
           </ul>
         </div>
@@ -220,7 +206,10 @@ const App = () => {
           <ul className='flex flex-col gap-4 overflow-y-auto rounded-2xl'>
             {
               bells.map((bell, index) => <div className='border rounded-2xl p-4 flex justify-between items-center' key={bell.name + bell.time + index}>
-                <span>{bell.name}</span>
+                <span className='flex items-center gap-2'>
+                  <button className='inline-flex border-red-300 border-2 bg-red-200 p-2 rounded-xl aspect-square'>&#128465;</button>
+                  <span>{bell.name}</span>
+                </span>
                 <div className='flex gap-1 items-center bg-gray-200 rounded-lg p-2'>
                   <select
                     className='appearance-none bg-gray-200'
