@@ -37,7 +37,6 @@ impl Timetable {
             pairs
         };
 
-        dbg!(timetable.clone());
         for (id, Bell { name, time }) in timetable {
             bytes.push(*id);
             bytes.push(u8::try_from(name.as_bytes().len()).unwrap());

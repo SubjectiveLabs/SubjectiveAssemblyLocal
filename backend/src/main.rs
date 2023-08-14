@@ -80,7 +80,6 @@ fn post_timetable(new: &[u8]) -> &'static str {
 
 #[patch("/timetable", data = "<new>")]
 fn patch_timetable(new: &[u8]) -> &'static str {
-    dbg!(new);
     let update = {
         fn bit_array_to_byte(array: [bool; 8], skip: usize) -> u8 {
             array
@@ -117,7 +116,6 @@ fn patch_timetable(new: &[u8]) -> &'static str {
             },
         }
     };
-    dbg!(&update);
     let mut timetable = {
         let mut bytes = Vec::new();
         File::open("static/timetable.stt")
