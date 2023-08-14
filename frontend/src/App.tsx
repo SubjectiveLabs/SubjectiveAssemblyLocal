@@ -204,7 +204,24 @@ const App = () => {
             {
               bells.map((bell, index) => <div className='border rounded-2xl p-4 flex gap-4' key={bell.id}>
                 <span className='flex items-center gap-4 grow shrink-0 basis-auto'>
-                  <button className='inline-flex border-red-300 border-2 bg-red-200 p-2 rounded-xl aspect-square'>&#128465;</button>
+                  <button
+                    className='inline-flex border-red-300 border-2 bg-red-200 p-2 rounded-xl aspect-square'
+                    onClick={() => {
+                      setBells(previous => {
+                        const bytes: number[] = [],
+                              next = [...previous]
+                        bytes.push(next[index].id)
+                        fetch('/api/v1/timetable', {
+                          body  : new Uint8ClampedArray(bytes),
+                          method: 'DELETE'
+                        })
+                        next.splice(next.findIndex(thisBell => thisBell.id === bell.id), 1)
+                        return next
+                      })
+                    }}
+                  >
+                    &#128465;
+                  </button>
                   <span className='flex flex-col grow shrink-0 basis-auto'>
                     <label className='text-gray-500 font-mono text-xs'>{bell.id}</label>
                     <span className='flex items-center'>

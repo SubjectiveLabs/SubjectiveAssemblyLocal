@@ -4,7 +4,7 @@
 mod patch;
 mod timetable;
 
-use patch::{Patch, Data, Time};
+use patch::{Data, Patch, Time};
 use rand::seq::SliceRandom;
 use rocket::fs::FileServer;
 use std::{
@@ -84,9 +84,15 @@ fn patch_timetable(new: &[u8]) -> &'static str {
         fn bit_array_to_byte(array: [bool; 8], skip: usize) -> u8 {
             array
                 .iter()
-                .skip(skip)
                 .enumerate()
-                .map(|(index, bit)| if *bit { 1 << index } else { 0 })
+                .map(|(index, bit)| {
+                    if *bit {
+                        1 << (array.len() - 1 - index)
+                    } else {
+                        0
+                    }
+                })
+                .skip(skip)
                 .sum()
         }
         let mut new = new.iter();
@@ -100,12 +106,8 @@ fn patch_timetable(new: &[u8]) -> &'static str {
         Patch {
             id: *id,
             data: match next_byte {
-                [true, true, ..] => {
-                    Data::Time(Time::Minute(bit_array_to_byte(next_byte, 2)))
-                }
-                [true, false, ..] => {
-                    Data::Time(Time::Hour(bit_array_to_byte(next_byte, 2)))
-                }
+                [true, true, ..] => Data::Time(Time::Minute(bit_array_to_byte(next_byte, 2))),
+                [true, false, ..] => Data::Time(Time::Hour(bit_array_to_byte(next_byte, 2))),
                 [false, ..] => {
                     let name_len = bit_array_to_byte(next_byte, 1);
                     Data::Name(
@@ -116,6 +118,7 @@ fn patch_timetable(new: &[u8]) -> &'static str {
             },
         }
     };
+
     let mut timetable = {
         let mut bytes = Vec::new();
         File::open("static/timetable.stt")
@@ -141,6 +144,24 @@ fn patch_timetable(new: &[u8]) -> &'static str {
     "done!"
 }
 
+#[delete("/timetable", data = "<id>")]
+fn delete_timetable(id: &[u8]) -> &'static str {
+    let mut timetable = {
+        let mut bytes = Vec::new();
+        File::open("static/timetable.stt")
+            .unwrap()
+            .read_to_end(&mut bytes)
+            .unwrap();
+        Timetable::serialise(&bytes)
+    };
+
+    timetable.bells.remove(&id[0]).unwrap();
+
+    write("static/timetable.stt", timetable.deserialise()).unwrap();
+
+    "done!"
+}
+
 #[launch]
 fn rocket() -> _ {
     if File::open("static/timetable.stt").is_err() {
@@ -150,7 +171,12 @@ fn rocket() -> _ {
         .mount("/app/", FileServer::from("dist"))
         .mount(
             "/api/v1/",
-            routes![patch_timetable, get_timetable, post_timetable],
+            routes![
+                patch_timetable,
+                get_timetable,
+                post_timetable,
+                delete_timetable
+            ],
         )
         .register("/", catchers![not_found])
 }
