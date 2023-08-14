@@ -37,10 +37,10 @@ impl Timetable {
             pairs
         };
 
+        dbg!(timetable.clone());
         for (id, Bell { name, time }) in timetable {
             bytes.push(*id);
-            #[allow(clippy::cast_possible_truncation)]
-            bytes.push(name.as_bytes().len() as u8);
+            bytes.push(u8::try_from(name.as_bytes().len()).unwrap());
             bytes.extend_from_slice(name.as_bytes());
             bytes.extend_from_slice(&time.to_be_bytes());
         }

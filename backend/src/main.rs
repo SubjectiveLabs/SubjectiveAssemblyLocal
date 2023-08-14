@@ -1,8 +1,10 @@
 #![warn(clippy::pedantic, clippy::nursery)]
 #![allow(clippy::no_effect_underscore_binding)]
 #![feature(iter_next_chunk, slice_take)]
+mod patch;
 mod timetable;
 
+use patch::{Patch, Data, Time};
 use rand::seq::SliceRandom;
 use rocket::fs::FileServer;
 use std::{
@@ -78,18 +80,44 @@ fn post_timetable(new: &[u8]) -> &'static str {
 
 #[patch("/timetable", data = "<new>")]
 fn patch_timetable(new: &[u8]) -> &'static str {
+    dbg!(new);
     let update = {
+        fn bit_array_to_byte(array: [bool; 8], skip: usize) -> u8 {
+            array
+                .iter()
+                .skip(skip)
+                .enumerate()
+                .map(|(index, bit)| if *bit { 1 << index } else { 0 })
+                .sum()
+        }
         let mut new = new.iter();
         let id = new.next().unwrap();
-        let name_len = new.next().unwrap();
-        let name =
-            String::from_utf8(new.by_ref().take(*name_len as usize).copied().collect()).unwrap();
-        let (unit, time) = {
-            let byte = new.next().unwrap();
-            (byte >> 7, byte & (!(1 << 7)))
-        };
-        (*id, name, unit, time)
+        let next_byte = new.next().unwrap();
+        let next_byte: [_; 8] = (0..8)
+            .map(|index| ((next_byte >> index) & 1) == 1)
+            .rev()
+            .next_chunk()
+            .unwrap();
+        Patch {
+            id: *id,
+            data: match next_byte {
+                [true, true, ..] => {
+                    Data::Time(Time::Minute(bit_array_to_byte(next_byte, 2)))
+                }
+                [true, false, ..] => {
+                    Data::Time(Time::Hour(bit_array_to_byte(next_byte, 2)))
+                }
+                [false, ..] => {
+                    let name_len = bit_array_to_byte(next_byte, 1);
+                    Data::Name(
+                        String::from_utf8(new.by_ref().take(name_len as usize).copied().collect())
+                            .unwrap(),
+                    )
+                }
+            },
+        }
     };
+    dbg!(&update);
     let mut timetable = {
         let mut bytes = Vec::new();
         File::open("static/timetable.stt")
@@ -99,14 +127,16 @@ fn patch_timetable(new: &[u8]) -> &'static str {
         Timetable::serialise(&bytes)
     };
 
-    let bell = timetable.bells.get_mut(&update.0).unwrap();
-    bell.name = update.1;
-    let (hours, minutes) = match update.2 {
-        0 => (update.3, u8::try_from(bell.time.rem_euclid(60)).unwrap()),
-        1 => (u8::try_from(bell.time.div_euclid(60)).unwrap(), update.3),
-        _ => unreachable!(),
-    };
-    bell.time = u16::from(hours) * 60 + u16::from(minutes);
+    let bell = timetable.bells.get_mut(&update.id).unwrap();
+    match update.data {
+        Data::Time(Time::Hour(hour)) => {
+            bell.time = u16::from(hour) * 60 + bell.time % 60;
+        }
+        Data::Time(Time::Minute(minute)) => {
+            bell.time = bell.time - bell.time % 60 + u16::from(minute);
+        }
+        Data::Name(name) => bell.name = name,
+    }
 
     write("static/timetable.stt", timetable.deserialise()).unwrap();
 
