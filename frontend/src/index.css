@@ -10,3 +10,14 @@
   font-family: 'Fira Code Retina';
   src: url('/fonts/FiraCodeRetina.ttf');
 }
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

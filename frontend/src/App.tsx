@@ -80,7 +80,7 @@ const App = () => {
   return <>
     <div className='py-4 bg-gray-50 h-full flex flex-col gap-4 font-semibold tracking-tighter leading-none md:pb-0'>
       <Header />
-      <div className='flex h-full overflow-x-auto snap-mandatory snap-x scroll-smooth gap-8 p-4 md:grid md:grid-cols-2 md:gap-4' onScroll={event => {
+      <div className='flex h-full overflow-x-auto snap-mandatory snap-x scroll-smooth gap-8 p-4 md:grid md:grid-cols-2 md:gap-4 no-scrollbar' onScroll={event => {
         const scroll = event.currentTarget.scrollLeft / event.currentTarget.scrollWidth * 2
         if (Math.abs(scroll - Math.round(scroll)) < 10)
           setActive(Math.round(scroll))
