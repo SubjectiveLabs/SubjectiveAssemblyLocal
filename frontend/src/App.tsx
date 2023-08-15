@@ -103,7 +103,7 @@ const App = () => {
             <span className='bg-black w-4 h-4 inline-flex rotate-45'></span>
             Bell Times
           </div>
-          <div className='flex gap-1 justify-between items-center border-b pb-2'>
+          <div className='flex gap-2 justify-between border-b pb-2 flex-col xl:flex-row'>
             <span className='flex items-center gap-2'>
               <span className='text-gray-500'>Today</span>
               <button
@@ -164,10 +164,10 @@ const App = () => {
                 Add Bell
               </button>
             </span>
-            <span className='items-center flex gap-2'>
+            <span className='flex gap-2 flex-col lg:flex-row'>
               {
                 bells.length === 0
-                  ? <span className='bg-red-500 p-2 rounded-full text-white flex items-center gap-2'>
+                  ? <span className='bg-rose-500 p-2 rounded-full text-white flex items-center gap-2'>
                       <svg viewBox='0 0 16 16' width={16} height={16}>
                         <circle cx={8} cy={8} r={8} className='fill-white' />
                         <circle cx={8} cy={12} r={2} className='fill-red-500' />
@@ -179,7 +179,7 @@ const App = () => {
                           t -2 -2
                           v -3
                           q 0 -2 2 -2
-                          z' className='fill-red-500'/>
+                          z' className='fill-rose-500' />
                       </svg>
                       No bells found.
                     </span>
