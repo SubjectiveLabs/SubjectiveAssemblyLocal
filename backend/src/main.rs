@@ -1,4 +1,4 @@
-#![warn(clippy::pedantic, clippy::nursery)]
+#![warn(clippy::pedantic, clippy::nursery, clippy::dbg_macro)]
 #![allow(clippy::no_effect_underscore_binding)]
 #![feature(iter_next_chunk, slice_take)]
 mod patch;
@@ -106,8 +106,12 @@ fn patch_timetable(new: &[u8]) -> &'static str {
         Patch {
             id: *id,
             data: match next_byte {
-                [true, true, ..] => Data::Time(Time::Minute(bit_array_to_byte(next_byte, 2))),
-                [true, false, ..] => Data::Time(Time::Hour(bit_array_to_byte(next_byte, 2))),
+                [true, true, ..] => {
+                    Data::Time(Time::Minute(bit_array_to_byte(next_byte, 2)))
+                }
+                [true, false, ..] => {
+                    Data::Time(Time::Hour(bit_array_to_byte(next_byte, 2)))
+                }
                 [false, ..] => {
                     let name_len = bit_array_to_byte(next_byte, 1);
                     Data::Name(
