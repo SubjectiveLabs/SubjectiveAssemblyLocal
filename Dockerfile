@@ -19,4 +19,5 @@ RUN cargo build --release
 EXPOSE 80
 ENV ROCKET_PORT=80
 ENV ROCKET_ADDRESS=0.0.0.0
+LABEL org.opencontainers.image.source https://github.com/circles-png/SubjectiveAssembly
 CMD ["./target/release/subjective-assembly"]
