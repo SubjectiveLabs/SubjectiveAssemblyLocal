@@ -17,9 +17,9 @@ Use this repository to self-host Assembly with the source code.
     subjectiveassembly-server-1  | Rocket has launched from http://0.0.0.0:80
     ```
 
-    The image is [also available on GitHub Packages Container Registry](https://github.com/circles-png/SubjectiveAssembly/pkgs/container/subjective-assembly) as ghcr.io/circles-png/subjective-assembly:latest.
+    The image is [also available on GitHub Packages Container Registry](https://github.com/SubjectiveLabs/SubjectiveAssembly/pkgs/container/subjective-assembly) as ghcr.io/SubjectiveLabs/subjective-assembly:latest.
 
-    Run `docker pull ghcr.io/circles-png/subjective-assembly:latest` to pull the image.
+    Run `docker pull ghcr.io/SubjectiveLabs/subjective-assembly:latest` to pull the image.
 
 3. Connect to the server with Subjective.
     If your school is public on Subjective Discovery, changes to your school'll be reflected to all students of your school on the next cache clear.
