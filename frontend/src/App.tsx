@@ -1,61 +1,99 @@
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
+import { ChangeEvent, Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
+import type { Day, Period, Timetable } from 'timetable'
 import Message, { Notice } from 'Message'
+import Bell from 'Bell'
 import Footer from 'Footer'
 import Header from 'Header'
-
-
-type Time = {
-  hour: number
-  minute: number
-}
-
-type Bell = {
-  id: number,
-  name: string,
-  time: Time,
-}
+import { v4 } from 'uuid'
+import classNames from 'utils/classNames'
 
 const App = () => {
-  const [ bells, setBells ]: [Bell[], Dispatch<SetStateAction<Bell[]>>] = useState<Bell[]>([]),
+  const getDefaultDay = () => {
+    let day = new Date().getDay() - 1
+    if (day === -1)
+      day = 0
+    if (day === 5)
+      day = 4
+    return day
+  },
+        [ timetable, setTimetable ]: [Day[], Dispatch<SetStateAction<Day[]>>] = useState<Day[]>([ [], [], [], [], [] ]),
+        [ day, setDay ] = useState(getDefaultDay()),
         [ notices, setNotices ]: [Notice[], Dispatch<SetStateAction<Notice[]>>] = useState<Notice[]>([]),
         [ active, setActive ] = useState(0),
-        scroll = useRef<HTMLDivElement>(null)
+        [ updateFailed, setUpdateFailed ] = useState(false),
+        scroll = useRef<HTMLDivElement>(null),
+        updateTimetable = () => {
+          setUpdateFailed(false)
+          fetch('/api/v1/timetable').then(response => response.json())
+            .then((data: Timetable) => {
+              setTimetable(data.timetable)
+            })
+            .catch(() => {
+              setUpdateFailed(true)
+            })
+        },
+        postBell = () => {
+          fetch('/api/v1/timetable', {
+            method: 'POST',
+            body  : JSON.stringify({
+              bell: {
+                id    : v4(),
+                name  : 'New Bell',
+                hour  : Math.floor(Math.random() * 24),
+                minute: Math.floor(Math.random() * 60)
+              },
+              day
+            })
+          })
+            .then(updateTimetable)
+        },
+        deleteBell = (period: Period) => {
+          fetch('/api/v1/timetable', {
+            method: 'DELETE',
+            body  : period.bell.id
+          })
+            .then(updateTimetable)
+        },
+        patchMinute = (event: ChangeEvent<HTMLSelectElement>, period: Period) => {
+          fetch('/api/v1/timetable', {
+            method: 'PATCH',
+            body  : JSON.stringify({
+              id    : period.bell.id,
+              name  : period.bell.name,
+              hour  : period.bell.hour,
+              minute: parseInt(event.target.value, 10)
+            })
+          })
+            .then(updateTimetable)
+        },
+        patchHour = (event: ChangeEvent<HTMLSelectElement>, period: Period) => {
+          fetch('/api/v1/timetable', {
+            method: 'PATCH',
+            body  : JSON.stringify({
+              id    : period.bell.id,
+              name  : period.bell.name,
+              hour  : parseInt(event.target.value, 10),
+              minute: period.bell.minute
+            })
+          })
+            .then(updateTimetable)
+        },
+        patchName = (event: ChangeEvent<HTMLInputElement>, period: Period) => {
+          fetch('/api/v1/timetable', {
+            method: 'PATCH',
+            body  : JSON.stringify({
+              id    : period.bell.id,
+              name  : event.target.value,
+              hour  : period.bell.hour,
+              minute: period.bell.minute
+            })
+          })
+            .then(updateTimetable)
+        },
+        days = [ 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday' ]
 
+  useEffect(updateTimetable, [day])
   useEffect(() => {
-    fetch('/api/v1/timetable').then(response => {
-      response.body?.getReader().read()
-        .then(value => {
-          if (!value.value)
-            return
-
-          let bytes = Array.from(value.value)
-          bytes = bytes.slice(3)
-          const bells = []
-          while (bytes.length > 0) {
-            const decoder = new TextDecoder(),
-                  id = bytes.shift(),
-                  name = decoder.decode(new Uint8ClampedArray(bytes.splice(0, bytes.shift()))),
-                  timeBytes = new Uint8ClampedArray(bytes.splice(0, 2))
-            let time = 0
-            timeBytes.forEach(byte => {
-              if (!byte)
-                return
-              time *= 0x100
-              time += byte
-            })
-
-            bells.push({
-              id  : id as number,
-              name,
-              time: {
-                hour  : Math.floor(time / 60),
-                minute: time % 60
-              }
-            })
-          }
-          setBells(bells)
-        })
-    })
     setNotices([
       {
         content : 'D13 & D14 classes will be running in B2 as carpets are replaced.',
@@ -103,41 +141,34 @@ const App = () => {
             <span className='bg-black w-4 h-4 inline-flex rotate-45'></span>
             Bell Times
           </div>
-          <div className='flex gap-2 justify-between border-b pb-2 flex-col xl:flex-row'>
-            <span className='flex items-center gap-2'>
-              <span className='text-gray-500'>Today</span>
+          <div className='flex gap-2 justify-between border-b pb-2 flex-col'>
+            <span className={classNames('flex items-center gap-2 justify-between',
+              updateFailed
+                  ? 'opacity-50 pointer-events-none'
+                  : ''
+            )}>
+              <span className='bg-gray-200 p-2 rounded-xl text-gray-500 flex gap-2'>
+                Day
+                <select
+                  className='appearance-none text-black bg-inherit'
+                  defaultValue={getDefaultDay()}
+                  onChange={event => {
+                    setDay(parseInt(event.target.value, 10))
+                  }}
+                >
+                  {
+                    days.map((day, index) => <option
+                      key={index}
+                      value={index}
+                    >
+                      {day}
+                    </option>)
+                  }
+                </select>
+              </span>
               <button
                 className='bg-black text-white flex p-2 pr-3 gap-2 items-center rounded-full'
-                onClick={() => {
-                  setBells(previous => {
-                    const bells = [...previous],
-                          // eslint-disable-next-line sort-vars
-                          bell = {
-                            id  : bells.length,
-                            name: 'New Bell',
-                            time: {
-                              hour  : Math.floor(Math.random() * 24),
-                              minute: Math.floor(Math.random() * 60)
-                            }
-                          },
-                          byteArray = [],
-                          encoder = new TextEncoder()
-                    bells.push(bell)
-                    bells.sort((first, second) => (first.time.hour * 60) + first.time.minute - (second.time.hour * 60) - second.time.minute)
-                    byteArray.push(bell.id)
-                    byteArray.push(encoder.encode(bell.name).length)
-                    byteArray.push(...encoder.encode(bell.name))
-                    byteArray.push(bell.time.hour)
-                    byteArray.push(bell.time.minute)
-
-                    fetch('/api/v1/timetable', {
-                      body  : new Uint8ClampedArray(byteArray),
-                      method: 'POST'
-                    })
-
-                    return bells
-                  })
-                }}
+                onClick={updateFailed ? undefined : postBell}
               >
                 <svg viewBox='0 0 16 16' width={16} height={16}>
                   <circle cx={8} cy={8} r={8} className='fill-white' />
@@ -164,10 +195,10 @@ const App = () => {
                 Add Bell
               </button>
             </span>
-            <span className='flex gap-2 flex-col lg:flex-row'>
+            <span className='flex gap-2 flex-wrap'>
               {
-                bells.length === 0
-                  ? <span className='bg-rose-500 p-2 rounded-full text-white flex items-center gap-2'>
+                updateFailed
+                  ? <span className='bg-rose-500 p-2 rounded-full text-white inline-flex items-center gap-2'>
                       <svg viewBox='0 0 16 16' width={16} height={16}>
                         <circle cx={8} cy={8} r={8} className='fill-white' />
                         <circle cx={8} cy={12} r={2} className='fill-red-500' />
@@ -181,11 +212,31 @@ const App = () => {
                           q 0 -2 2 -2
                           z' className='fill-rose-500' />
                       </svg>
-                      No bells found.
+                    Failed to get timetable.
                     </span>
                   : null
               }
-              <span className='bg-blue-500 p-2 rounded-full text-white flex items-center gap-2'>
+              {
+                timetable[day].length === 0
+                  ? <span className='bg-rose-500 p-2 rounded-full text-white inline-flex items-center gap-2'>
+                      <svg viewBox='0 0 16 16' width={16} height={16}>
+                        <circle cx={8} cy={8} r={8} className='fill-white' />
+                        <circle cx={8} cy={12} r={2} className='fill-red-500' />
+                        <path d='
+                          M 8 2
+                          q 2 0 2 2
+                          v 3
+                          q 0 2 -2 2
+                          t -2 -2
+                          v -3
+                          q 0 -2 2 -2
+                          z' className='fill-rose-500' />
+                      </svg>
+                    No bells found for {days[day]}.
+                    </span>
+                  : null
+              }
+              <span className='bg-blue-500 p-2 rounded-full text-white inline-flex items-center gap-2'>
                 <svg viewBox='0 0 16 16' width={16} height={16}>
                   <circle cx={8} cy={8} r={8} className='fill-white' />
                   {[...Array(3)].map((_value, index, array) => <circle
@@ -202,115 +253,14 @@ const App = () => {
           </div>
           <ul className='flex flex-col gap-4 overflow-y-auto rounded-2xl'>
             {
-              bells.map((bell, index) => <div className='border rounded-2xl p-4 flex gap-4 items-center' key={bell.id}>
-                <button
-                  className='inline-flex outline-red-300 outline-2 outline -outline-offset-2 bg-red-200 p-2 rounded-xl aspect-square'
-                  onClick={() => {
-                    setBells(previous => {
-                      const bytes: number[] = [],
-                            next = [...previous]
-                      bytes.push(next[index].id)
-                      fetch('/api/v1/timetable', {
-                        body  : new Uint8ClampedArray(bytes),
-                        method: 'DELETE'
-                      })
-                      next.splice(next.findIndex(thisBell => thisBell.id === bell.id), 1)
-                      return next
-                    })
-                  }}
-                >
-                    &#128465;
-                </button>
-                <input
-                  type='text'
-                  defaultValue={bell.name}
-                  className='bg-gray-200 rounded-xl p-1 w-full transition peer duration-300 h-full px-2'
-                  maxLength={127}
-                  required
-                  onChange={event => {
-                    setBells(previous => {
-                      const bytes: number[] = [],
-                            encodedName = new TextEncoder().encode(event.target.value),
-                            next = [...previous]
-                      next[index].name = event.target.value
-                      bytes.push(next[index].id)
-                      bytes.push((encodedName.length & 0b0111_1111))
-                      bytes.push(...encodedName)
-
-                      fetch('/api/v1/timetable', {
-                        body  : new Uint8ClampedArray(bytes),
-                        method: 'PATCH'
-                      })
-
-                      return next
-                    })
-                  }}
-                />
-                <div className='flex gap-1 items-center bg-gray-200 rounded-xl p-2 h-full'>
-                  <select
-                    className='appearance-none bg-gray-200'
-                    defaultValue={bell.time.hour}
-                    onChange={event => {
-                      setBells(previous => {
-                        const bytes: number[] = [],
-                              next = [...previous]
-                        next[index].time.hour = parseInt(event.target.value, 10)
-                        bytes.push(next[index].id)
-                        bytes.push((next[index].time.hour & 0b0011_1111) | 0b1000_0000)
-                        next.sort((first, second) => (first.time.hour * 60) + first.time.minute - (second.time.hour * 60) - second.time.minute)
-
-                        fetch('/api/v1/timetable', {
-                          body  : new Uint8ClampedArray(bytes),
-                          method: 'PATCH'
-                        })
-
-                        return next
-                      })
-                    }}
-                  >
-                    {
-                      [...Array(24)].map((_value, index) => <option
-                        key={index}
-                        value={index}
-                      >
-                        {index}
-                      </option>)
-                    }
-                  </select>
-                  :
-                  <select
-                    className='appearance-none bg-gray-200'
-                    defaultValue={bell.time.minute}
-                    onChange={event => {
-                      setBells(previous => {
-                        const bytes: number[] = [],
-                              next = [...previous]
-                        next[index].time.minute = parseInt(event.target.value, 10)
-                        bytes.push(next[index].id)
-                        bytes.push((next[index].time.minute & 0b0011_1111) | 0b1100_0000)
-                        next.sort((first, second) => (first.time.hour * 60) + first.time.minute - (second.time.hour * 60) - second.time.minute)
-
-                        fetch('/api/v1/timetable', {
-                          body  : new Uint8ClampedArray(bytes),
-                          method: 'PATCH'
-                        })
-
-                        return next
-                      })
-                    }}
-                  >
-                    {
-                      [...Array(60)].map((_value, index) => <option
-                        key={index}
-                        value={index}
-                      >
-                        {index.toString().padStart(2, '0')}
-                      </option>)
-                    }
-                  </select>
-                </div>
-                <span className='text-gray-500 font-mono text-xs'>{bell.id.toString().padStart(3, '0')}</span>
-              </div>)
+              timetable[day].map(period => <Bell
+                deleteBell={deleteBell}
+                key={period.bell.id}
+                patchHour={patchHour}
+                patchMinute={patchMinute}
+                patchName={patchName}
+                period={period}
+              />)
             }
           </ul>
         </div>
