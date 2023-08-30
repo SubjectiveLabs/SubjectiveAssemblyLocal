@@ -2,6 +2,7 @@
   "name": "subjective-assembly",
   "private": true,
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
     "dev": "vite --host",
     "build": "tsc && vite build",
@@ -9,9 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/uuid": "^9.0.2",
     "luxon": "^3.4.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@types/luxon": "^3.3.1",
