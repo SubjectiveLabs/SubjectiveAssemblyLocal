@@ -7,7 +7,7 @@ import Header from 'Header'
 import { v4 } from 'uuid'
 import classNames from 'utils/classNames'
 import Alert from 'components/Alert'
-import { Exclamation, ThreeDots } from 'components/Icons'
+import { Exclamation, Plus, ThreeDots } from 'components/Icons'
 
 const App = () => {
   const getDefaultDay = () => {
@@ -172,28 +172,7 @@ const App = () => {
                 className='bg-black text-white flex p-2 gap-2 items-center rounded-full whitespace-nowrap'
                 onClick={updateFailed ? undefined : postBell}
               >
-                <svg viewBox='0 0 16 16' width={16} height={16}>
-                  <circle cx={8} cy={8} r={8} className='fill-white' />
-                  <path d='
-                    M 8 2.5
-                    q 1.25 0 1.25 1.25
-                    v 3
-                    h 3
-                    q 1.25 0 1.25 1.25
-                    t -1.25 1.25
-                    h -3
-                    v 3
-                    q 0 1.25 -1.25 1.25
-                    t -1.25 -1.25
-                    v -3
-                    h -3
-                    q -1.25 0 -1.25 -1.25
-                    t 1.25 -1.25
-                    h 3
-                    v -3
-                    q 0 -1.25 1.25 -1.25
-                    z'/>
-                </svg>
+                <Plus />
                 Add Bell
               </button>
             </span>
