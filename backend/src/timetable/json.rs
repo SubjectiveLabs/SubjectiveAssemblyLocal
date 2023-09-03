@@ -1,6 +1,6 @@
-use std::path::Path;
+use std::{fs::read_to_string, path::Path};
 
-use anyhow::{Ok, Result};
+use anyhow::Result;
 
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -20,15 +20,11 @@ pub struct Timetable {
 
 impl Timetable {
     pub fn from_path<P: AsRef<Path>>(path: P) -> Result<Self> {
-        let file = std::fs::read_to_string(path)?;
-        let timetable: Self = from_str(&file)?;
-        Ok(timetable)
+        Ok(from_str(&read_to_string(path)?)?)
     }
 
     pub fn save_to_path<P: AsRef<Path>>(&self, path: P) -> Result<()> {
-        let file = to_string(&self)?;
-        write(path, file)?;
-        Ok(())
+        Ok(write(path, to_string(&self)?)?)
     }
 }
 

@@ -3,11 +3,14 @@ import type { Day, Period, Timetable } from 'timetable'
 import Message, { Notice } from 'Message'
 import Bell from 'Bell'
 import Footer from 'Footer'
-import Header from 'Header'
 import { v4 } from 'uuid'
 import classNames from 'utils/classNames'
-import Alert from 'components/Alert'
+import Alert from 'Alert'
 import { Exclamation, Plus, ThreeDots } from 'components/Icons'
+import Loading from 'Loading'
+import Password from 'Password'
+import { SHA256 } from 'crypto-js'
+import Login from 'Login'
 
 const App = () => {
   const getDefaultDay = () => {
@@ -23,6 +26,12 @@ const App = () => {
     [notices, setNotices]: [Notice[], Dispatch<SetStateAction<Notice[]>>] = useState<Notice[]>([]),
     [active, setActive] = useState(0),
     [updateFailed, setUpdateFailed] = useState(false),
+    [loading, setLoading] = useState(true),
+    [loadingItems, setLoadingItems] = useState<string[]>([]),
+    [passwordSet, setPasswordSet] = useState(true),
+    [settingPassword, setSettingPassword] = useState(false),
+    [login, setLogin] = useState(false),
+    [loggingIn, setLoggingIn] = useState(false),
     scroll = useRef<HTMLDivElement>(null),
     updateTimetable = () => {
       setUpdateFailed(false)
@@ -92,10 +101,67 @@ const App = () => {
       })
         .then(updateTimetable)
     },
-    days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
-
+    putPassword = (previous: string, next: string) => {
+      setSettingPassword(true)
+      fetch('/api/v1/auth/password', {
+        method: 'PUT',
+        body: JSON.stringify({
+          old: SHA256(previous).toString(),
+          new: SHA256(next).toString()
+        })
+      })
+        .then(() => {
+          setPasswordSet(true)
+          setSettingPassword(false)
+          addLoadingItem('Password set. Getting token...')
+          fetch(`/api/v1/auth/token?password=${SHA256(next).toString()}`)
+            .then(response => response.text())
+            .then(token => {
+              console.log(token)
+              window.addEventListener('beforeunload', () => {
+                fetch(`/api/v1/auth/token?token=${token}`, {
+                  method: 'DELETE'
+                })
+                .catch(reason => {
+                  console.log(reason)
+                })
+              })
+              setLoading(false)
+            })
+        })
+    },
+    setPassword = (password: string) => {
+      setLoggingIn(true)
+      addLoadingItem('Getting token...')
+      fetch(`/api/v1/auth/token?password=${SHA256(password).toString()}`)
+        .then(response => {
+          setLogin(false)
+          return response.text()
+        })
+        .then(token => {
+          console.log(token)
+          window.addEventListener('beforeunload', () => {
+            fetch(`/api/v1/auth/token?token=${token}`, {
+              method: 'DELETE'
+            })
+            .catch(reason => {
+              console.log(reason)
+            })
+          })
+          setLoading(false)
+        })
+    },
+    days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+    addLoadingItem = (item: string) => {
+      setLoadingItems(previous => {
+        const next = [...previous]
+        next.push(item)
+        return next
+      })
+    }
   useEffect(updateTimetable, [day])
   useEffect(() => {
+    addLoadingItem('Getting notices...')
     setNotices([
       {
         content: 'D13 & D14 classes will be running in B2 as carpets are replaced.',
@@ -116,10 +182,23 @@ const App = () => {
         title: 'Y9 2024 Subject Selection'
       }
     ])
+    addLoadingItem('Done.')
+    addLoadingItem('Checking for password...')
+    fetch('/api/v1/auth/password').then(value => {
+      return value.text()
+    })
+      .then(value => {
+        if (value) {
+          addLoadingItem('Password set. Authenticating...')
+          setLogin(true)
+        } else {
+          addLoadingItem('Password not set. Prompting user...')
+          setPasswordSet(false)
+        }
+      })
   }, [])
   return <>
     <div className='py-4 bg-gray-50 h-full flex flex-col gap-4 font-semibold tracking-tighter leading-none md:pb-0'>
-      <Header />
       <div className='flex h-full overflow-x-auto snap-mandatory snap-x scroll-smooth md:p-4 md:grid md:grid-cols-2 md:gap-4 no-scrollbar' onScroll={event => {
         const scroll = event.currentTarget.scrollLeft / event.currentTarget.scrollWidth * 2
         if (Math.abs(scroll - Math.round(scroll)) < 10)
@@ -217,6 +296,9 @@ const App = () => {
         }} />
       </div>
     </div>
+    <Loading show={loading} items={loadingItems} />
+    <Password show={!passwordSet} inProgress={settingPassword} putPassword={putPassword} />
+    <Login show={login} inProgress={loggingIn} login={setPassword} />
   </>
 }
 

@@ -1,2 +1,2 @@
-pub mod patch;
-pub mod post;
+pub mod config;
+pub mod timetable;

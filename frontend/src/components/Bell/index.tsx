@@ -26,7 +26,7 @@ const Bell = ({ period, deleteBell, patchName, patchHour, patchMinute }:
         setDeleting(true)
       }}
     >
-      &#128465;
+      &#128465
     </button>
     <input
       type='text'
