@@ -21,4 +21,6 @@ jobs:
         node-version: 20.5.1
         cache: 'npm'
         cache-dependency-path: '**/package-lock.json'
-    - run: npm run build
+    - run: |
+        npm i \
+        npm run build
