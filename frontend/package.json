@@ -11,16 +11,16 @@
   },
   "dependencies": {
     "@types/uuid": "^9.0.2",
-    "luxon": "^3.4.0",
+    "luxon": "^3.4.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "@types/luxon": "^3.3.1",
+    "@types/luxon": "^3.3.2",
     "@types/react": "^18.2.21",
     "@types/react-dom": "^18.0.11",
-    "@typescript-eslint/eslint-plugin": "^5.59.0",
+    "@typescript-eslint/eslint-plugin": "^6.5.0",
     "@typescript-eslint/parser": "^5.59.0",
     "@vitejs/plugin-react-swc": "^3.0.0",
     "autoprefixer": "^10.4.15",
