@@ -12,6 +12,8 @@ updates:
       day: "saturday"
     assignees:
       - "circles-png"
+    reviewers:
+      - "circles-png"
     commit-message:
       prefix: "cargo"
       include: "scope"
@@ -21,6 +23,8 @@ updates:
       interval: "weekly"
       day: "saturday"
     assignees:
+      - "circles-png"
+    reviewers:
       - "circles-png"
     commit-message:
       prefix: "npm"
