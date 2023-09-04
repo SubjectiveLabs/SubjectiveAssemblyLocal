@@ -1,28 +1,13 @@
-use std::{
-    convert::Infallible,
-    fs::{read_to_string, write},
-};
+use std::fs::{read_to_string, write};
 
 use rocket::{
     http::Status,
     request::{FromRequest, Outcome},
-    serde::json::Json,
     Request,
 };
 use rocket_okapi::{openapi, OpenApiFromRequest};
-use schemars::JsonSchema;
-use serde::Deserialize;
 
 use crate::PASSWORD_PATH;
-
-#[openapi(tag = "authentication")]
-#[get("/auth/password")]
-pub fn get_password() -> String {
-    match read_to_string(PASSWORD_PATH) {
-        Ok(_) => "\0".to_string(),
-        Err(_) => String::new(),
-    }
-}
 
 #[derive(OpenApiFromRequest)]
 pub struct Password(pub String);
@@ -48,9 +33,8 @@ impl PartialEq<Password> for String {
     }
 }
 
-#[openapi(tag = "authentication")]
-#[put("/auth/password", data = "<new>")]
-#[allow(clippy::ignored_unit_patterns, clippy::needless_pass_by_value)]
+#[openapi]
+#[put("/password", data = "<new>")]
 pub fn put_password(old: Password, new: &str) -> Status {
     fn put_password(new: &str) -> Status {
         if write(PASSWORD_PATH, new).is_err() {
@@ -62,5 +46,14 @@ pub fn put_password(old: Password, new: &str) -> Status {
         Ok(stored) if stored == old => put_password(new),
         Err(_) => put_password(new),
         Ok(_) => Status::Unauthorized,
+    }
+}
+
+#[openapi]
+#[get("/password")]
+pub fn get_password() -> String {
+    match read_to_string(PASSWORD_PATH) {
+        Ok(_) => "\0".to_string(),
+        Err(_) => String::new(),
     }
 }

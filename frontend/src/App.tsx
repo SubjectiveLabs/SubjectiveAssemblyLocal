@@ -1,5 +1,4 @@
-import { ChangeEvent, Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
-import type { Day, Period, Timetable } from 'timetable'
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
 import Message, { Notice } from 'Message'
 import Bell from 'Bell'
 import Footer from 'Footer'
@@ -9,8 +8,9 @@ import Alert from 'Alert'
 import { Exclamation, Plus, ThreeDots } from 'components/Icons'
 import Loading from 'Loading'
 import Password from 'Password'
-import { SHA256 } from 'crypto-js'
 import Login from 'Login'
+import { Agent, School } from 'backend'
+import { SHA256 } from 'crypto-js'
 
 const App = () => {
   const getDefaultDay = () => {
@@ -21,135 +21,27 @@ const App = () => {
       day = 4
     return day
   },
-    [timetable, setTimetable]: [Day[], Dispatch<SetStateAction<Day[]>>] = useState<Day[]>([[], [], [], [], []]),
+    [school, setSchool]: [School, Dispatch<SetStateAction<School>>] = useState<School>({ name: "", bell_times: [[], [], [], [], []] }),
     [day, setDay] = useState(getDefaultDay()),
     [notices, setNotices]: [Notice[], Dispatch<SetStateAction<Notice[]>>] = useState<Notice[]>([]),
     [active, setActive] = useState(0),
     [updateFailed, setUpdateFailed] = useState(false),
     [loading, setLoading] = useState(true),
     [loadingItems, setLoadingItems] = useState<string[]>([]),
-    [passwordSet, setPasswordSet] = useState(true),
-    [settingPassword, setSettingPassword] = useState(false),
-    [login, setLogin] = useState(false),
-    [loggingIn, setLoggingIn] = useState(false),
+    [showPassword, setShowPassword] = useState(false),
+    [waitingForPassword, setWaitingForPassword] = useState(false),
+    [showLogin, setShowLogin] = useState(false),
+    [waitingForLogin, setWaitingForLogin] = useState(false),
+    [password, setPassword] = useState(''),
     scroll = useRef<HTMLDivElement>(null),
-    updateTimetable = () => {
+    agent = new Agent('/api/v1'),
+    get = () => {
       setUpdateFailed(false)
-      fetch('/api/v1/timetable').then(response => response.json())
-        .then((data: Timetable) => {
-          setTimetable(data.timetable)
-        })
-        .catch(() => {
-          setUpdateFailed(true)
-        })
-    },
-    postBell = () => {
-      fetch('/api/v1/timetable', {
-        method: 'POST',
-        body: JSON.stringify({
-          bell: {
-            id: v4(),
-            name: 'New Bell',
-            hour: Math.floor(Math.random() * 24),
-            minute: Math.floor(Math.random() * 60)
-          },
-          day
-        })
+      agent.getSchool().then(school => {
+        setSchool(school)
+      }).catch(() => {
+        setUpdateFailed(true)
       })
-        .then(updateTimetable)
-    },
-    deleteBell = (period: Period) => {
-      fetch('/api/v1/timetable', {
-        method: 'DELETE',
-        body: period.bell.id
-      })
-        .then(updateTimetable)
-    },
-    patchMinute = (event: ChangeEvent<HTMLSelectElement>, period: Period) => {
-      fetch('/api/v1/timetable', {
-        method: 'PATCH',
-        body: JSON.stringify({
-          id: period.bell.id,
-          name: period.bell.name,
-          hour: period.bell.hour,
-          minute: parseInt(event.target.value, 10)
-        })
-      })
-        .then(updateTimetable)
-    },
-    patchHour = (event: ChangeEvent<HTMLSelectElement>, period: Period) => {
-      fetch('/api/v1/timetable', {
-        method: 'PATCH',
-        body: JSON.stringify({
-          id: period.bell.id,
-          name: period.bell.name,
-          hour: parseInt(event.target.value, 10),
-          minute: period.bell.minute
-        })
-      })
-        .then(updateTimetable)
-    },
-    patchName = (event: ChangeEvent<HTMLInputElement>, period: Period) => {
-      fetch('/api/v1/timetable', {
-        method: 'PATCH',
-        body: JSON.stringify({
-          id: period.bell.id,
-          name: event.target.value,
-          hour: period.bell.hour,
-          minute: period.bell.minute
-        })
-      })
-        .then(updateTimetable)
-    },
-    putPassword = (previous: string, next: string) => {
-      setSettingPassword(true)
-      fetch('/api/v1/auth/password', {
-        method: 'PUT',
-        body: JSON.stringify({
-          old: SHA256(previous).toString(),
-          new: SHA256(next).toString()
-        })
-      })
-        .then(() => {
-          setPasswordSet(true)
-          setSettingPassword(false)
-          addLoadingItem('Password set. Getting token...')
-          fetch(`/api/v1/auth/token?password=${SHA256(next).toString()}`)
-            .then(response => response.text())
-            .then(token => {
-              console.log(token)
-              window.addEventListener('beforeunload', () => {
-                fetch(`/api/v1/auth/token?token=${token}`, {
-                  method: 'DELETE'
-                })
-                .catch(reason => {
-                  console.log(reason)
-                })
-              })
-              setLoading(false)
-            })
-        })
-    },
-    setPassword = (password: string) => {
-      setLoggingIn(true)
-      addLoadingItem('Getting token...')
-      fetch(`/api/v1/auth/token?password=${SHA256(password).toString()}`)
-        .then(response => {
-          setLogin(false)
-          return response.text()
-        })
-        .then(token => {
-          console.log(token)
-          window.addEventListener('beforeunload', () => {
-            fetch(`/api/v1/auth/token?token=${token}`, {
-              method: 'DELETE'
-            })
-            .catch(reason => {
-              console.log(reason)
-            })
-          })
-          setLoading(false)
-        })
     },
     days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
     addLoadingItem = (item: string) => {
@@ -159,7 +51,9 @@ const App = () => {
         return next
       })
     }
-  useEffect(updateTimetable, [day])
+  useEffect(() => {
+    get()
+  }, [day])
   useEffect(() => {
     addLoadingItem('Getting notices...')
     setNotices([
@@ -184,16 +78,14 @@ const App = () => {
     ])
     addLoadingItem('Done.')
     addLoadingItem('Checking for password...')
-    fetch('/api/v1/auth/password').then(value => {
-      return value.text()
-    })
-      .then(value => {
-        if (value) {
+    agent.getPassword()
+      .then(exists => {
+        if (exists) {
           addLoadingItem('Password set. Authenticating...')
-          setLogin(true)
+          setShowLogin(true)
         } else {
           addLoadingItem('Password not set. Prompting user...')
-          setPasswordSet(false)
+          setShowPassword(true)
         }
       })
   }, [])
@@ -249,7 +141,20 @@ const App = () => {
               </span>
               <button
                 className='bg-black text-white flex p-2 gap-2 items-center rounded-full whitespace-nowrap'
-                onClick={updateFailed ? undefined : postBell}
+                onClick={updateFailed ? undefined : () => {
+                  const period = {
+                    id: v4(),
+                    name: 'New Bell',
+                    hour: Math.random() * 24,
+                    minute: Math.random() * 60,
+                  }
+                  setSchool(previous => {
+                    const next = { ...previous }
+                    next.bell_times[day].push(period)
+                    return next
+                  })
+                  agent.putSchool(school, password)
+                }}
               >
                 <Plus />
                 Add Bell
@@ -257,14 +162,14 @@ const App = () => {
             </span>
             <span className='flex gap-2 flex-wrap whitespace-nowrap'>
               <Alert
-                text='Failed to get timetable.'
+                text='Failed to get school.'
                 show={updateFailed}
                 colour='bg-rose-500'
                 icon={<Exclamation />}
               />
               <Alert
                 text={`No bells found for ${days[day]}.`}
-                show={timetable[day].length === 0}
+                show={school.bell_times[day].length === 0}
                 colour='bg-rose-500'
                 icon={<Exclamation />}
               />
@@ -278,13 +183,10 @@ const App = () => {
           </div>
           <ul className='flex flex-col gap-4 overflow-y-auto rounded-2xl'>
             {
-              timetable[day].map(period => <Bell
-                deleteBell={deleteBell}
-                key={period.bell.id}
-                patchHour={patchHour}
-                patchMinute={patchMinute}
-                patchName={patchName}
-                period={period}
+              school.bell_times[day].map(period => <Bell
+                key={period.id}
+                bellTime={period}
+                setSchool={setSchool}
               />)
             }
           </ul>
@@ -297,8 +199,29 @@ const App = () => {
       </div>
     </div>
     <Loading show={loading} items={loadingItems} />
-    <Password show={!passwordSet} inProgress={settingPassword} putPassword={putPassword} />
-    <Login show={login} inProgress={loggingIn} login={setPassword} />
+    <Password show={showPassword} inProgress={waitingForPassword} putPassword={next => {
+      setWaitingForPassword(true)
+      agent.putPassword(' ', next).then(() => {
+        setShowPassword(false)
+        setWaitingForPassword(false)
+        setPassword(next)
+        addLoadingItem(`Password set. Hash is ${SHA256(next).toString()}.`)
+        setLoading(false)
+      })
+    }} />
+    <Login show={showLogin} inProgress={waitingForLogin} login={password => {
+      setWaitingForLogin(true)
+      setPassword(password)
+      agent.getSchool().then(school => {
+        agent.putSchool(school, password).then(() => {
+          addLoadingItem(`Password set. Hash is ${SHA256(password).toString()}.`)
+          setLoading(false)
+          setShowLogin(false)
+        }).catch(() => {
+          addLoadingItem('Wrong password.')
+        })
+      })
+    }} />
   </>
 }
 

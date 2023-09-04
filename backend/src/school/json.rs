@@ -5,14 +5,26 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_json::{from_str, to_string};
 use std::fs::write;
+use uuid::Uuid;
 
-#[derive(Serialize, Deserialize, Default, JsonSchema, Debug, Clone)]
-pub struct Config {
-    pub school_name: String,
-    pub school_icon_path: String,
+type Day = Vec<BellTime>;
+
+#[derive(Serialize, Deserialize, Default, JsonSchema)]
+pub struct BellTime {
+    pub id: Uuid,
+    pub name: String,
+    pub hour: u8,
+    pub minute: u8,
+    pub location: Option<String>,
 }
 
-impl Config {
+#[derive(Serialize, Deserialize, Default, JsonSchema)]
+pub struct School {
+    pub name: String,
+    pub bell_times: [Day; 5],
+}
+
+impl School {
     pub fn from_path<P: AsRef<Path>>(path: P) -> Result<Self> {
         Ok(from_str(&read_to_string(path)?)?)
     }

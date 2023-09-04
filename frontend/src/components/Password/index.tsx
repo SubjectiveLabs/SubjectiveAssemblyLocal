@@ -2,7 +2,7 @@ import { Clock } from "react-svg-spinners"
 import classNames from "classNames"
 import { useState } from "react"
 
-const Password = ({ show, inProgress, putPassword }: { show: boolean, inProgress: boolean, putPassword: (previous: string, next: string) => void }) => {
+const Password = ({ show, inProgress, putPassword }: { show: boolean, inProgress: boolean, putPassword: (next: string) => void }) => {
   const [password, setPassword] = useState<string>('')
   return <div className={classNames(
     'w-full h-full absolute top-0 left-0 z-20 backdrop-blur-3xl grid place-content-center transition duration-1000',
@@ -29,7 +29,7 @@ const Password = ({ show, inProgress, putPassword }: { show: boolean, inProgress
         )}
         onClick={() => {
           if (password && !inProgress)
-            putPassword('', password)
+            putPassword(password)
         }}
       >
         Set Password

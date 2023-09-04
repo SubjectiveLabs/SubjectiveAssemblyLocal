@@ -5,30 +5,25 @@
     clippy::unwrap_used,
     clippy::expect_used
 )]
-#![allow(clippy::no_effect_underscore_binding, clippy::module_name_repetitions)]
+#![allow(
+    clippy::no_effect_underscore_binding,
+    clippy::module_name_repetitions,
+    clippy::needless_pass_by_value,
+    clippy::ignored_unit_patterns
+)]
 #![feature(iter_next_chunk, slice_take)]
 mod auth;
-mod bell;
-mod config;
 mod methods;
-mod timetable;
+mod school;
 
 use anyhow::{anyhow, Result};
 use auth::{
     get_password, okapi_add_operation_for_get_password_, okapi_add_operation_for_put_password_,
     put_password,
 };
-use methods::{
-    config::{
-        get::{get_config, okapi_add_operation_for_get_config_},
-        put::{okapi_add_operation_for_put_config_, put_config},
-    },
-    timetable::{
-        delete::{delete_timetable, okapi_add_operation_for_delete_timetable_},
-        get::{get_timetable, okapi_add_operation_for_get_timetable_},
-        patch::{okapi_add_operation_for_patch_timetable_, patch_timetable},
-        post::{okapi_add_operation_for_post_timetable_, post_timetable},
-    },
+use methods::school::{
+    get::{get_school, okapi_add_operation_for_get_school_},
+    put::{okapi_add_operation_for_put_school_, put_school},
 };
 use rand::seq::SliceRandom;
 use rocket::{fs::FileServer, http::Status, Request};
@@ -38,8 +33,7 @@ use rocket_okapi::{
 };
 use serde_json::to_string;
 use std::fs::write;
-use timetable::json::School;
-use uuid::Uuid;
+use school::json::School;
 
 #[macro_use]
 extern crate rocket;
@@ -51,10 +45,8 @@ const ERROR_MESSAGES: &[&str] = &[
     "This is not the page you're looking for.",
     "This is awkward.",
 ];
-const TIMETABLE_PATH: &str = "static/timetable";
-const CONFIG_PATH: &str = "static/config";
+const SCHOOL_PATH: &str = "static/school";
 const PASSWORD_PATH: &str = "static/password";
-const SECRET_PATH: &str = "static/secret";
 
 #[catch(default)]
 fn catch_default(status: Status, _request: &Request) -> String {
@@ -70,25 +62,18 @@ fn catch_default(status: Status, _request: &Request) -> String {
 
 #[main]
 async fn main() -> Result<()> {
-    if School::from_path(TIMETABLE_PATH).is_err() {
-        if let Err(error) = write(TIMETABLE_PATH, to_string(&School::default())?) {
-            return Err(anyhow!("Failed to create timetable file: {}", error));
+    if School::from_path(SCHOOL_PATH).is_err() {
+        if let Err(error) = write(SCHOOL_PATH, to_string(&School::default())?) {
+            return Err(anyhow!("Failed to create school file: {}", error));
         }
-    }
-    if let Err(error) = write(SECRET_PATH, Uuid::new_v4()) {
-        return Err(anyhow!("Failed to create secret file: {}", error));
     }
     let mut rocket = rocket::build()
         .mount("/app/", FileServer::from("dist"))
         .mount(
             "/api/v1/",
             openapi_get_routes![
-                get_timetable,
-                post_timetable,
-                patch_timetable,
-                delete_timetable,
-                get_config,
-                put_config,
+                get_school,
+                put_school,
                 get_password,
                 put_password,
             ],
