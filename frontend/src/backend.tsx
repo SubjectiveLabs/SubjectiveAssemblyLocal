@@ -1,5 +1,6 @@
 import { SHA256 } from "crypto-js";
 import { createContext } from "react";
+import { encrypt } from "utils/hash";
 
 export type Day = BellTime[];
 export type BellTime = {
@@ -55,7 +56,7 @@ export const Agent = function (this: Agent, url: string) {
       headers: {
         'X-Assembly-Password': SHA256(previous).toString(),
       },
-      body: SHA256(next).toString()
+      body: (await encrypt(next))
     })).ok)
       throw new Error()
   }

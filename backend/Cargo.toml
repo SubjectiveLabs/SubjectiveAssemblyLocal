@@ -11,6 +11,7 @@ path = "src/main.rs"
 
 [dependencies]
 anyhow = "1.0.75"
+bcrypt = "0.15.0"
 hmac = "0.12.1"
 jwt = "0.16.0"
 okapi = { version = "=0.7.0-rc.1" }

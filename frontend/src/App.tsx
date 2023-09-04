@@ -10,7 +10,6 @@ import Loading from 'Loading'
 import Password from 'Password'
 import Login from 'Login'
 import { Agent, AgentContext, School } from 'backend'
-import { SHA256 } from 'crypto-js'
 
 export const AppContext = createContext<[School, Dispatch<SetStateAction<School>>, string]>
   ({} as [School, Dispatch<SetStateAction<School>>, string])
@@ -207,7 +206,7 @@ const App = () => {
         setShowPassword(false)
         setWaitingForPassword(false)
         setPassword(next)
-        addLoadingItem(`Password set. Hash is ${SHA256(next).toString()}.`)
+        addLoadingItem('Password set.')
         setLoading(false)
       })
     }} />
@@ -216,7 +215,7 @@ const App = () => {
       setPassword(password)
       agent.getSchool().then(school => {
         agent.putSchool(school, password).then(() => {
-          addLoadingItem(`Password set. Hash is ${SHA256(password).toString()}.`)
+          addLoadingItem('Password set.')
           setLoading(false)
           setShowLogin(false)
         }).catch(() => {

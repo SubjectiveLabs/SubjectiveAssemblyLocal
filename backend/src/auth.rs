@@ -1,5 +1,6 @@
 use std::fs::{read_to_string, write};
 
+use bcrypt::verify;
 use rocket::{
     http::Status,
     request::{FromRequest, Outcome},
@@ -33,6 +34,12 @@ impl PartialEq<Password> for String {
     }
 }
 
+impl AsRef<[u8]> for Password {
+    fn as_ref(&self) -> &[u8] {
+        self.0.as_bytes()
+    }
+}
+
 #[openapi]
 #[put("/password", data = "<new>")]
 pub fn put_password(old: Password, new: &str) -> Status {
@@ -43,7 +50,7 @@ pub fn put_password(old: Password, new: &str) -> Status {
         Status::Ok
     }
     match read_to_string(PASSWORD_PATH) {
-        Ok(stored) if stored == old => put_password(new),
+        Ok(stored) if matches!(verify(old, &stored), Ok(true)) => put_password(new),
         Err(_) => put_password(new),
         Ok(_) => Status::Unauthorized,
     }
