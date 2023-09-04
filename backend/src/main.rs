@@ -15,9 +15,8 @@ mod timetable;
 
 use anyhow::{anyhow, Result};
 use auth::{
-    delete_token, get_password, get_token, okapi_add_operation_for_delete_token_,
-    okapi_add_operation_for_get_password_, okapi_add_operation_for_get_token_,
-    okapi_add_operation_for_put_password_, put_password,
+    get_password, okapi_add_operation_for_get_password_, okapi_add_operation_for_put_password_,
+    put_password,
 };
 use methods::{
     config::{
@@ -39,7 +38,7 @@ use rocket_okapi::{
 };
 use serde_json::to_string;
 use std::fs::write;
-use timetable::json::Timetable;
+use timetable::json::School;
 use uuid::Uuid;
 
 #[macro_use]
@@ -56,7 +55,6 @@ const TIMETABLE_PATH: &str = "static/timetable";
 const CONFIG_PATH: &str = "static/config";
 const PASSWORD_PATH: &str = "static/password";
 const SECRET_PATH: &str = "static/secret";
-const TOKEN_PATH: &str = "static/token";
 
 #[catch(default)]
 fn catch_default(status: Status, _request: &Request) -> String {
@@ -72,8 +70,8 @@ fn catch_default(status: Status, _request: &Request) -> String {
 
 #[main]
 async fn main() -> Result<()> {
-    if Timetable::from_path(TIMETABLE_PATH).is_err() {
-        if let Err(error) = write(TIMETABLE_PATH, to_string(&Timetable::default())?) {
+    if School::from_path(TIMETABLE_PATH).is_err() {
+        if let Err(error) = write(TIMETABLE_PATH, to_string(&School::default())?) {
             return Err(anyhow!("Failed to create timetable file: {}", error));
         }
     }
@@ -93,8 +91,6 @@ async fn main() -> Result<()> {
                 put_config,
                 get_password,
                 put_password,
-                get_token,
-                delete_token
             ],
         )
         .register("/", catchers![catch_default]);
