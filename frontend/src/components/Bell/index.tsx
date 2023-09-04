@@ -1,13 +1,12 @@
-import { Dispatch, SetStateAction, useState } from 'react'
+import { useContext, useState } from 'react'
 import classNames from 'classNames'
-import { BellTime, School } from 'backend'
+import { Agent, AgentContext, BellTime } from 'backend'
+import { AppContext } from 'App'
 
-const Bell = ({ bellTime, setSchool }:
-  {
-    bellTime: BellTime,
-    setSchool: Dispatch<SetStateAction<School>>,
-  }) => {
-  const [deleting, setDeleting] = useState(false)
+const Bell = ({ bellTime }: { bellTime: BellTime }) => {
+  const [deleting, setDeleting] = useState(false),
+    agent = useContext(AgentContext) as Agent,
+    [school, setSchool, password] = useContext(AppContext)
   return <div className='border rounded-2xl p-4 flex gap-4 items-center'>
     <button
       className={classNames(
@@ -25,9 +24,12 @@ const Bell = ({ bellTime, setSchool }:
           })
         }
         setDeleting(true)
+        agent.putSchool(school, password).then(() => {
+          setDeleting(false)
+        })
       }}
     >
-      &#128465
+      &#128465;
     </button>
     <input
       type='text'

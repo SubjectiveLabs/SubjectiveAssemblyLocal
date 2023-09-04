@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
+import { Dispatch, SetStateAction, createContext, useContext, useEffect, useRef, useState } from 'react'
 import Message, { Notice } from 'Message'
 import Bell from 'Bell'
 import Footer from 'Footer'
@@ -9,9 +9,11 @@ import { Exclamation, Plus, ThreeDots } from 'components/Icons'
 import Loading from 'Loading'
 import Password from 'Password'
 import Login from 'Login'
-import { Agent, School } from 'backend'
+import { Agent, AgentContext, School } from 'backend'
 import { SHA256 } from 'crypto-js'
 
+export const AppContext = createContext<[School, Dispatch<SetStateAction<School>>, string]>
+  ({} as [School, Dispatch<SetStateAction<School>>, string])
 const App = () => {
   const getDefaultDay = () => {
     let day = new Date().getDay() - 1
@@ -34,15 +36,7 @@ const App = () => {
     [waitingForLogin, setWaitingForLogin] = useState(false),
     [password, setPassword] = useState(''),
     scroll = useRef<HTMLDivElement>(null),
-    agent = new Agent('/api/v1'),
-    get = () => {
-      setUpdateFailed(false)
-      agent.getSchool().then(school => {
-        setSchool(school)
-      }).catch(() => {
-        setUpdateFailed(true)
-      })
-    },
+    agent = useContext(AgentContext) as Agent,
     days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
     addLoadingItem = (item: string) => {
       setLoadingItems(previous => {
@@ -50,10 +44,19 @@ const App = () => {
         next.push(item)
         return next
       })
+    },
+    update = () => {
+      setUpdateFailed(false)
+      agent.getSchool().then(school => {
+        setSchool(school)
+      }).catch(() => {
+        setUpdateFailed(true)
+      })
     }
+  useEffect(update, [day])
   useEffect(() => {
-    get()
-  }, [day])
+    agent.putSchool(school, password)
+  }, [school])
   useEffect(() => {
     addLoadingItem('Getting notices...')
     setNotices([
@@ -89,7 +92,7 @@ const App = () => {
         }
       })
   }, [])
-  return <>
+  return <AppContext.Provider value={[school, setSchool, password]}>
     <div className='py-4 bg-gray-50 h-full flex flex-col gap-4 font-semibold tracking-tighter leading-none md:pb-0'>
       <div className='flex h-full overflow-x-auto snap-mandatory snap-x scroll-smooth md:p-4 md:grid md:grid-cols-2 md:gap-4 no-scrollbar' onScroll={event => {
         const scroll = event.currentTarget.scrollLeft / event.currentTarget.scrollWidth * 2
@@ -145,8 +148,8 @@ const App = () => {
                   const period = {
                     id: v4(),
                     name: 'New Bell',
-                    hour: Math.random() * 24,
-                    minute: Math.random() * 60,
+                    hour: Math.floor(Math.random() * 24),
+                    minute: Math.floor(Math.random() * 60),
                   }
                   setSchool(previous => {
                     const next = { ...previous }
@@ -186,7 +189,6 @@ const App = () => {
               school.bell_times[day].map(period => <Bell
                 key={period.id}
                 bellTime={period}
-                setSchool={setSchool}
               />)
             }
           </ul>
@@ -222,7 +224,7 @@ const App = () => {
         })
       })
     }} />
-  </>
+  </AppContext.Provider>
 }
 
 export default App

@@ -1,4 +1,5 @@
 import { SHA256 } from "crypto-js";
+import { createContext } from "react";
 
 export type Day = BellTime[];
 export type BellTime = {
@@ -59,3 +60,5 @@ export const Agent = function (this: Agent, url: string) {
       throw new Error()
   }
 } as unknown as { new(url: string): Agent }
+
+export const AgentContext = createContext<Agent>({} as Agent)
