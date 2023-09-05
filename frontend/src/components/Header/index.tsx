@@ -8,7 +8,7 @@ const Header = () => {
   return <header className='text-center flex flex-col shrink grow-0 basis-auto items-center'>
     <h1>Welcome to</h1>
     <input
-      className='bg-gray-200 rounded-xl p-2 w-1/2 text-center'
+      className='bg-gray-200 rounded-xl p-2 w-1/2 text-center text-xl font-bold'
       onChange={event => {
         setSchool(previous => {
           const next = { ...previous }
