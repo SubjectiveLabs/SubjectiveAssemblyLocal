@@ -1,4 +1,3 @@
-import { Clock } from "react-svg-spinners"
 import classNames from "classNames"
 import { useState } from "react"
 
@@ -33,7 +32,7 @@ const Password = ({ show, inProgress, putPassword }: { show: boolean, inProgress
         }}
       >
         Set Password
-        {inProgress && <Clock color='white' className='inline' />}
+        {inProgress && <img src="/loader.gif" className="w-8 h-8" />}
       </button>
     </div>
   </div>

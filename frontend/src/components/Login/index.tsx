@@ -48,7 +48,7 @@ const Login = ({ show, inProgress, login }: { show: boolean, inProgress: boolean
         }}
       >
         Log in
-        {inProgress && <Clock color='white' className='inline' />}
+        {inProgress && <img src="/loader.gif" />}
       </button>
     </div>
   </div>
