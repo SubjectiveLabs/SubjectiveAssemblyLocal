@@ -157,7 +157,6 @@ const App = () => {
                     next.bell_times[day].push(period)
                     return next
                   })
-                  agent.putSchool(school, password)
                 }}
               >
                 <Plus />

@@ -1,12 +1,11 @@
 import { useContext, useState } from 'react'
 import classNames from 'classNames'
-import { Agent, AgentContext, BellTime } from 'backend'
+import { BellTime } from 'backend'
 import { AppContext } from 'App'
 
 const Bell = ({ bellTime }: { bellTime: BellTime }) => {
   const [deleting, setDeleting] = useState(false),
-    agent = useContext(AgentContext) as Agent,
-    [school, setSchool, password] = useContext(AppContext)
+    [, setSchool] = useContext(AppContext)
   return <div className='border rounded-2xl p-4 flex gap-4 items-center'>
     <button
       className={classNames(
@@ -24,9 +23,6 @@ const Bell = ({ bellTime }: { bellTime: BellTime }) => {
           })
         }
         setDeleting(true)
-        agent.putSchool(school, password).then(() => {
-          setDeleting(false)
-        })
       }}
     >
       &#128465;
@@ -37,7 +33,7 @@ const Bell = ({ bellTime }: { bellTime: BellTime }) => {
       className='bg-gray-200 rounded-xl p-1 w-full transition peer duration-300 h-full px-2'
       maxLength={127}
       required
-      onChange={event => {
+      onBlur={event => {
         const name = event.target.value
         setSchool(previous => {
           const next = { ...previous }
