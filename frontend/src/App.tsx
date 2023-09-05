@@ -10,6 +10,7 @@ import Loading from 'Loading'
 import Password from 'Password'
 import Login from 'Login'
 import { Agent, AgentContext, School } from 'backend'
+import Header from 'components/Header'
 
 export const AppContext = createContext<[School, Dispatch<SetStateAction<School>>, string]>
   ({} as [School, Dispatch<SetStateAction<School>>, string])
@@ -93,6 +94,7 @@ const App = () => {
   }, [])
   return <AppContext.Provider value={[school, setSchool, password]}>
     <div className='py-4 bg-gray-50 h-full flex flex-col gap-4 font-semibold tracking-tighter leading-none md:pb-0'>
+      <Header />
       <div className='flex h-full overflow-x-auto snap-mandatory snap-x scroll-smooth md:p-4 md:grid md:grid-cols-2 md:gap-4 no-scrollbar' onScroll={event => {
         const scroll = event.currentTarget.scrollLeft / event.currentTarget.scrollWidth * 2
         if (Math.abs(scroll - Math.round(scroll)) < 10)
