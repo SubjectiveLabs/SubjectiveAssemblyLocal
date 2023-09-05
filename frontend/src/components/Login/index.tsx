@@ -1,4 +1,3 @@
-import { Clock } from "react-svg-spinners"
 import classNames from "classNames"
 import { useContext, useState } from "react"
 import { AppContext } from "App"
