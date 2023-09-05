@@ -2,8 +2,9 @@ import { Clock } from "react-svg-spinners"
 import classNames from "classNames"
 import { useState } from "react"
 
-const Login = ({ show, inProgress, login }: { show: boolean, inProgress: boolean, login: (password: string) => void }) => {
+const Login = ({ show, inProgress, login }: { show: boolean, inProgress: boolean, login: (password: string) => Promise<boolean> }) => {
   const [password, setPassword] = useState<string>('')
+  const [incorrect, setIncorrect] = useState(false)
   return <div className={classNames(
     'w-full h-full absolute top-0 left-0 z-20 backdrop-blur-3xl grid place-content-center transition duration-1000',
     show ? '' : 'opacity-0 pointer-events-none'
@@ -18,16 +19,25 @@ const Login = ({ show, inProgress, login }: { show: boolean, inProgress: boolean
         className='border rounded-lg p-2'
         onInput={event => {
           setPassword(event.currentTarget.value)
+          setIncorrect(false)
         }}
       />
+      <span className={classNames(
+        'text-red-500 transition duration-1000',
+        incorrect ? '' : 'opacity-0 pointer-events-none'
+      )}>
+        Incorrect password.
+      </span>
       <button
         className={classNames(
           'bg-black text-white rounded-full p-2 flex items-center justify-center gap-2',
-          password && !inProgress ? '' : 'opacity-50 pointer-events-none'
+          password && !inProgress && !incorrect ? '' : 'opacity-50 pointer-events-none'
         )}
         onClick={() => {
-          if (password && !inProgress)
-            login(password)
+          if (password && !inProgress && !incorrect)
+            login(password).then(correct => {
+              setIncorrect(!correct)
+            })
         }}
       >
         Login

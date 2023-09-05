@@ -58,9 +58,15 @@ pub fn put_password(old: Password, new: &str) -> Status {
 
 #[openapi]
 #[get("/password")]
-pub fn get_password() -> String {
-    match read_to_string(PASSWORD_PATH) {
-        Ok(_) => "\0".to_string(),
-        Err(_) => String::new(),
-    }
+pub fn get_password(password: Password) -> String {
+    let exists = read_to_string(PASSWORD_PATH).is_ok();
+    let correct = match read_to_string(PASSWORD_PATH) {
+        Ok(stored) if matches!(verify(password, &stored), Ok(true)) => true,
+        Err(_) | Ok(_) => false,
+    };
+    format!(
+        "{}{}",
+        if exists { "1" } else { "0" },
+        if correct { "1" } else { "0" }
+    )
 }

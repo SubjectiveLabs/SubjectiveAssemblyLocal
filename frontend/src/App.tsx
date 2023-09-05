@@ -80,8 +80,8 @@ const App = () => {
     ])
     addLoadingItem('Done.')
     addLoadingItem('Checking for password...')
-    agent.getPassword()
-      .then(exists => {
+    agent.getPassword(' ')
+      .then(([exists,]) => {
         if (exists) {
           addLoadingItem('Password set. Authenticating...')
           setShowLogin(true)
@@ -210,18 +210,19 @@ const App = () => {
         setLoading(false)
       })
     }} />
-    <Login show={showLogin} inProgress={waitingForLogin} login={password => {
+    <Login show={showLogin} inProgress={waitingForLogin} login={async password => {
       setWaitingForLogin(true)
       setPassword(password)
-      agent.getSchool().then(school => {
-        agent.putSchool(school, password).then(() => {
-          addLoadingItem('Password set.')
-          setLoading(false)
-          setShowLogin(false)
-        }).catch(() => {
-          addLoadingItem('Wrong password.')
-        })
-      })
+      const [, correct] = await agent.getPassword(password)
+      if (correct) {
+        addLoadingItem('Password set.')
+        setLoading(false)
+        setShowLogin(false)
+      } else {
+        addLoadingItem('Wrong password.')
+      }
+      setWaitingForLogin(false)
+      return correct
     }} />
   </AppContext.Provider>
 }

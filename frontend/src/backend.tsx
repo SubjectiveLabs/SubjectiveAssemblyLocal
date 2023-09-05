@@ -18,7 +18,7 @@ export type School = {
 export type Agent = {
   getSchool: () => Promise<School>,
   putSchool: (school: School, password: string | null) => Promise<void>,
-  getPassword: () => Promise<boolean>,
+  getPassword: (password: string) => Promise<[boolean, boolean]>,
   putPassword: (previous: string, next: string | null) => Promise<void>,
 }
 
@@ -42,12 +42,16 @@ export const Agent = function (this: Agent, url: string) {
     })).ok)
       throw new Error()
   }
-  this.getPassword = async () => {
-    const response = await fetch(`${url}/password`)
-    if (!response.ok)
-      throw new Error()
-    const password = await response.text()
-    return !!password
+  this.getPassword = async password => {
+    const response = await fetch(`${url}/password`, {
+      headers: {
+        'X-Assembly-Password': SHA256(password).toString(),
+      }
+    })
+    const text = await response.text()
+    const exists = text[0] == "1",
+      correct = text[1] == "1"
+    return [exists, correct]
   }
   this.putPassword = async (previous, next: string | null) => {
     if (!(next && previous)) throw new Error()

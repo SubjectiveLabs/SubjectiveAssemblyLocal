@@ -31,9 +31,9 @@ use rocket_okapi::{
     openapi_get_routes,
     swagger_ui::{make_swagger_ui, SwaggerUIConfig},
 };
+use school::json::School;
 use serde_json::to_string;
 use std::fs::write;
-use school::json::School;
 
 #[macro_use]
 extern crate rocket;
