@@ -159,50 +159,69 @@ const App = () => {
             }
           </ul>
         </div>
-        <div className='md:border md:shadow-lg md:rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full snap-center bg-white'>
-          <div className='gap-2 items-center flex text-xl'>
-            <span className='w-6 h-6 inline-flex border-[6px] border-black rounded-full'></span>
-            Links
+        <div className="grow shrink-0 basis-auto snap-center flex flex-col gap-4">
+          <div className='md:border md:shadow-lg md:rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full bg-white overflow-auto'>
+            <div className='gap-2 items-center flex text-xl'>
+              <span className='w-6 h-6 inline-flex border-[6px] border-black rounded-full'></span>
+              Links
+            </div>
+            <div className='flex gap-2 justify-between border-b pb-2 flex-col'>
+              <button
+                className={classNames(
+                  'bg-black text-white flex p-2 gap-2 items-center rounded-full whitespace-nowrap',
+                  updateFailed
+                    ? 'opacity-50 pointer-events-none'
+                    : ''
+                )}
+                onClick={updateFailed ? undefined : () => {
+                  const link = {
+                    id: v4(),
+                    title: 'New Link',
+                    destination: 'https://example.com',
+                    icon: 'link',
+                  }
+                  setSchool(previous => {
+                    const next = { ...previous }
+                    next.links.push(link)
+                    return next
+                  })
+                }}
+              >
+                <Plus />
+                Add Link
+              </button>
+              <span className='flex gap-2 flex-wrap whitespace-nowrap'>
+                <Alert
+                  text='Failed to get school.'
+                  show={updateFailed}
+                  colour='bg-rose-500'
+                  icon={<Exclamation />}
+                />
+              </span>
+            </div>
+            <ul className='flex flex-col gap-4 overflow-y-auto rounded-2xl'>
+              {
+                school.links.map(link => <Link link={link} />)
+              }
+            </ul>
           </div>
-          <div className='flex gap-2 justify-between border-b pb-2 flex-col'>
-            <button
-              className={classNames(
-                'bg-black text-white flex p-2 gap-2 items-center rounded-full whitespace-nowrap',
-                updateFailed
-                  ? 'opacity-50 pointer-events-none'
-                  : ''
-              )}
-              onClick={updateFailed ? undefined : () => {
-                const link = {
-                  id: v4(),
-                  title: 'New Link',
-                  destination: 'https://example.com',
-                  icon: 'link',
-                }
-                setSchool(previous => {
-                  const next = { ...previous }
-                  next.links.push(link)
-                  return next
-                })
-              }}
-            >
-              <Plus />
-              Add Link
-            </button>
-            <span className='flex gap-2 flex-wrap whitespace-nowrap'>
-              <Alert
-                text='Failed to get school.'
-                show={updateFailed}
-                colour='bg-rose-500'
-                icon={<Exclamation />}
+          <div className="md:border md:shadow-lg md:rounded-2xl p-4 flex flex-col gap-2 w-full bg-white overflow-auto shrink grow-0 basis-auto">
+            <div className='items-center flex text-xl justify-between gap-4 px-2'>
+              <span className='gap-2 items-center flex'>
+                <span className='w-6 h-6 inline-flex bg-black'></span>
+                Password
+              </span>
+              <input
+                type="text"
+                defaultValue={password}
+                className='bg-gray-200 rounded-xl p-1 w-full'
+                onBlur={event => {
+                  setPassword(event.target.value)
+                  agent.putPassword(password, event.target.value)
+                }}
               />
-            </span>
+            </div>
           </div>
-          <ul className='flex flex-col gap-4 overflow-y-auto rounded-2xl'>
-            {
-              school.links.map(link => <Link link={link} />)
-            }
-          </ul>
         </div>
       </div>
       <div className='shrink grow-0 basis-auto md:hidden'>
@@ -211,8 +230,8 @@ const App = () => {
         }} />
       </div>
     </div>
-    <Loading show={loading} items={loadingItems} />
-    <Password show={showPassword} inProgress={waitingForPassword} putPassword={next => {
+    <Loading show={loading && (import.meta as unknown as { env: { PROD: boolean } }).env.PROD} items={loadingItems} />
+    <Password show={showPassword && (import.meta as unknown as {env: {PROD: boolean}}).env.PROD} inProgress={waitingForPassword} putPassword={next => {
       setWaitingForPassword(true)
       agent.putPassword(' ', next).then(() => {
         setShowPassword(false)
@@ -222,7 +241,7 @@ const App = () => {
         setLoading(false)
       })
     }} />
-    <Login show={showLogin} inProgress={waitingForLogin} login={async password => {
+    <Login show={showLogin && (import.meta as unknown as {env: {PROD: boolean}}).env.PROD} inProgress={waitingForLogin} login={async password => {
       setWaitingForLogin(true)
       setPassword(password)
       const [, correct] = await agent.getPassword(password)
