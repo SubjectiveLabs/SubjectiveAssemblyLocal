@@ -6,7 +6,7 @@ Use this repository to self-host Assembly with the source code.
 ## Usage
 
 1. Clone this repository.
-2. Use Cargo and Vite to run Assembly's front-end and back-end servers locally, or host the code using your own hardware or service. A Docker image is available for easy deployment.
+2. Use Cargo and Vite to run Assembly's front-end and back-end servers locally with the script at `scripts/start.sh`, or host the code using your own hardware or service. A Docker image is available for easy deployment.
 
     ```bash
     $ docker compose up --build
