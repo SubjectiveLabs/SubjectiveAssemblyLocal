@@ -10,7 +10,9 @@ use crate::{auth::Password, school::json::School, PASSWORD_PATH, SCHOOL_PATH};
 #[put("/school", data = "<new>")]
 pub fn put_school(new: Json<School>, password: Password) -> Status {
     match read_to_string(PASSWORD_PATH) {
-        Ok(stored) if !matches!(verify(password, &stored), Ok(true)) => return Status::Unauthorized,
+        Ok(stored) if !matches!(verify(password, &stored), Ok(true)) => {
+            return Status::Unauthorized
+        }
         Err(_) => return Status::Unauthorized,
         Ok(_) => {}
     }

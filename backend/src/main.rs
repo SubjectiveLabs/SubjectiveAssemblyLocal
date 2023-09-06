@@ -33,7 +33,7 @@ use rocket_okapi::{
 };
 use school::json::School;
 use serde_json::to_string;
-use std::fs::write;
+use std::fs::{create_dir, write};
 
 #[macro_use]
 extern crate rocket;
@@ -45,6 +45,7 @@ const ERROR_MESSAGES: &[&str] = &[
     "This is not the page you're looking for.",
     "This is awkward.",
 ];
+const PATH: &str = "static";
 const SCHOOL_PATH: &str = "static/school";
 const PASSWORD_PATH: &str = "static/password";
 
@@ -62,6 +63,7 @@ fn catch_default(status: Status, _request: &Request) -> String {
 
 #[main]
 async fn main() -> Result<()> {
+    create_dir(PATH).ok();
     if School::from_path(SCHOOL_PATH).is_err() {
         if let Err(error) = write(SCHOOL_PATH, to_string(&School::default())?) {
             return Err(anyhow!("Failed to create school file: {}", error));
@@ -71,12 +73,7 @@ async fn main() -> Result<()> {
         .mount("/app/", FileServer::from("dist"))
         .mount(
             "/api/v1/",
-            openapi_get_routes![
-                get_school,
-                put_school,
-                get_password,
-                put_password,
-            ],
+            openapi_get_routes![get_school, put_school, get_password, put_password],
         )
         .register("/", catchers![catch_default]);
     if cfg!(debug_assertions) {
