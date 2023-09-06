@@ -1,10 +1,14 @@
 import './index.css'
 import App from 'App'
-import React from 'react'
+import { Agent, AgentContext } from 'backend'
+import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
+
 createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+  <StrictMode>
+    <AgentContext.Provider value={new Agent('/api/v1')}>
+      <App />
+    </AgentContext.Provider>
+  </StrictMode>
 )

@@ -5,31 +5,35 @@
     clippy::unwrap_used,
     clippy::expect_used
 )]
-#![allow(clippy::no_effect_underscore_binding)]
+#![allow(
+    clippy::no_effect_underscore_binding,
+    clippy::module_name_repetitions,
+    clippy::needless_pass_by_value,
+    clippy::ignored_unit_patterns
+)]
 #![feature(iter_next_chunk, slice_take)]
-mod bell;
+mod auth;
 mod methods;
-mod timetable;
+mod school;
 
 use anyhow::{anyhow, Result};
-use methods::patch::Patch;
+use auth::{
+    get_password, okapi_add_operation_for_get_password_, okapi_add_operation_for_put_password_,
+    put_password,
+};
+use methods::school::{
+    get::{get_school, okapi_add_operation_for_get_school_},
+    put::{okapi_add_operation_for_put_school_, put_school},
+};
 use rand::seq::SliceRandom;
-use rocket::{
-    fs::FileServer,
-    http::{ContentType, Status},
-    serde::json::Json,
-    Request,
-};
+use rocket::{fs::FileServer, http::Status, Request};
 use rocket_okapi::{
-    openapi, openapi_get_routes,
-    swagger_ui::{make_swagger_ui, SwaggerUIConfig}
+    openapi_get_routes,
+    swagger_ui::{make_swagger_ui, SwaggerUIConfig},
 };
+use school::json::School;
 use serde_json::to_string;
-use std::fs::write;
-use timetable::json::{Period, Timetable};
-use uuid::Uuid;
-
-use crate::methods::post::Post;
+use std::fs::{create_dir, write};
 
 #[macro_use]
 extern crate rocket;
@@ -41,7 +45,9 @@ const ERROR_MESSAGES: &[&str] = &[
     "This is not the page you're looking for.",
     "This is awkward.",
 ];
-const PATH: &str = "static/timetable";
+const PATH: &str = "static";
+const SCHOOL_PATH: &str = "static/school";
+const PASSWORD_PATH: &str = "static/password";
 
 #[catch(default)]
 fn catch_default(status: Status, _request: &Request) -> String {
@@ -55,145 +61,20 @@ fn catch_default(status: Status, _request: &Request) -> String {
     )
 }
 
-/// Get the timetable.
-///
-/// # Status Codes
-///
-/// - 200: The timetable was successfully retrieved.
-/// - 404: The timetable file was not found.
-/// - 500: The timetable file could not be read or serialised.
-#[openapi(tag = "timetable")]
-#[get("/timetable")]
-fn get() -> (Status, (ContentType, String)) {
-    let Ok(timetable) = Timetable::from_path(PATH) else {
-        return (Status::NotFound, (ContentType::Any, String::new()));
-    };
-    to_string(&timetable).map_or(
-        (
-            Status::InternalServerError,
-            (ContentType::Any, String::new()),
-        ),
-        |timetable| (Status::Ok, (ContentType::JSON, timetable)),
-    )
-}
-
-/// Add a bell to the timetable.
-///
-/// # Status Codes
-///
-/// - 200: The bell was successfully added.
-/// - 400: The day was not found or the new bell's ID was already taken.
-/// - 404: The timetable file was not found.
-/// - 500: The timetable file could not be saved.
-#[openapi(tag = "timetable")]
-#[post("/timetable", data = "<new>")]
-fn post(new: Json<Post>) -> Status {
-    let Ok(mut timetable) = Timetable::from_path(PATH) else {
-        return Status::NotFound;
-    };
-    let new = new.0;
-    if timetable
-        .timetable
-        .iter()
-        .flatten()
-        .any(|period| period.bell.id == new.bell.id)
-    {
-        return Status::BadRequest;
-    }
-    let day = timetable.timetable.get_mut(new.day);
-    if let Some(day) = day {
-        day.push(Period::new(new.bell));
-    } else {
-        return Status::BadRequest;
-    }
-    if timetable.save_to_path(PATH).is_err() {
-        return Status::InternalServerError;
-    };
-    Status::Ok
-}
-
-/// Update a bell in the timetable.
-///
-/// # Status Codes
-///
-/// - 200: The bell was successfully updated.
-/// - 400: The bell ID was not found.
-/// - 404: The timetable file was not found.
-/// - 500: The timetable file could not be saved.
-#[openapi(tag = "timetable")]
-#[patch("/timetable", data = "<new>")]
-fn patch(new: Json<Patch>) -> Status {
-    let Ok(mut timetable) = Timetable::from_path(PATH) else {
-        return Status::NotFound;
-    };
-    let new = new.0 .0;
-    match timetable
-        .timetable
-        .iter_mut()
-        .flatten()
-        .find(|period| period.bell.id == new.id)
-    {
-        Some(day) => {
-            day.bell = new;
-        }
-        None => return Status::BadRequest,
-    }
-    if timetable.save_to_path(PATH).is_err() {
-        return Status::InternalServerError;
-    };
-    Status::Ok
-}
-
-/// Delete a bell from the timetable.
-///
-/// # Status Codes
-///
-/// - 200: The bell was successfully deleted.
-/// - 400: The bell ID was not found.
-/// - 404: The timetable file was not found.
-/// - 500: The timetable file could not be saved.
-#[openapi(tag = "timetable")]
-#[delete("/timetable", data = "<id>")]
-fn delete(id: &str) -> Status {
-    let Ok(mut timetable) = Timetable::from_path(PATH) else {
-        return Status::NotFound;
-    };
-    let Ok(id) = Uuid::try_parse(id) else {
-        return Status::BadRequest;
-    };
-    match timetable.timetable.iter_mut().find_map(|day| {
-        day.iter_mut()
-            .enumerate()
-            .find_map(|(index, period)| {
-                if period.bell.id == id {
-                    Some(index)
-                } else {
-                    None
-                }
-            })
-            .map(|index| (index, day))
-    }) {
-        Some((period_index, day)) => {
-            day.remove(period_index);
-        }
-        None => return Status::BadRequest,
-    }
-    if timetable.save_to_path(PATH).is_err() {
-        return Status::InternalServerError;
-    };
-    Status::Ok
-}
-
 #[main]
 async fn main() -> Result<()> {
-    if Timetable::from_path(PATH).is_err() {
-        if let Err(error) = write(PATH, to_string(&Timetable::default())?) {
-            return Err(anyhow!("Failed to create timetable file: {}", error));
+    create_dir(PATH).ok();
+    if School::from_path(SCHOOL_PATH).is_err() {
+        if let Err(error) = write(SCHOOL_PATH, to_string(&School::default())?) {
+            return Err(anyhow!("Failed to create school file: {}", error));
         }
     }
     let mut rocket = rocket::build()
         .mount("/app/", FileServer::from("dist"))
-        .mount("/api/v1/", openapi_get_routes![get, post, patch, delete])
+        .mount(
+            "/api/v1/",
+            openapi_get_routes![get_school, put_school, get_password, put_password],
+        )
         .register("/", catchers![catch_default]);
     if cfg!(debug_assertions) {
         rocket = rocket.mount(
