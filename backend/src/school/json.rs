@@ -19,9 +19,18 @@ pub struct BellTime {
 }
 
 #[derive(Serialize, Deserialize, Default, JsonSchema)]
+pub struct Link {
+    pub id: Uuid,
+    pub title: String,
+    pub destination: String,
+    pub icon: String,
+}
+
+#[derive(Serialize, Deserialize, Default, JsonSchema)]
 pub struct School {
     pub name: String,
     pub bell_times: [Day; 5],
+    pub links: Vec<Link>,
 }
 
 impl School {

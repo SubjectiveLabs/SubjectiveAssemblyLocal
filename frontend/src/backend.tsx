@@ -10,9 +10,16 @@ export type BellTime = {
   minute: number,
   location?: string,
 }
+export type Link = {
+  id: string,
+  title: string,
+  destination: string,
+  icon: string,
+}
 export type School = {
   name: string,
   bell_times: Day[],
+  links: Link[],
 }
 
 export type Agent = {

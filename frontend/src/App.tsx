@@ -1,5 +1,4 @@
 import { Dispatch, SetStateAction, createContext, useContext, useEffect, useRef, useState } from 'react'
-import Message, { Notice } from 'Message'
 import Bell from 'Bell'
 import Footer from 'Footer'
 import { v4 } from 'uuid'
@@ -11,6 +10,7 @@ import Password from 'Password'
 import Login from 'Login'
 import { Agent, AgentContext, School } from 'backend'
 import Header from 'components/Header'
+import Link from 'components/Link'
 
 export const AppContext = createContext<[School, Dispatch<SetStateAction<School>>, string]>
   ({} as [School, Dispatch<SetStateAction<School>>, string])
@@ -23,9 +23,8 @@ const App = () => {
       day = 4
     return day
   },
-    [school, setSchool]: [School, Dispatch<SetStateAction<School>>] = useState<School>({ name: "", bell_times: [[], [], [], [], []] }),
+    [school, setSchool]: [School, Dispatch<SetStateAction<School>>] = useState<School>({ name: "", bell_times: [[], [], [], [], []], links: [] }),
     [day, setDay] = useState(getDefaultDay()),
-    [notices, setNotices]: [Notice[], Dispatch<SetStateAction<Notice[]>>] = useState<Notice[]>([]),
     [active, setActive] = useState(0),
     [updateFailed, setUpdateFailed] = useState(false),
     [loading, setLoading] = useState(true),
@@ -59,26 +58,6 @@ const App = () => {
   }, [school])
   useEffect(() => {
     addLoadingItem('Getting notices...')
-    setNotices([
-      {
-        content: 'D13 & D14 classes will be running in B2 as carpets are replaced.',
-        priority: true,
-        time: 'Today',
-        title: 'D Block Room Changes'
-      },
-      {
-        content: 'French will be off today due to a Year 11 excursion occuring. See you next week!',
-        priority: false,
-        time: 'Until 12th September',
-        title: 'French Club'
-      },
-      {
-        content: 'Meeting tomorrow lunch in TLC for Year 9 will be running outlining the subject selection process for 2024.',
-        priority: false,
-        time: 'Until tomorrow',
-        title: 'Y9 2024 Subject Selection'
-      }
-    ])
     addLoadingItem('Done.')
     addLoadingItem('Checking for password...')
     agent.getPassword(' ')
@@ -100,19 +79,6 @@ const App = () => {
         if (Math.abs(scroll - Math.round(scroll)) < 10)
           setActive(Math.round(scroll))
       }} ref={scroll}>
-        <div className='md:border md:shadow-lg md:rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full snap-center bg-white'>
-          <div className='gap-2 items-center flex text-xl'>
-            <span className='bg-black w-6 h-6 inline-flex rounded-full rounded-bl-none'></span>
-            Messages
-          </div>
-          <div className='flex gap-1'>
-            <span className='text-gray-500'>Noticeboard</span>
-            <span>{notices.length} notices</span>
-          </div>
-          <ul className='flex flex-col gap-4 overflow-y-auto rounded-2xl'>
-            {notices.map((notice, index) => <Message key={index} notice={notice} />)}
-          </ul>
-        </div>
         <div className='md:border md:shadow-lg md:rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full snap-center bg-white'>
           <div className='gap-2 items-center flex text-xl'>
             <span className='bg-black w-4 h-4 inline-flex rotate-45'></span>
@@ -190,6 +156,51 @@ const App = () => {
                 key={period.id}
                 bellTime={period}
               />)
+            }
+          </ul>
+        </div>
+        <div className='md:border md:shadow-lg md:rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full snap-center bg-white'>
+          <div className='gap-2 items-center flex text-xl'>
+            <span className='w-6 h-6 inline-flex border-[6px] border-black rounded-full'></span>
+            Links
+          </div>
+          <div className='flex gap-2 justify-between border-b pb-2 flex-col'>
+            <button
+              className={classNames(
+                'bg-black text-white flex p-2 gap-2 items-center rounded-full whitespace-nowrap',
+                updateFailed
+                  ? 'opacity-50 pointer-events-none'
+                  : ''
+              )}
+              onClick={updateFailed ? undefined : () => {
+                const link = {
+                  id: v4(),
+                  title: 'New Link',
+                  destination: 'https://example.com',
+                  icon: 'link',
+                }
+                setSchool(previous => {
+                  const next = { ...previous }
+                  next.links.push(link)
+                  return next
+                })
+              }}
+            >
+              <Plus />
+              Add Link
+            </button>
+            <span className='flex gap-2 flex-wrap whitespace-nowrap'>
+              <Alert
+                text='Failed to get school.'
+                show={updateFailed}
+                colour='bg-rose-500'
+                icon={<Exclamation />}
+              />
+            </span>
+          </div>
+          <ul className='flex flex-col gap-4 overflow-y-auto rounded-2xl'>
+            {
+              school.links.map(link => <Link link={link} />)
             }
           </ul>
         </div>

@@ -47,7 +47,13 @@ const Login = ({ show, inProgress, login }: { show: boolean, inProgress: boolean
         }}
       >
         Log in
-        {inProgress && <img src="/app/loader.gif" />}
+        <img
+          src="/app/loader.gif"
+          className={classNames(
+            'transition duration-1000',
+            inProgress ? 'w-8 h-8' : 'opacity-0 h-0 w-0'
+          )}
+        />
       </button>
     </div>
   </div>
