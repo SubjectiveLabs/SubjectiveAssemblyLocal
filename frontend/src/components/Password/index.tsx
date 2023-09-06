@@ -32,7 +32,7 @@ const Password = ({ show, inProgress, putPassword }: { show: boolean, inProgress
         }}
       >
         Set Password
-        {inProgress && <img src="/loader.gif" className="w-8 h-8" />}
+        {inProgress && <img src="/app/loader.gif" className="w-8 h-8" />}
       </button>
     </div>
   </div>

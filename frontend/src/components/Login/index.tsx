@@ -47,7 +47,7 @@ const Login = ({ show, inProgress, login }: { show: boolean, inProgress: boolean
         }}
       >
         Log in
-        {inProgress && <img src="/loader.gif" />}
+        {inProgress && <img src="/app/loader.gif" />}
       </button>
     </div>
   </div>
