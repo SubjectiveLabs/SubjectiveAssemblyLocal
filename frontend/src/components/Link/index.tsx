@@ -1,28 +1,18 @@
-import { useContext, useState } from 'react'
-import classNames from 'classNames'
+import { useContext } from 'react'
 import { AppContext } from 'App'
 import { Link } from 'backend'
 
 const Link = ({ link }: { link: Link }) => {
-  const [deleting, setDeleting] = useState(false),
-    [, setSchool] = useContext(AppContext)
+  const [, setSchool] = useContext(AppContext)
   return <div className='border rounded-2xl p-4 flex gap-4 items-center'>
     <button
-      className={classNames(
-        'inline-flex outline-red-300 outline-2 outline -outline-offset-2 bg-red-200 p-2 rounded-xl aspect-square',
-        deleting
-          ? 'animate-spin'
-          : ''
-      )}
+      className='inline-flex outline-red-300 outline-2 outline -outline-offset-2 bg-red-200 p-2 rounded-xl aspect-square'
       onClick={() => {
-        if (!deleting) {
-          setSchool(previous => {
-            const next = { ...previous }
-            next.links = next.links.filter(l => l.id !== link.id)
-            return next
-          })
-        }
-        setDeleting(true)
+        setSchool(previous => {
+          const next = { ...previous }
+          next.links = next.links.filter(l => l.id !== link.id)
+          return next
+        })
       }}
     >
       &#128465;
