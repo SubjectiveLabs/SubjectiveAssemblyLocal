@@ -29,15 +29,11 @@ impl<'r> FromRequest<'r> for Password {
 }
 
 impl PartialEq<Password> for String {
-    fn eq(&self, other: &Password) -> bool {
-        *self == other.0
-    }
+    fn eq(&self, other: &Password) -> bool { *self == other.0 }
 }
 
 impl AsRef<[u8]> for Password {
-    fn as_ref(&self) -> &[u8] {
-        self.0.as_bytes()
-    }
+    fn as_ref(&self) -> &[u8] { self.0.as_bytes() }
 }
 
 #[openapi]

@@ -13,17 +13,16 @@
 )]
 #![feature(iter_next_chunk, slice_take)]
 mod auth;
-mod methods;
 mod school;
+
+use std::fs::{create_dir, write};
 
 use anyhow::{anyhow, Result};
 use auth::{
-    get_password, okapi_add_operation_for_get_password_, okapi_add_operation_for_put_password_,
+    get_password,
+    okapi_add_operation_for_get_password_,
+    okapi_add_operation_for_put_password_,
     put_password,
-};
-use methods::school::{
-    get::{get_school, okapi_add_operation_for_get_school_},
-    put::{okapi_add_operation_for_put_school_, put_school},
 };
 use rand::seq::SliceRandom;
 use rocket::{fs::FileServer, http::Status, Request};
@@ -31,9 +30,14 @@ use rocket_okapi::{
     openapi_get_routes,
     swagger_ui::{make_swagger_ui, SwaggerUIConfig},
 };
-use school::json::School;
+use school::{
+    get_school,
+    okapi_add_operation_for_get_school_,
+    okapi_add_operation_for_put_school_,
+    put_school,
+    School,
+};
 use serde_json::to_string;
-use std::fs::{create_dir, write};
 
 #[macro_use]
 extern crate rocket;
