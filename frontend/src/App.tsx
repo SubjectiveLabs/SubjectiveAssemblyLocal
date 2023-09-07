@@ -212,7 +212,7 @@ const App = () => {
                 Password
               </span>
               <input
-                type="text"
+                type="password"
                 defaultValue={password}
                 className='bg-gray-200 rounded-xl p-1 w-full'
                 onBlur={event => {
