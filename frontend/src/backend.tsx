@@ -27,6 +27,7 @@ export type Agent = {
   putSchool: (school: School, password: string | null) => Promise<void>,
   getPassword: (password: string) => Promise<[boolean, boolean]>,
   putPassword: (previous: string, next: string | null) => Promise<void>,
+  getThanks: () => Promise<number>,
 }
 
 export const Agent = function (this: Agent, url: string) {
@@ -70,6 +71,12 @@ export const Agent = function (this: Agent, url: string) {
       body: (await encrypt(next))
     })).ok)
       throw new Error()
+  }
+  this.getThanks = async () => {
+    const response = await fetch(`${url}/thanks`)
+    if (!response.ok)
+      throw new Error()
+    return parseInt(await response.text())
   }
 } as unknown as { new(url: string): Agent }
 

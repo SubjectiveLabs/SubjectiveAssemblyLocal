@@ -11,33 +11,43 @@
     clippy::needless_pass_by_value,
     clippy::ignored_unit_patterns
 )]
-#![feature(iter_next_chunk, slice_take)]
+#![feature(iter_next_chunk, slice_take, file_create_new)]
 mod auth;
 mod school;
+mod thanks;
 
-use std::fs::{create_dir, write};
+use std::fs::{create_dir, write, File};
 
 use anyhow::{anyhow, Result};
-use auth::{
-    get_password,
-    okapi_add_operation_for_get_password_,
-    okapi_add_operation_for_put_password_,
-    put_password,
-};
 use rand::seq::SliceRandom;
 use rocket::{fs::FileServer, http::Status, Request};
 use rocket_okapi::{
     openapi_get_routes,
     swagger_ui::{make_swagger_ui, SwaggerUIConfig},
 };
-use school::{
-    get_school,
-    okapi_add_operation_for_get_school_,
-    okapi_add_operation_for_put_school_,
-    put_school,
-    School,
-};
 use serde_json::to_string;
+
+use crate::{
+    auth::{
+        get_password,
+        okapi_add_operation_for_get_password_,
+        okapi_add_operation_for_put_password_,
+        put_password,
+    },
+    school::{
+        get_school,
+        okapi_add_operation_for_get_school_,
+        okapi_add_operation_for_put_school_,
+        put_school,
+        School,
+    },
+    thanks::{
+        post_thanks,
+        get_thanks,
+        okapi_add_operation_for_post_thanks_,
+        okapi_add_operation_for_get_thanks_,
+    },
+};
 
 #[macro_use]
 extern crate rocket;
@@ -52,6 +62,7 @@ const ERROR_MESSAGES: &[&str] = &[
 const PATH: &str = "static";
 const SCHOOL_PATH: &str = "static/school";
 const PASSWORD_PATH: &str = "static/password";
+const THANKS_PATH: &str = "static/thanks";
 
 #[catch(default)]
 fn catch_default(status: Status, _request: &Request) -> String {
@@ -73,11 +84,19 @@ async fn main() -> Result<()> {
             return Err(anyhow!("Failed to create school file: {}", error));
         }
     }
+    File::create_new(THANKS_PATH).ok();
     let mut rocket = rocket::build()
         .mount("/app/", FileServer::from("dist"))
         .mount(
             "/api/v1/",
-            openapi_get_routes![get_school, put_school, get_password, put_password],
+            openapi_get_routes![
+                get_school,
+                put_school,
+                get_password,
+                put_password,
+                post_thanks,
+                get_thanks
+            ],
         )
         .register("/", catchers![catch_default]);
     if cfg!(debug_assertions) {
