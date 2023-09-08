@@ -54,10 +54,10 @@ const Header = () => {
           }}
           defaultValue={school.name}
         />
-        <div className="absolute text-center inset-x-0 flex justify-center items-center pointer-events-none gap-2 tracking-normal">
+        <div className="absolute text-center inset-x-0 flex justify-center items-center pointer-events-none gap-4 tracking-normal">
           <div className="w-8 h-8"></div>
           <span className="invisible">{name || 'School Name'}</span>
-          <svg viewBox="0 0 16 16" width={32} height={32} className={classNames(
+          <svg viewBox="0 0 16 16" width={16} height={16} className={classNames(
             focused ? 'invisible' : ''
           )}>
             <path
