@@ -11,7 +11,7 @@ const Header = () => {
     setName(school.name)
   }, [school])
   return <header className='text-center flex flex-col shrink grow-0 basis-auto items-center w-full px-4 gap-4 md:flex-row'>
-    <div className="w-64 hidden md:flex gap-2">
+    <div className="w-72 hidden md:flex gap-2">
       <svg width={24} height={24} viewBox="0 0 16 16">
         <circle cx={8} cy={8} r={8} className='fill-white' />
         <path
@@ -19,13 +19,13 @@ const Header = () => {
           className="fill-rose-400"
         />
       </svg>
-      <div className="flex flex-col text-left">
-        <span className="text-rose-400 text-sm">Thanks Recieved</span>
-        <span className="text-xl">{thanks || 0}</span>
+      <div className="flex flex-col text-left text-xl">
+        <span className="text-rose-400 whitespace-nowrap">Thanks Recieved</span>
+        <span>{thanks || 0}</span>
       </div>
     </div>
     <div className="flex flex-col basis-auto w-full relative">
-      <h1>Welcome to</h1>
+      <h1 className="text-xl">Welcome to</h1>
       <span className={classNames(
         "rounded-xl p-1 w-full text-xl font-bold flex gap-4 items-center transition",
         focused ? 'bg-gray-200' : ''
@@ -64,7 +64,7 @@ const Header = () => {
         </div>
       </span>
     </div>
-    <div className="hidden gap-4 w-64 justify-center md:flex">
+    <div className="hidden gap-4 w-72 justify-center md:flex">
       <svg
         viewBox="0 0 16 16"
         width={32}
