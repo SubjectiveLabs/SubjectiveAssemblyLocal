@@ -12,8 +12,8 @@ import { Agent, AgentContext, School } from 'backend'
 import Header from 'components/Header'
 import Link from 'components/Link'
 
-export const AppContext = createContext<[School, Dispatch<SetStateAction<School>>, string]>
-  ({} as [School, Dispatch<SetStateAction<School>>, string])
+export const AppContext = createContext<[School, Dispatch<SetStateAction<School>>, string, Dispatch<SetStateAction<boolean>>]>
+  ({} as [School, Dispatch<SetStateAction<School>>, string, Dispatch<SetStateAction<boolean>>])
 const App = () => {
   const getDefaultDay = () => {
     let day = new Date().getDay() - 1
@@ -33,7 +33,7 @@ const App = () => {
     [waitingForPassword, setWaitingForPassword] = useState(false),
     [showLogin, setShowLogin] = useState(false),
     [waitingForLogin, setWaitingForLogin] = useState(false),
-    [password, setPassword] = useState(''),
+    [password, setPassword] = useState(' '),
     scroll = useRef<HTMLDivElement>(null),
     agent = useContext(AgentContext) as Agent,
     days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
@@ -71,8 +71,8 @@ const App = () => {
         }
       })
   }, [])
-  return <AppContext.Provider value={[school, setSchool, password]}>
-    <div className='py-4 bg-gray-50 h-full flex flex-col gap-4 font-semibold tracking-tighter leading-none md:pb-0'>
+  return <AppContext.Provider value={[school, setSchool, password, setShowPassword]}>
+    <div className='py-4 bg-gray-50 h-full flex flex-col gap-4 font-semibold tracking-tighter leading-none md:pb-0 divide-y divide-neutral-400'>
       <Header />
       <div className='flex h-full overflow-x-auto snap-mandatory snap-x scroll-smooth md:p-4 md:grid md:grid-cols-2 md:gap-4 no-scrollbar' onScroll={event => {
         const scroll = event.currentTarget.scrollLeft / event.currentTarget.scrollWidth * 2
@@ -84,8 +84,8 @@ const App = () => {
             <span className='bg-black w-4 h-4 inline-flex rotate-45'></span>
             Bell Times
           </div>
-          <div className='flex gap-2 justify-between border-b pb-2 flex-col'>
-            <span className={classNames('flex items-center gap-2 justify-between',
+          <div className='flex gap-2 justify-between border-b pb-2 flex-col border-neutral-400'>
+            <span className={classNames('flex items-center gap-2 justify-between flex-wrap',
               updateFailed
                 ? 'opacity-50 pointer-events-none'
                 : ''
@@ -110,7 +110,9 @@ const App = () => {
                 </select>
               </span>
               <button
-                className='bg-black text-white flex p-2 gap-2 items-center rounded-full whitespace-nowrap'
+                className={classNames(
+                  'bg-black text-white flex p-2 gap-2 items-center rounded-full whitespace-nowrap grow shrink-0 basis-auto',
+                )}
                 onClick={updateFailed ? undefined : () => {
                   const period = {
                     id: v4(),
@@ -153,13 +155,13 @@ const App = () => {
             }
           </ul>
         </div>
-        <div className="grow shrink-0 basis-auto snap-center flex flex-col gap-4">
+        <div className="grow shrink-0 basis-auto snap-center flex flex-col gap-4 w-full">
           <div className='md:border md:shadow-lg md:rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full bg-white overflow-auto'>
             <div className='gap-2 items-center flex text-xl'>
               <span className='w-6 h-6 inline-flex border-[6px] border-black rounded-full'></span>
               Links
             </div>
-            <div className='flex gap-2 justify-between border-b pb-2 flex-col'>
+            <div className='flex gap-2 justify-between border-b pb-2 flex-col border-neutral-400'>
               <button
                 className={classNames(
                   'bg-black text-white flex p-2 gap-2 items-center rounded-full whitespace-nowrap',
@@ -191,23 +193,6 @@ const App = () => {
               }
             </ul>
           </div>
-          <div className="md:border md:shadow-lg md:rounded-2xl p-4 flex flex-col gap-2 w-full bg-white overflow-auto shrink grow-0 basis-auto">
-            <div className='items-center flex text-xl justify-between gap-4 px-2'>
-              <span className='gap-2 items-center flex'>
-                <span className='w-6 h-6 inline-flex bg-black'></span>
-                Password
-              </span>
-              <input
-                type="password"
-                defaultValue={password}
-                className='bg-gray-200 rounded-xl p-1 w-full'
-                onBlur={event => {
-                  setPassword(event.target.value)
-                  agent.putPassword(password, event.target.value)
-                }}
-              />
-            </div>
-          </div>
         </div>
       </div>
       <div className='shrink grow-0 basis-auto md:hidden'>
@@ -217,9 +202,9 @@ const App = () => {
       </div>
     </div>
     <Loading show={loading && (import.meta as unknown as { env: { PROD: boolean } }).env.PROD} items={loadingItems} />
-    <Password show={showPassword && (import.meta as unknown as {env: {PROD: boolean}}).env.PROD} inProgress={waitingForPassword} putPassword={next => {
+    <Password show={showPassword && (import.meta as unknown as { env: { PROD: boolean } }).env.PROD} inProgress={waitingForPassword} putPassword={next => {
       setWaitingForPassword(true)
-      agent.putPassword(' ', next).then(() => {
+      agent.putPassword(password, next).then(() => {
         setShowPassword(false)
         setWaitingForPassword(false)
         setPassword(next)
@@ -227,7 +212,7 @@ const App = () => {
         setLoading(false)
       })
     }} />
-    <Login show={showLogin && (import.meta as unknown as {env: {PROD: boolean}}).env.PROD} inProgress={waitingForLogin} login={async password => {
+    <Login show={showLogin && (import.meta as unknown as { env: { PROD: boolean } }).env.PROD} inProgress={waitingForLogin} login={async password => {
       setWaitingForLogin(true)
       setPassword(password)
       const [, correct] = await agent.getPassword(password)
