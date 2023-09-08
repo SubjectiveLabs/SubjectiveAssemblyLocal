@@ -202,7 +202,7 @@ const App = () => {
             <div className='gap-2 items-center flex text-xl'>
               <span className='w-4 h-4 inline-flex flex-col gap-1'>
                 {
-                  [...Array(3)].map(() => <span className='bg-black grow rounded-full'></span>)
+                  [...Array(3)].map((_, index) => <span className='bg-black grow rounded-full' key={index}></span>)
                 }
               </span>
               Menu
