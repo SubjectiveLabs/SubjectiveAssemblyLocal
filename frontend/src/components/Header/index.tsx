@@ -12,7 +12,7 @@ const Header = () => {
     <div className="flex flex-col basis-auto w-full gap-2">
       <h1>Welcome to</h1>
       <span className={classNames(
-        "rounded-xl p-2 w-full text-xl font-bold flex gap-4 items-center pl-16 transition",
+        "rounded-xl p-2 w-full text-xl font-bold flex gap-4 items-center pl-[43px] transition",
         focused ? 'bg-gray-200' : ''
       )}>
         <input
