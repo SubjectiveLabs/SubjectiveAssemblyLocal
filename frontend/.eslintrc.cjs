@@ -14,6 +14,6 @@ module.exports = {
     sourceType : 'module'
   },
   ignorePatterns: [ 'node_modules/', 'dist/' ],
-  plugins       : [ 'react-refresh', '@typescript-eslint' ],
+  plugins: ['react-refresh', '@typescript-eslint'],
   root: true
 }

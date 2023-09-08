@@ -76,8 +76,8 @@ const App = () => {
     <div className='py-4 bg-gray-50 h-full flex flex-col gap-4 font-semibold tracking-tighter leading-none md:pb-0'>
       <Header />
       <div className='flex h-full overflow-x-auto snap-mandatory snap-x scroll-smooth md:p-4 md:grid md:grid-cols-2 md:gap-4 no-scrollbar' onScroll={event => {
-        const scroll = event.currentTarget.scrollLeft / event.currentTarget.scrollWidth * 2
-        if (Math.abs(scroll - Math.round(scroll)) < 10)
+        const scroll = event.currentTarget.scrollLeft / event.currentTarget.scrollWidth * 3
+        if (Math.abs(scroll - Math.round(scroll)) < 20)
           setActive(Math.round(scroll))
       }} ref={scroll}>
         <div className='md:border md:shadow-lg md:rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full snap-center bg-white'>
@@ -193,6 +193,91 @@ const App = () => {
                 school.links.map(link => <Link link={link} />)
               }
             </ul>
+          </div>
+        </div>
+        <div className="grow shrink-0 basis-auto snap-center flex flex-col gap-4 w-full md:hidden">
+          <div className='md:border md:shadow-lg md:rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full bg-white overflow-auto'>
+            <div className='gap-2 items-center flex text-xl'>
+              <span className='w-4 h-4 inline-flex flex-col gap-1'>
+                {
+                  [...Array(3)].map(() => <span className='bg-black grow rounded-full'></span>)
+                }
+              </span>
+              Menu
+            </div>
+            <div className='bg-rose-400 p-4 text-white rounded-xl flex'>
+              <div className=''>
+
+              </div>
+              <div className='flex flex-col'>
+                <span className='text-4xl font-extrabold '>8 billion</span>
+                <span className='text-xl'>thanks recieved.</span>
+              </div>
+            </div>
+            <button className='p-4 shadow-lg border rounded-xl flex gap-2 items-center'>
+              <svg
+                viewBox="0 0 16 16"
+                width={32}
+                height={32}
+                className="bg-black rounded-xl p-2"
+                onClick={() => {
+                  setShowPassword(true)
+                }}
+              >
+                <path
+                  d="
+                    M 1 15
+                    l 5 0
+                    l 0 -1.5
+                    l 1.5 0
+                    l 0 -1.5
+                    l 1.5 0
+                    l 0 -1.5
+                    a 4.5 4.5 0 1 0 -3 -3
+                    l -5 5
+                    M 12.5 5
+                    a 1 1 0 0 1 -1 1
+                    a 1 1 0 0 1 -1 -1
+                    a 1 1 0 0 1 1 -1
+                    a 1 1 0 0 1 1 1
+                    z
+                  "
+                  className="fill-white"
+                />
+              </svg>
+              Change Password
+            </button>
+            <button className='p-4 shadow-lg border rounded-xl flex gap-2 items-center text-rose-400'>
+              <svg
+                viewBox="0 0 16 16"
+                width={32}
+                height={32}
+                className='bg-rose-400 rounded-xl p-2'
+                onClick={location.reload.bind(location)}
+              >
+                <path
+                  d="
+                    M 1 1
+                    l 9 0
+                    l 0 14
+                    l -9 0
+                    z
+                    m 5.5 6
+                    l 6 0
+                    l -1.5 -1.5
+                    l 1 -1
+                    l 3.5 3.5
+                    l -3.5 3.5
+                    l -1 -1
+                    l 1.5 -1.5
+                    l -8 0
+                  "
+                  fillRule="evenodd"
+                  className="fill-white"
+                />
+              </svg>
+              Log Out
+            </button>
           </div>
         </div>
       </div>

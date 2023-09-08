@@ -64,7 +64,7 @@ const Header = () => {
         </div>
       </span>
     </div>
-    <div className="flex gap-4 w-32 justify-center md:justify-end">
+    <div className="hidden gap-4 w-32 justify-center md:flex">
       <svg
         viewBox="0 0 16 16"
         width={32}
@@ -120,7 +120,7 @@ const Header = () => {
               l -8 0
             "
           fillRule="evenodd"
-          className="fill-neutral-500"
+          className="fill-rose-400"
         />
       </svg>
     </div>
