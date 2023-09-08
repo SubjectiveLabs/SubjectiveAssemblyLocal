@@ -219,15 +219,17 @@ const App = () => {
                 <span className='text-xl'>thanks recieved.</span>
               </div>
             </div>
-            <button className='p-4 shadow-lg border rounded-xl flex gap-2 items-center'>
+            <button
+              className='p-4 shadow-lg border rounded-xl flex gap-2 items-center'
+              onClick={() => {
+                setShowPassword(true)
+              }}
+            >
               <svg
                 viewBox="0 0 16 16"
                 width={32}
                 height={32}
                 className="bg-black rounded-xl p-2"
-                onClick={() => {
-                  setShowPassword(true)
-                }}
               >
                 <path
                   d={Key}
@@ -236,13 +238,15 @@ const App = () => {
               </svg>
               Change Password
             </button>
-            <button className='p-4 shadow-lg border rounded-xl flex gap-2 items-center text-rose-400'>
+            <button
+              className='p-4 shadow-lg border rounded-xl flex gap-2 items-center text-rose-400'
+              onClick={location.reload.bind(location)}
+            >
               <svg
                 viewBox="0 0 16 16"
                 width={32}
                 height={32}
                 className='bg-rose-400 rounded-xl p-2'
-                onClick={location.reload.bind(location)}
               >
                 <path
                   d={Door}
