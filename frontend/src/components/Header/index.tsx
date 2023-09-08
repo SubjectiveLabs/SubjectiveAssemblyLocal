@@ -3,7 +3,7 @@ import { useContext } from "react"
 
 const Header = () => {
   const [school, setSchool, , setShowPassword] = useContext(AppContext)
-  return <header className='text-center flex flex-col shrink grow-0 basis-auto items-center w-full px-4 gap-4'>
+  return <header className='text-center flex flex-col shrink grow-0 basis-auto items-center w-full px-4 gap-4 md:flex-row'>
     <div className="flex flex-col basis-auto w-full gap-2">
       <h1>Welcome to</h1>
       <span className="bg-gray-200 rounded-xl p-2 w-full text-center text-xl font-bold flex gap-4 items-center">
