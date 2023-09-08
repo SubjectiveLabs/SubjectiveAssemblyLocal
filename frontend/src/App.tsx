@@ -37,6 +37,7 @@ const App = () => {
     scroll = useRef<HTMLDivElement>(null),
     agent = useContext(AgentContext) as Agent,
     days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+    env = (import.meta as unknown as { env: { PROD: boolean } }).env,
     addLoadingItem = (item: string) => {
       setLoadingItems(previous => {
         const next = [...previous]
@@ -86,7 +87,7 @@ const App = () => {
           </div>
           <div className='flex gap-2 justify-between border-b pb-2 flex-col border-neutral-400'>
             <span className={classNames('flex items-center gap-2 justify-between flex-wrap',
-              updateFailed
+              updateFailed && env.PROD
                 ? 'opacity-50 pointer-events-none'
                 : ''
             )}>
@@ -113,7 +114,7 @@ const App = () => {
                 className={classNames(
                   'bg-black text-white flex p-2 gap-2 items-center rounded-full whitespace-nowrap grow shrink-0 basis-auto',
                 )}
-                onClick={updateFailed ? undefined : () => {
+                onClick={(updateFailed && env.PROD) ? undefined : () => {
                   const period = {
                     id: v4(),
                     name: 'New Bell',
@@ -165,11 +166,11 @@ const App = () => {
               <button
                 className={classNames(
                   'bg-black text-white flex p-2 gap-2 items-center rounded-full whitespace-nowrap',
-                  updateFailed
+                  updateFailed && env.PROD
                     ? 'opacity-50 pointer-events-none'
                     : ''
                 )}
-                onClick={updateFailed ? undefined : () => {
+                onClick={(updateFailed && env.PROD) ? undefined : () => {
                   const link = {
                     id: v4(),
                     title: 'New Link',
@@ -201,8 +202,8 @@ const App = () => {
         }} />
       </div>
     </div>
-    <Loading show={loading && (import.meta as unknown as { env: { PROD: boolean } }).env.PROD} items={loadingItems} />
-    <Password show={showPassword && (import.meta as unknown as { env: { PROD: boolean } }).env.PROD} inProgress={waitingForPassword} putPassword={next => {
+    <Loading show={loading && env.PROD} items={loadingItems} />
+    <Password show={showPassword && env.PROD} inProgress={waitingForPassword} putPassword={next => {
       setWaitingForPassword(true)
       agent.putPassword(password, next).then(() => {
         setShowPassword(false)
@@ -212,7 +213,7 @@ const App = () => {
         setLoading(false)
       })
     }} />
-    <Login show={showLogin && (import.meta as unknown as { env: { PROD: boolean } }).env.PROD} inProgress={waitingForLogin} login={async password => {
+    <Login show={showLogin && env.PROD} inProgress={waitingForLogin} login={async password => {
       setWaitingForLogin(true)
       setPassword(password)
       const [, correct] = await agent.getPassword(password)
