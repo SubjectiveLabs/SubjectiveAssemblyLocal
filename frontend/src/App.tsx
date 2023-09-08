@@ -87,7 +87,7 @@ const App = () => {
             <span className='bg-black w-4 h-4 inline-flex rotate-45'></span>
             Bell Times
           </div>
-          <div className='flex gap-2 justify-between border-b pb-2 flex-col border-neutral-400'>
+          <div className='flex gap-2 justify-between pb-2 flex-col'>
             <span className={classNames('flex items-center gap-2 justify-between flex-wrap',
               updateFailed && env.PROD
                 ? 'opacity-50 pointer-events-none'
@@ -164,7 +164,7 @@ const App = () => {
               <span className='w-6 h-6 inline-flex border-[6px] border-black rounded-full'></span>
               Links
             </div>
-            <div className='flex gap-2 justify-between border-b pb-2 flex-col border-neutral-400'>
+            <div className='flex gap-2 justify-between pb-2 flex-col'>
               <button
                 className={classNames(
                   'bg-black text-white flex p-2 gap-2 items-center rounded-full whitespace-nowrap',
