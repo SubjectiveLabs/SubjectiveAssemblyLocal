@@ -24,10 +24,10 @@ const Header = () => {
         <span className="text-xl">{thanks || 0}</span>
       </div>
     </div>
-    <div className="flex flex-col basis-auto w-full gap-2 relative">
+    <div className="flex flex-col basis-auto w-full relative">
       <h1>Welcome to</h1>
       <span className={classNames(
-        "rounded-xl p-2 w-full text-xl font-bold flex gap-4 items-center transition",
+        "rounded-xl p-1 w-full text-xl font-bold flex gap-4 items-center transition",
         focused ? 'bg-gray-200' : ''
       )}>
         <input
@@ -50,7 +50,7 @@ const Header = () => {
           }}
           defaultValue={school.name}
         />
-        <div className="absolute text-center inset-x-0 flex justify-center items-center pointer-events-none gap-4 tracking-normal">
+        <div className="absolute text-center inset-x-0 flex justify-center items-center pointer-events-none gap-2 tracking-normal">
           <div className="w-8 h-8"></div>
           <span className="invisible">{name || 'School Name'}</span>
           <svg viewBox="0 0 16 16" width={24} height={24} className={classNames(
