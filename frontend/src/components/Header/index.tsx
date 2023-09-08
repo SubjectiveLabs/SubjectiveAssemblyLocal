@@ -1,5 +1,4 @@
-import { AppContext, env } from "App"
-import Alert from "Alert";
+import { AppContext } from "App"
 import { Door, Heart, Key, Pencil } from "Icons";
 import { useContext, useEffect, useState } from "react"
 import classNames from "classNames";
@@ -12,24 +11,18 @@ const Header = () => {
     setName(school.name)
   }, [school])
   return <header className='text-center flex flex-col shrink grow-0 basis-auto items-center w-full px-4 gap-4 md:flex-row'>
-    <div className="w-32 hidden md:block">
-      <Alert
-        text={
-          <div className="flex gap-2">
-            <span>Thanks</span>
-            <span>{thanks || 0}</span>
-          </div>
-        }
-        show={!!thanks || env.DEV}
-        colour="bg-rose-400"
-        icon={<svg width={16} height={16} viewBox="0 0 16 16">
-          <circle cx={8} cy={8} r={8} className='fill-white' />
-          <path
-            d={Heart}
-            className="fill-rose-400"
-          />
-        </svg>}
-      />
+    <div className="w-64 hidden md:flex gap-2">
+      <svg width={24} height={24} viewBox="0 0 16 16">
+        <circle cx={8} cy={8} r={8} className='fill-white' />
+        <path
+          d={Heart}
+          className="fill-rose-400"
+        />
+      </svg>
+      <div className="flex flex-col text-left">
+        <span className="text-rose-400 text-sm">Thanks Recieved</span>
+        <span className="text-xl">{thanks || 0}</span>
+      </div>
     </div>
     <div className="flex flex-col basis-auto w-full gap-2 relative">
       <h1>Welcome to</h1>
@@ -71,7 +64,7 @@ const Header = () => {
         </div>
       </span>
     </div>
-    <div className="hidden gap-4 w-32 justify-center md:flex">
+    <div className="hidden gap-4 w-64 justify-center md:flex">
       <svg
         viewBox="0 0 16 16"
         width={32}
