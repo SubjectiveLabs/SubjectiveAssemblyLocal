@@ -33,7 +33,7 @@ const Header = () => {
         <input
           type='text'
           placeholder="School name"
-          className="bg-transparent w-full text-center"
+          className="bg-transparent w-full text-center text-2xl"
           onFocus={() => {
             setFocused(true)
           }}
