@@ -136,7 +136,7 @@ const App = () => {
               <Alert
                 text={`No bells found for ${days[day]}.`}
                 show={school.bell_times[day].length === 0}
-                colour='bg-rose-500'
+                colour='bg-rose-400'
                 icon={<Exclamation />}
               />
               <Alert

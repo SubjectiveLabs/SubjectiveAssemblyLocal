@@ -1,6 +1,6 @@
 export const Exclamation = () => <svg viewBox='0 0 16 16' width={16} height={16}>
   <circle cx={8} cy={8} r={8} className='fill-white' />
-  <circle cx={8} cy={12} r={2} className='fill-red-500' />
+  <circle cx={8} cy={12} r={2} className='fill-rose-400' />
   <path d='
     M 8 2
     q 2 0 2 2
@@ -9,7 +9,7 @@ export const Exclamation = () => <svg viewBox='0 0 16 16' width={16} height={16}
     t -2 -2
     v -3
     q 0 -2 2 -2
-    z' className='fill-rose-500' />
+    z' className='fill-rose-400' />
 </svg>
 
 export const ThreeDots = () => <svg viewBox='0 0 16 16' width={16} height={16}>
