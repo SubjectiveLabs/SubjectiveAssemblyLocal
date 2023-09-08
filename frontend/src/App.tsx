@@ -131,12 +131,6 @@ const App = () => {
             </span>
             <span className='flex gap-2 flex-wrap whitespace-nowrap'>
               <Alert
-                text='Failed to get school.'
-                show={updateFailed}
-                colour='bg-rose-500'
-                icon={<Exclamation />}
-              />
-              <Alert
                 text={`No bells found for ${days[day]}.`}
                 show={school.bell_times[day].length === 0}
                 colour='bg-rose-500'
@@ -190,14 +184,6 @@ const App = () => {
                 <Plus />
                 Add Link
               </button>
-              <span className='flex gap-2 flex-wrap whitespace-nowrap'>
-                <Alert
-                  text='Failed to get school.'
-                  show={updateFailed}
-                  colour='bg-rose-500'
-                  icon={<Exclamation />}
-                />
-              </span>
             </div>
             <ul className='flex flex-col gap-4 overflow-y-auto rounded-2xl'>
               {
