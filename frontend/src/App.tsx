@@ -12,8 +12,8 @@ import { Agent, AgentContext, School } from 'backend'
 import Header from 'components/Header'
 import Link from 'components/Link'
 
-export const AppContext = createContext<[School, Dispatch<SetStateAction<School>>, string, Dispatch<SetStateAction<boolean>>]>
-  ({} as [School, Dispatch<SetStateAction<School>>, string, Dispatch<SetStateAction<boolean>>])
+export const AppContext = createContext<[School, Dispatch<SetStateAction<School>>, string, number, Dispatch<SetStateAction<boolean>>]>
+  ({} as [School, Dispatch<SetStateAction<School>>, string, number, Dispatch<SetStateAction<boolean>>])
 const App = () => {
   const getDefaultDay = () => {
     let day = new Date().getDay() - 1
@@ -34,6 +34,7 @@ const App = () => {
     [showLogin, setShowLogin] = useState(false),
     [waitingForLogin, setWaitingForLogin] = useState(false),
     [password, setPassword] = useState(' '),
+    [thanks, setThanks] = useState(0),
     scroll = useRef<HTMLDivElement>(null),
     agent = useContext(AgentContext) as Agent,
     days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
@@ -58,21 +59,22 @@ const App = () => {
     agent.putSchool(school, password)
   }, [school])
   useEffect(() => {
-    addLoadingItem('Getting notices...')
-    addLoadingItem('Done.')
-    addLoadingItem('Checking for password...')
-    agent.getPassword(' ')
-      .then(([exists,]) => {
-        if (exists) {
-          addLoadingItem('Password set. Authenticating...')
-          setShowLogin(true)
-        } else {
-          addLoadingItem('Password not set. Prompting user...')
-          setShowPassword(true)
-        }
-      })
+    (async () => {
+      addLoadingItem('Getting "thanks" count...')
+      setThanks(await agent.getThanks())
+      addLoadingItem('Done.')
+      addLoadingItem('Checking for password...')
+      const [exists,] = await agent.getPassword(' ')
+      if (exists) {
+        addLoadingItem('Password set. Authenticating...')
+        setShowLogin(true)
+      } else {
+        addLoadingItem('Password not set. Prompting user...')
+        setShowPassword(true)
+      }
+    })()
   }, [])
-  return <AppContext.Provider value={[school, setSchool, password, setShowPassword]}>
+  return <AppContext.Provider value={[school, setSchool, password, thanks, setShowPassword]}>
     <div className='py-4 bg-gray-50 h-full flex flex-col gap-4 font-semibold tracking-tighter leading-none md:pb-0'>
       <Header />
       <div className='flex h-full overflow-x-auto snap-mandatory snap-x scroll-smooth md:p-4 md:grid md:grid-cols-2 md:gap-4 no-scrollbar' onScroll={event => {
@@ -287,8 +289,8 @@ const App = () => {
         }} />
       </div>
     </div>
-    <Loading show={loading && env.PROD} items={loadingItems} />
-    <Password show={showPassword && env.PROD} inProgress={waitingForPassword} putPassword={next => {
+    <Loading show={loading && (import.meta as unknown as { env: { PROD: boolean } }).env.PROD} items={loadingItems} />
+    <Password show={showPassword && (import.meta as unknown as { env: { PROD: boolean } }).env.PROD} inProgress={waitingForPassword} putPassword={next => {
       setWaitingForPassword(true)
       agent.putPassword(password, next).then(() => {
         setShowPassword(false)
@@ -298,7 +300,7 @@ const App = () => {
         setLoading(false)
       })
     }} />
-    <Login show={showLogin && env.PROD} inProgress={waitingForLogin} login={async password => {
+    <Login show={showLogin && (import.meta as unknown as { env: { PROD: boolean } }).env.PROD} inProgress={waitingForLogin} login={async password => {
       setWaitingForLogin(true)
       setPassword(password)
       const [, correct] = await agent.getPassword(password)

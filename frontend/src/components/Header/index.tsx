@@ -3,7 +3,7 @@ import { useContext, useState } from "react"
 import classNames from "utils/classNames";
 
 const Header = () => {
-  const [school, setSchool, , setShowPassword] = useContext(AppContext)
+  const [school, setSchool, , , setShowPassword] = useContext(AppContext)
   const [focused, setFocused] = useState(false);
   const [name, setName] = useState(school.name);
   return <header className='text-center flex flex-col shrink grow-0 basis-auto items-center w-full px-4 gap-4 md:flex-row'>
