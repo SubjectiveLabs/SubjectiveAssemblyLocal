@@ -9,10 +9,7 @@ const Bell = ({ bellTime }: { bellTime: BellTime }) => {
   return <div className='border rounded-2xl p-4 flex gap-4 items-center'>
     <button
       className={classNames(
-        'inline-flex outline-red-300 outline-2 outline -outline-offset-2 bg-red-200 p-2 rounded-xl aspect-square',
-        deleting
-          ? 'animate-spin'
-          : ''
+        'inline-flex bg-rose-400 p-2 rounded-xl aspect-square',
       )}
       onClick={() => {
         if (!deleting) {
@@ -25,7 +22,27 @@ const Bell = ({ bellTime }: { bellTime: BellTime }) => {
         setDeleting(true)
       }}
     >
-      &#128465;
+      <svg width={16} height={16} viewBox='0 0 16 16'>
+        <path
+          d="
+            M 5 1
+            l 6 0
+            l 1 2
+            l 2 0
+            l 0 1
+            l -12 0
+            l 0 -1
+            l 2 0
+            z
+            M 3.5 5
+            l 9 0
+            l -0.5 9
+            l -8 0
+
+          "
+          className='fill-white'
+        />
+      </svg>
     </button>
     <input
       type='text'

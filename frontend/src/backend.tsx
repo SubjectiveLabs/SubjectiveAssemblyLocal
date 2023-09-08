@@ -39,7 +39,7 @@ export const Agent = function (this: Agent, url: string) {
     return school as School
   }
   this.putSchool = async (school, password: string | null) => {
-    if (!password) return
+    if (!password || password === ' ') return
     if (!(await fetch(`${url}/school`, {
       method: 'PUT',
       headers: {

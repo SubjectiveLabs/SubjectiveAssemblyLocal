@@ -9,9 +9,8 @@ const Password = ({ show, inProgress, putPassword }: { show: boolean, inProgress
   )}>
     <div className='p-8 bg-white border rounded-2xl shadow-xl flex flex-col gap-4'>
       <div>
-        <h1 className='text-2xl'>No password set.</h1>
-        <p>Secure student bell times with a strong password.</p>
-        <p>You won't be able to see this again, so keep it safe.</p>
+        <h1 className='text-2xl'>Set a password</h1>
+        <p>Secure Assembly with a strong password.</p>
       </div>
       <input
         type="password"

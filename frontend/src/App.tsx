@@ -4,7 +4,7 @@ import Footer from 'Footer'
 import { v4 } from 'uuid'
 import classNames from 'utils/classNames'
 import Alert from 'Alert'
-import { Exclamation, Plus, ThreeDots } from 'components/Icons'
+import { Door, Exclamation, Heart, Key, Plus, ThreeDots } from 'components/Icons'
 import Loading from 'Loading'
 import Password from 'Password'
 import Login from 'Login'
@@ -12,8 +12,9 @@ import { Agent, AgentContext, School } from 'backend'
 import Header from 'components/Header'
 import Link from 'components/Link'
 
-export const AppContext = createContext<[School, Dispatch<SetStateAction<School>>, string, number]>
-  ({} as [School, Dispatch<SetStateAction<School>>, string, number])
+export const AppContext = createContext<[School, Dispatch<SetStateAction<School>>, string, number, Dispatch<SetStateAction<boolean>>]>
+  ({} as [School, Dispatch<SetStateAction<School>>, string, number, Dispatch<SetStateAction<boolean>>])
+export const env = (import.meta as unknown as { env: { PROD: boolean, DEV: boolean } }).env
 const App = () => {
   const getDefaultDay = () => {
     let day = new Date().getDay() - 1
@@ -33,7 +34,7 @@ const App = () => {
     [waitingForPassword, setWaitingForPassword] = useState(false),
     [showLogin, setShowLogin] = useState(false),
     [waitingForLogin, setWaitingForLogin] = useState(false),
-    [password, setPassword] = useState(''),
+    [password, setPassword] = useState(' '),
     [thanks, setThanks] = useState(0),
     scroll = useRef<HTMLDivElement>(null),
     agent = useContext(AgentContext) as Agent,
@@ -73,12 +74,12 @@ const App = () => {
       }
     })()
   }, [])
-  return <AppContext.Provider value={[school, setSchool, password, thanks]}>
+  return <AppContext.Provider value={[school, setSchool, password, thanks, setShowPassword]}>
     <div className='py-4 bg-gray-50 h-full flex flex-col gap-4 font-semibold tracking-tighter leading-none md:pb-0'>
       <Header />
       <div className='flex h-full overflow-x-auto snap-mandatory snap-x scroll-smooth md:p-4 md:grid md:grid-cols-2 md:gap-4 no-scrollbar' onScroll={event => {
-        const scroll = event.currentTarget.scrollLeft / event.currentTarget.scrollWidth * 2
-        if (Math.abs(scroll - Math.round(scroll)) < 10)
+        const scroll = event.currentTarget.scrollLeft / event.currentTarget.scrollWidth * 3
+        if (Math.abs(scroll - Math.round(scroll)) < 20)
           setActive(Math.round(scroll))
       }} ref={scroll}>
         <div className='md:border md:shadow-lg md:rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full snap-center bg-white'>
@@ -86,9 +87,9 @@ const App = () => {
             <span className='bg-black w-4 h-4 inline-flex rotate-45'></span>
             Bell Times
           </div>
-          <div className='flex gap-2 justify-between border-b pb-2 flex-col'>
-            <span className={classNames('flex items-center gap-2 justify-between',
-              updateFailed
+          <div className='flex gap-2 justify-between pb-2 flex-col'>
+            <span className={classNames('flex items-center gap-2 justify-between flex-wrap',
+              updateFailed && env.PROD
                 ? 'opacity-50 pointer-events-none'
                 : ''
             )}>
@@ -112,8 +113,10 @@ const App = () => {
                 </select>
               </span>
               <button
-                className='bg-black text-white flex p-2 gap-2 items-center rounded-full whitespace-nowrap'
-                onClick={updateFailed ? undefined : () => {
+                className={classNames(
+                  'bg-black text-white flex p-2 gap-2 items-center rounded-full whitespace-nowrap grow shrink-0 basis-auto',
+                )}
+                onClick={(updateFailed && env.PROD) ? undefined : () => {
                   const period = {
                     id: v4(),
                     name: 'New Bell',
@@ -133,15 +136,9 @@ const App = () => {
             </span>
             <span className='flex gap-2 flex-wrap whitespace-nowrap'>
               <Alert
-                text='Failed to get school.'
-                show={updateFailed}
-                colour='bg-rose-500'
-                icon={<Exclamation />}
-              />
-              <Alert
                 text={`No bells found for ${days[day]}.`}
                 show={school.bell_times[day].length === 0}
-                colour='bg-rose-500'
+                colour='bg-rose-400'
                 icon={<Exclamation />}
               />
               <Alert
@@ -161,21 +158,21 @@ const App = () => {
             }
           </ul>
         </div>
-        <div className="grow shrink-0 basis-auto snap-center flex flex-col gap-4">
+        <div className="grow shrink-0 basis-auto snap-center flex flex-col gap-4 w-full">
           <div className='md:border md:shadow-lg md:rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full bg-white overflow-auto'>
             <div className='gap-2 items-center flex text-xl'>
               <span className='w-6 h-6 inline-flex border-[6px] border-black rounded-full'></span>
               Links
             </div>
-            <div className='flex gap-2 justify-between border-b pb-2 flex-col'>
+            <div className='flex gap-2 justify-between pb-2 flex-col'>
               <button
                 className={classNames(
                   'bg-black text-white flex p-2 gap-2 items-center rounded-full whitespace-nowrap',
-                  updateFailed
+                  updateFailed && env.PROD
                     ? 'opacity-50 pointer-events-none'
                     : ''
                 )}
-                onClick={updateFailed ? undefined : () => {
+                onClick={(updateFailed && env.PROD) ? undefined : () => {
                   const link = {
                     id: v4(),
                     title: 'New Link',
@@ -192,14 +189,6 @@ const App = () => {
                 <Plus />
                 Add Link
               </button>
-              <span className='flex gap-2 flex-wrap whitespace-nowrap'>
-                <Alert
-                  text='Failed to get school.'
-                  show={updateFailed}
-                  colour='bg-rose-500'
-                  icon={<Exclamation />}
-                />
-              </span>
             </div>
             <ul className='flex flex-col gap-4 overflow-y-auto rounded-2xl'>
               {
@@ -207,22 +196,66 @@ const App = () => {
               }
             </ul>
           </div>
-          <div className="md:border md:shadow-lg md:rounded-2xl p-4 flex flex-col gap-2 w-full bg-white overflow-auto shrink grow-0 basis-auto">
-            <div className='items-center flex text-xl justify-between gap-4 px-2'>
-              <span className='gap-2 items-center flex'>
-                <span className='w-6 h-6 inline-flex bg-black'></span>
-                Password
+        </div>
+        <div className="grow shrink-0 basis-auto snap-center flex flex-col gap-4 w-full md:hidden">
+          <div className='md:border md:shadow-lg md:rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full bg-white overflow-auto'>
+            <div className='gap-2 items-center flex text-xl'>
+              <span className='w-4 h-4 inline-flex flex-col gap-1'>
+                {
+                  [...Array(3)].map((_, index) => <span className='bg-black grow rounded-full' key={index}></span>)
+                }
               </span>
-              <input
-                type="password"
-                defaultValue={password}
-                className='bg-gray-200 rounded-xl p-1 w-full'
-                onBlur={event => {
-                  setPassword(event.target.value)
-                  agent.putPassword(password, event.target.value)
-                }}
-              />
+              Menu
             </div>
+            <div className='bg-rose-400 p-4 text-white rounded-xl flex gap-4 items-center'>
+              <svg width={72} height={72} viewBox="0 0 16 16">
+                <path
+                  d={Heart}
+                  className="fill-white"
+                />
+              </svg>
+              <div className='flex flex-col'>
+                <span className='text-4xl font-extrabold'>{thanks || 0}</span>
+                <span className='text-xl'>thanks recieved.</span>
+              </div>
+            </div>
+            <button
+              className='p-4 shadow-lg border rounded-xl flex gap-2 items-center'
+              onClick={() => {
+                setShowPassword(true)
+              }}
+            >
+              <svg
+                viewBox="0 0 16 16"
+                width={32}
+                height={32}
+                className="bg-black rounded-xl p-2"
+              >
+                <path
+                  d={Key}
+                  className="fill-white"
+                />
+              </svg>
+              Change Password
+            </button>
+            <button
+              className='p-4 shadow-lg border rounded-xl flex gap-2 items-center text-rose-400'
+              onClick={location.reload.bind(location)}
+            >
+              <svg
+                viewBox="0 0 16 16"
+                width={32}
+                height={32}
+                className='bg-rose-400 rounded-xl p-2'
+              >
+                <path
+                  d={Door}
+                  fillRule="evenodd"
+                  className="fill-white"
+                />
+              </svg>
+              Log Out
+            </button>
           </div>
         </div>
       </div>
@@ -235,7 +268,7 @@ const App = () => {
     <Loading show={loading && (import.meta as unknown as { env: { PROD: boolean } }).env.PROD} items={loadingItems} />
     <Password show={showPassword && (import.meta as unknown as { env: { PROD: boolean } }).env.PROD} inProgress={waitingForPassword} putPassword={next => {
       setWaitingForPassword(true)
-      agent.putPassword(' ', next).then(() => {
+      agent.putPassword(password, next).then(() => {
         setShowPassword(false)
         setWaitingForPassword(false)
         setPassword(next)

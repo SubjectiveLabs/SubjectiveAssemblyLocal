@@ -1,53 +1,97 @@
 import { AppContext } from "App"
-import Alert from "components/Alert"
-import { useContext } from "react"
+import { Door, Heart, Key, Pencil } from "Icons";
+import { useContext, useEffect, useState } from "react"
+import classNames from "classNames";
 
 const Header = () => {
-  const [school, setSchool, , thanks] = useContext(AppContext)
-  return <header className="grid grid-cols-2 md:grid-cols-3">
-    <div className="grid place-content-center">
-      <Alert
-        text={
-          <div className="flex gap-2">
-            <span>Thanks</span>
-            <span>{thanks}</span>
-          </div>
-        }
-        show={!!thanks || (import.meta as unknown as { env: { DEV: boolean } }).env.DEV}
-        colour="bg-rose-400"
-        icon={<svg width={16} height={16} viewBox="0 0 16 16">
-          <circle cx={8} cy={8} r={8} className='fill-white' />
-          <path
-            d="
-              M 8 13.333
-              a 0.666 0.666 0 0 1 -0.291 -0.066
-              C 7.476 13.153 2 10.447 2 6
-              a 3.333 3.333 0 0 1 5.69 -2.357
-              l 0.31 0.31 0.31 -0.31
-              A 3.333 3.333 0 0 1 14 6
-              c 0 4.431 -5.475 7.152 -5.708 7.27
-              A 0.666 0.666 0 0 1 8 13.333
-              z
-            "
-            className="fill-rose-400"
-          />
-        </svg>}
-      />
+  const [school, setSchool, , thanks, setShowPassword] = useContext(AppContext)
+  const [focused, setFocused] = useState(false);
+  const [name, setName] = useState(school.name);
+  useEffect(() => {
+    setName(school.name)
+  }, [school])
+  return <header className='text-center flex flex-col shrink grow-0 basis-auto items-center w-full px-4 gap-4 md:flex-row'>
+    <div className="w-72 hidden md:flex gap-2">
+      <svg width={24} height={24} viewBox="0 0 16 16">
+        <circle cx={8} cy={8} r={8} className='fill-white' />
+        <path
+          d={Heart}
+          className="fill-rose-400"
+        />
+      </svg>
+      <div className="flex flex-col text-left text-xl">
+        <span className="text-rose-400 whitespace-nowrap">Thanks Recieved</span>
+        <span>{thanks || 0}</span>
+      </div>
     </div>
-    <div className="text-center flex flex-col items-center px-4">
-      <h1>Welcome to</h1>
-      <input
-        type='text'
-        className='bg-gray-200 rounded-xl p-2 w-full text-center text-xl font-bold'
-        onBlur={event => {
-          setSchool(previous => {
-            const next = { ...previous }
-            next.name = event.target.value
-            return next
-          })
+    <div className="flex flex-col basis-auto w-full relative">
+      <h1 className="text-xl">Welcome to</h1>
+      <span className={classNames(
+        "rounded-xl p-1 w-full text-xl font-bold flex gap-4 items-center transition",
+        focused ? 'bg-gray-200' : ''
+      )}>
+        <input
+          type='text'
+          placeholder="School name"
+          className="bg-transparent w-full text-center"
+          onFocus={() => {
+            setFocused(true)
+          }}
+          onBlur={event => {
+            setFocused(false)
+            setSchool(previous => {
+              const next = { ...previous }
+              next.name = event.target.value
+              return next
+            })
+          }}
+          onChange={event => {
+            setName(event.target.value)
+          }}
+          defaultValue={school.name}
+        />
+        <div className="absolute text-center inset-x-0 flex justify-center items-center pointer-events-none gap-2 tracking-normal">
+          <div className="w-8 h-8"></div>
+          <span className="invisible">{name || 'School Name'}</span>
+          <svg viewBox="0 0 16 16" width={24} height={24} className={classNames(
+            focused ? 'invisible' : ''
+          )}>
+            <path
+              d={Pencil}
+              className="fill-neutral-500"
+            />
+          </svg>
+        </div>
+      </span>
+    </div>
+    <div className="hidden gap-4 w-72 justify-center md:flex">
+      <svg
+        viewBox="0 0 16 16"
+        width={32}
+        height={32}
+        className="cursor-pointer hover:opacity-75 transition"
+        onClick={() => {
+          setShowPassword(true)
         }}
-        defaultValue={school.name}
-      />
+      >
+        <path
+          d={Key}
+          className="fill-neutral-500"
+        />
+      </svg>
+      <svg
+        viewBox="0 0 16 16"
+        width={32}
+        height={32}
+        className="cursor-pointer hover:opacity-75 transition"
+        onClick={location.reload.bind(location)}
+      >
+        <path
+          d={Door}
+          fillRule="evenodd"
+          className="fill-rose-400"
+        />
+      </svg>
     </div>
   </header>
 }
