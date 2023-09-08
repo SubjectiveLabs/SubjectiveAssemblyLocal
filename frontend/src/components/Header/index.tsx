@@ -1,14 +1,32 @@
-import { AppContext } from "App"
+import { AppContext, env } from "App"
+import Alert from "Alert";
+import { Door, Heart, Key, Pencil } from "Icons";
 import { useContext, useState } from "react"
-import classNames from "utils/classNames";
+import classNames from "classNames";
 
 const Header = () => {
-  const [school, setSchool, , , setShowPassword] = useContext(AppContext)
+  const [school, setSchool, , thanks, setShowPassword] = useContext(AppContext)
   const [focused, setFocused] = useState(false);
   const [name, setName] = useState(school.name);
   return <header className='text-center flex flex-col shrink grow-0 basis-auto items-center w-full px-4 gap-4 md:flex-row'>
-    <div className="w-32">
-
+    <div className="w-32 hidden md:block">
+      <Alert
+        text={
+          <div className="flex gap-2">
+            <span>Thanks</span>
+            <span>{thanks || 0}</span>
+          </div>
+        }
+        show={!!thanks || env.DEV}
+        colour="bg-rose-400"
+        icon={<svg width={16} height={16} viewBox="0 0 16 16">
+          <circle cx={8} cy={8} r={8} className='fill-white' />
+          <path
+            d={Heart}
+            className="fill-rose-400"
+          />
+        </svg>}
+      />
     </div>
     <div className="flex flex-col basis-auto w-full gap-2 relative">
       <h1>Welcome to</h1>
@@ -43,21 +61,7 @@ const Header = () => {
             focused ? 'invisible' : ''
           )}>
             <path
-              d="
-              M 1 15
-              l 3 -1
-              l 8 -8
-              l -2 -2
-              l -8 8
-              z
-              m 9.5 -11.5
-              l 2 2
-              l 1 -1
-              a 1 1 0 0 0 0 -1
-              l -1 -1
-              a 1 1 0 0 0 -1 0
-              z
-            "
+              d={Pencil}
               className="fill-neutral-500"
             />
           </svg>
@@ -69,29 +73,13 @@ const Header = () => {
         viewBox="0 0 16 16"
         width={32}
         height={32}
-        className="cursor-pointer"
+        className="cursor-pointer hover:opacity-75 transition"
         onClick={() => {
           setShowPassword(true)
         }}
       >
         <path
-          d="
-              M 1 15
-              l 5 0
-              l 0 -1.5
-              l 1.5 0
-              l 0 -1.5
-              l 1.5 0
-              l 0 -1.5
-              a 4.5 4.5 0 1 0 -3 -3
-              l -5 5
-              M 12.5 5
-              a 1 1 0 0 1 -1 1
-              a 1 1 0 0 1 -1 -1
-              a 1 1 0 0 1 1 -1
-              a 1 1 0 0 1 1 1
-              z
-              "
+          d={Key}
           className="fill-neutral-500"
         />
       </svg>
@@ -103,22 +91,7 @@ const Header = () => {
         onClick={location.reload.bind(location)}
       >
         <path
-          d="
-              M 1 1
-              l 9 0
-              l 0 14
-              l -9 0
-              z
-              m 5.5 6
-              l 6 0
-              l -1.5 -1.5
-              l 1 -1
-              l 3.5 3.5
-              l -3.5 3.5
-              l -1 -1
-              l 1.5 -1.5
-              l -8 0
-            "
+          d={Door}
           fillRule="evenodd"
           className="fill-rose-400"
         />

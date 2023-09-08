@@ -4,7 +4,7 @@ import Footer from 'Footer'
 import { v4 } from 'uuid'
 import classNames from 'utils/classNames'
 import Alert from 'Alert'
-import { Exclamation, Plus, ThreeDots } from 'components/Icons'
+import { Door, Exclamation, Heart, Key, Plus, ThreeDots } from 'components/Icons'
 import Loading from 'Loading'
 import Password from 'Password'
 import Login from 'Login'
@@ -14,6 +14,7 @@ import Link from 'components/Link'
 
 export const AppContext = createContext<[School, Dispatch<SetStateAction<School>>, string, number, Dispatch<SetStateAction<boolean>>]>
   ({} as [School, Dispatch<SetStateAction<School>>, string, number, Dispatch<SetStateAction<boolean>>])
+export const env = (import.meta as unknown as { env: { PROD: boolean, DEV: boolean } }).env
 const App = () => {
   const getDefaultDay = () => {
     let day = new Date().getDay() - 1
@@ -38,7 +39,6 @@ const App = () => {
     scroll = useRef<HTMLDivElement>(null),
     agent = useContext(AgentContext) as Agent,
     days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-    env = (import.meta as unknown as { env: { PROD: boolean } }).env,
     addLoadingItem = (item: string) => {
       setLoadingItems(previous => {
         const next = [...previous]
@@ -207,12 +207,15 @@ const App = () => {
               </span>
               Menu
             </div>
-            <div className='bg-rose-400 p-4 text-white rounded-xl flex'>
-              <div className=''>
-
-              </div>
+            <div className='bg-rose-400 p-4 text-white rounded-xl flex gap-4 items-center'>
+              <svg width={72} height={72} viewBox="0 0 16 16">
+                <path
+                  d={Heart}
+                  className="fill-white"
+                />
+              </svg>
               <div className='flex flex-col'>
-                <span className='text-4xl font-extrabold '>8 billion</span>
+                <span className='text-4xl font-extrabold'>{thanks || 0}</span>
                 <span className='text-xl'>thanks recieved.</span>
               </div>
             </div>
@@ -227,23 +230,7 @@ const App = () => {
                 }}
               >
                 <path
-                  d="
-                    M 1 15
-                    l 5 0
-                    l 0 -1.5
-                    l 1.5 0
-                    l 0 -1.5
-                    l 1.5 0
-                    l 0 -1.5
-                    a 4.5 4.5 0 1 0 -3 -3
-                    l -5 5
-                    M 12.5 5
-                    a 1 1 0 0 1 -1 1
-                    a 1 1 0 0 1 -1 -1
-                    a 1 1 0 0 1 1 -1
-                    a 1 1 0 0 1 1 1
-                    z
-                  "
+                  d={Key}
                   className="fill-white"
                 />
               </svg>
@@ -258,22 +245,7 @@ const App = () => {
                 onClick={location.reload.bind(location)}
               >
                 <path
-                  d="
-                    M 1 1
-                    l 9 0
-                    l 0 14
-                    l -9 0
-                    z
-                    m 5.5 6
-                    l 6 0
-                    l -1.5 -1.5
-                    l 1 -1
-                    l 3.5 3.5
-                    l -3.5 3.5
-                    l -1 -1
-                    l 1.5 -1.5
-                    l -8 0
-                  "
+                  d={Door}
                   fillRule="evenodd"
                   className="fill-white"
                 />
