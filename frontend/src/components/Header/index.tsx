@@ -1,13 +1,16 @@
 import { AppContext, env } from "App"
 import Alert from "Alert";
 import { Door, Heart, Key, Pencil } from "Icons";
-import { useContext, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import classNames from "classNames";
 
 const Header = () => {
   const [school, setSchool, , thanks, setShowPassword] = useContext(AppContext)
   const [focused, setFocused] = useState(false);
   const [name, setName] = useState(school.name);
+  useEffect(() => {
+    setName(school.name)
+  }, [school])
   return <header className='text-center flex flex-col shrink grow-0 basis-auto items-center w-full px-4 gap-4 md:flex-row'>
     <div className="w-32 hidden md:block">
       <Alert
