@@ -4,16 +4,26 @@ import Footer from 'Footer'
 import { v4 } from 'uuid'
 import classNames from 'utils/classNames'
 import Alert from 'Alert'
-import { Door, Exclamation, Heart, Key, Plus} from 'components/Icons'
+import { Door, Exclamation, Heart, Key, Plus } from 'components/Icons'
 import Loading from 'Loading'
 import Password from 'Password'
 import Login from 'Login'
 import { Agent, AgentContext, School } from 'backend'
 import Header from 'components/Header'
 import Link from 'components/Link'
+import Settings from 'components/Settings'
+import { Duration } from 'luxon'
 
-export const AppContext = createContext<[School, Dispatch<SetStateAction<School>>, string, number, Dispatch<SetStateAction<boolean>>]>
-  ({} as [School, Dispatch<SetStateAction<School>>, string, number, Dispatch<SetStateAction<boolean>>])
+export type Context = {
+  school: [School, Dispatch<SetStateAction<School>>],
+  password: string,
+  thanks: number,
+  setShowSettings: Dispatch<SetStateAction<boolean>>,
+  autoRefresh: [boolean, Dispatch<SetStateAction<boolean>>],
+  refreshInterval: [Duration, Dispatch<SetStateAction<Duration>>],
+}
+
+export const AppContext = createContext<Context>({} as Context)
 export const env = (import.meta as unknown as { env: { PROD: boolean, DEV: boolean } }).env
 const App = () => {
   const getDefaultDay = () => {
@@ -36,6 +46,7 @@ const App = () => {
     [waitingForLogin, setWaitingForLogin] = useState(false),
     [password, setPassword] = useState(' '),
     [thanks, setThanks] = useState(0),
+    [showSettings, setShowSettings] = useState(false),
     scroll = useRef<HTMLDivElement>(null),
     agent = useContext(AgentContext) as Agent,
     days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
@@ -48,17 +59,30 @@ const App = () => {
     },
     update = () => {
       setUpdateFailed(false)
+      agent.getThanks().then(thanks => {
+        setThanks(thanks)
+      }).catch(() => {
+        setUpdateFailed(true)
+      })
       agent.getSchool().then(school => {
         setSchool(school)
       }).catch(() => {
         setUpdateFailed(true)
       })
-    }
+    },
+    [autoRefresh, setAutoRefresh] = useState(true),
+    [refreshInterval, setRefreshInterval] = useState(Duration.fromObject({ minutes: 60 }))
   useEffect(update, [day])
   useEffect(() => {
     agent.putSchool(school, password)
   }, [school])
   useEffect(() => {
+    {
+      setInterval(() => {
+        if (autoRefresh)
+          update()
+      }, refreshInterval.as('milliseconds'))
+    }
     (async () => {
       addLoadingItem('Getting "thanks" count...')
       setThanks(await agent.getThanks())
@@ -74,7 +98,14 @@ const App = () => {
       }
     })()
   }, [])
-  return <AppContext.Provider value={[school, setSchool, password, thanks, setShowPassword]}>
+  return <AppContext.Provider value={{
+    school: [school, setSchool],
+    password,
+    thanks,
+    setShowSettings,
+    autoRefresh: [autoRefresh, setAutoRefresh],
+    refreshInterval: [refreshInterval, setRefreshInterval],
+  }}>
     <div className='py-4 bg-gray-50 h-full flex flex-col gap-2 font-semibold tracking-tighter leading-none md:pb-0'>
       <Header />
       <div className='flex h-full overflow-x-auto snap-mandatory snap-x scroll-smooth md:p-4 md:grid md:grid-cols-2 md:gap-4 no-scrollbar' onScroll={event => {
@@ -216,7 +247,7 @@ const App = () => {
             <button
               className='p-4 shadow-lg border rounded-xl flex gap-2 items-center'
               onClick={() => {
-                setShowPassword(true)
+                setShowSettings(true)
               }}
             >
               <svg
@@ -259,8 +290,8 @@ const App = () => {
         }} />
       </div>
     </div>
-    <Loading show={loading && (import.meta as unknown as { env: { PROD: boolean } }).env.PROD} items={loadingItems} />
-    <Password show={showPassword && (import.meta as unknown as { env: { PROD: boolean } }).env.PROD} inProgress={waitingForPassword} putPassword={next => {
+    <Loading show={loading && env.PROD} items={loadingItems} />
+    <Password show={showPassword && env.PROD} inProgress={waitingForPassword} putPassword={next => {
       setWaitingForPassword(true)
       agent.putPassword(password, next).then(() => {
         setShowPassword(false)
@@ -270,7 +301,17 @@ const App = () => {
         setLoading(false)
       })
     }} />
-    <Login show={showLogin && (import.meta as unknown as { env: { PROD: boolean } }).env.PROD} inProgress={waitingForLogin} login={async password => {
+    <Settings show={showSettings && env.PROD} inProgress={waitingForPassword} putPassword={next => {
+      setWaitingForPassword(true)
+      agent.putPassword(password, next).then(() => {
+        setShowPassword(false)
+        setWaitingForPassword(false)
+        setPassword(next)
+        addLoadingItem('Password set.')
+        setLoading(false)
+      })
+    }} />
+    <Login show={showLogin && env.PROD} inProgress={waitingForLogin} login={async password => {
       setWaitingForLogin(true)
       setPassword(password)
       const [, correct] = await agent.getPassword(password)
@@ -284,6 +325,7 @@ const App = () => {
       setWaitingForLogin(false)
       return correct
     }} />
+
   </AppContext.Provider>
 }
 

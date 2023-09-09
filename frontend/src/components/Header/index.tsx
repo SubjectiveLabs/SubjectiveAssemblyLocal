@@ -4,7 +4,12 @@ import { useContext, useEffect, useState } from "react"
 import classNames from "classNames";
 
 const Header = () => {
-  const [school, setSchool, , thanks, setShowPassword] = useContext(AppContext)
+  // const [school, setSchool, , thanks, setShowSettings] = useContext(AppContext)
+  const {
+    school: [school, setSchool],
+    thanks,
+    setShowSettings
+  } = useContext(AppContext)
   const [focused, setFocused] = useState(false);
   const [name, setName] = useState(school.name);
   useEffect(() => {
@@ -72,7 +77,7 @@ const Header = () => {
         height={32}
         className="cursor-pointer hover:opacity-75 transition"
         onClick={() => {
-          setShowPassword(true)
+          setShowSettings(true)
         }}
       >
         <path

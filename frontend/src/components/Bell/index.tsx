@@ -5,7 +5,7 @@ import { AppContext } from 'App'
 
 const Bell = ({ bellTime }: { bellTime: BellTime }) => {
   const [deleting, setDeleting] = useState(false),
-    [, setSchool] = useContext(AppContext)
+    { school: [, setSchool] } = useContext(AppContext)
   return <div className='border rounded-2xl p-4 flex gap-4 items-center'>
     <button
       className={classNames(
