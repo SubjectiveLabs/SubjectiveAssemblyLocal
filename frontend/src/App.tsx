@@ -301,7 +301,7 @@ const App = () => {
         setLoading(false)
       })
     }} />
-    <Settings show={showSettings || env.DEV} inProgress={waitingForPassword} putPassword={next => {
+    <Settings show={showSettings && env.PROD} inProgress={waitingForPassword} putPassword={next => {
       setWaitingForPassword(true)
       agent.putPassword(password, next).then(() => {
         setShowPassword(false)
