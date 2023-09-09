@@ -9,7 +9,7 @@ const Bell = ({ bellTime }: { bellTime: BellTime }) => {
   return <div className='border rounded-2xl p-4 flex gap-4 items-center'>
     <button
       className={classNames(
-        'inline-flex bg-rose-400 p-2 rounded-xl aspect-square',
+        'inline-flex bg-red-500 p-2 rounded-xl aspect-square',
       )}
       onClick={() => {
         if (!deleting) {

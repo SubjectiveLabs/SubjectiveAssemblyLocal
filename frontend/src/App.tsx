@@ -4,7 +4,7 @@ import Footer from 'Footer'
 import { v4 } from 'uuid'
 import classNames from 'utils/classNames'
 import Alert from 'Alert'
-import { Door, Exclamation, Heart, Key, Plus, ThreeDots } from 'components/Icons'
+import { Door, Exclamation, Heart, Key, Plus} from 'components/Icons'
 import Loading from 'Loading'
 import Password from 'Password'
 import Login from 'Login'
@@ -75,7 +75,7 @@ const App = () => {
     })()
   }, [])
   return <AppContext.Provider value={[school, setSchool, password, thanks, setShowPassword]}>
-    <div className='py-4 bg-gray-50 h-full flex flex-col gap-4 font-semibold tracking-tighter leading-none md:pb-0'>
+    <div className='py-4 bg-gray-50 h-full flex flex-col gap-2 font-semibold tracking-tighter leading-none md:pb-0'>
       <Header />
       <div className='flex h-full overflow-x-auto snap-mandatory snap-x scroll-smooth md:p-4 md:grid md:grid-cols-2 md:gap-4 no-scrollbar' onScroll={event => {
         const scroll = event.currentTarget.scrollLeft / event.currentTarget.scrollWidth * 3
@@ -138,14 +138,8 @@ const App = () => {
               <Alert
                 text={`No bells found for ${days[day]}.`}
                 show={school.bell_times[day].length === 0}
-                colour='bg-rose-400'
+                colour='bg-red-500'
                 icon={<Exclamation />}
-              />
-              <Alert
-                text='Showing Monday bell times.'
-                show={true}
-                colour='bg-blue-500'
-                icon={<ThreeDots />}
               />
             </span>
           </div>
@@ -207,7 +201,7 @@ const App = () => {
               </span>
               Menu
             </div>
-            <div className='bg-rose-400 p-4 text-white rounded-xl flex gap-4 items-center'>
+            <div className='bg-pink-500 p-4 text-white rounded-xl flex gap-4 items-center'>
               <svg width={72} height={72} viewBox="0 0 16 16">
                 <path
                   d={Heart}
@@ -239,14 +233,14 @@ const App = () => {
               Change Password
             </button>
             <button
-              className='p-4 shadow-lg border rounded-xl flex gap-2 items-center text-rose-400'
+              className='p-4 shadow-lg border rounded-xl flex gap-2 items-center text-red-500'
               onClick={location.reload.bind(location)}
             >
               <svg
                 viewBox="0 0 16 16"
                 width={32}
                 height={32}
-                className='bg-rose-400 rounded-xl p-2'
+                className='bg-red-500 rounded-xl p-2'
               >
                 <path
                   d={Door}
