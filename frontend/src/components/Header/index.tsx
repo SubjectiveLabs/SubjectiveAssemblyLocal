@@ -33,7 +33,7 @@ const Header = () => {
         <input
           type='text'
           placeholder="School name"
-          className="bg-transparent w-full text-center md:text-3xl sm:text:xl"
+          className="bg-transparent w-full text-center text-xl md:text-3xl"
           onFocus={() => {
             setFocused(true)
           }}
@@ -52,7 +52,7 @@ const Header = () => {
         />
         <div className="absolute text-center inset-x-0 flex justify-center items-center pointer-events-none gap-2 tracking-normal">
           <div className="w-8 h-8"></div>
-          <span className="invisible md:text-3xl sm:text:xl">{name || 'School Name'}</span>
+          <span className="invisible text-xl md:text-3xl">{name || 'School Name'}</span>
           <svg viewBox="0 0 16 16" width={24} height={24} className={classNames(
             focused ? 'invisible' : ''
           )}>
