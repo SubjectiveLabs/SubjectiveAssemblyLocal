@@ -5,7 +5,7 @@ import { AppContext } from "App"
 const Login = ({ show, inProgress, login }: { show: boolean, inProgress: boolean, login: (password: string) => Promise<boolean> }) => {
   const [password, setPassword] = useState<string>(''),
     [incorrect, setIncorrect] = useState(false),
-    [school,] = useContext(AppContext)
+    { school: [school] } = useContext(AppContext)
   return <div className={classNames(
     'w-full h-full absolute top-0 left-0 z-20 backdrop-blur-3xl grid place-content-center transition duration-1000',
     show ? '' : 'opacity-0 pointer-events-none'
