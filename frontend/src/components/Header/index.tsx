@@ -52,7 +52,7 @@ const Header = () => {
         />
         <div className="absolute text-center inset-x-0 flex justify-center items-center pointer-events-none gap-2 tracking-normal">
           <div className="w-8 h-8"></div>
-          <span className="invisible">{name || 'School Name'}</span>
+          <span className="invisible text-2xl">{name || 'School Name'}</span>
           <svg viewBox="0 0 16 16" width={24} height={24} className={classNames(
             focused ? 'invisible' : ''
           )}>
