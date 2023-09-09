@@ -54,7 +54,7 @@ const Header = () => {
           <div className="w-8 h-8"></div>
           <span className="invisible text-xl md:text-3xl">{name || 'School Name'}</span>
           <svg viewBox="0 0 16 16" width={24} height={24} className={classNames(
-            'shrink-0 bg-gradient-to-r from-white/20 to-white to-50%',
+            'shrink-0 bg-white',
             focused ? 'invisible' : ''
           )}>
             <path
