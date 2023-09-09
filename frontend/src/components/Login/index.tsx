@@ -16,7 +16,7 @@ const Login = ({ show, inProgress, login }: { show: boolean, inProgress: boolean
       </div>
       <div className="flex flex-col">
         <span className={classNames(
-          'text-rose-500 transition duration-1000 text-sm text-center',
+          'text-red-500 transition duration-1000 text-sm text-center',
           incorrect ? '' : 'opacity-0 pointer-events-none'
         )}>
           Incorrect password.
@@ -26,7 +26,7 @@ const Login = ({ show, inProgress, login }: { show: boolean, inProgress: boolean
           placeholder='Enter your password'
           className={classNames(
             'border rounded-lg p-2',
-            !password || inProgress || incorrect ? 'border-rose-400 bg-rose-100' : ''
+            !password || inProgress || incorrect ? 'border-red-500 bg-red-100' : ''
           )}
           onInput={event => {
             setPassword(event.currentTarget.value)
