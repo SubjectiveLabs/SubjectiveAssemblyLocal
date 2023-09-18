@@ -153,7 +153,6 @@ const App = () => {
                     name: 'New Bell',
                     hour: Math.floor(Math.random() * 24),
                     minute: Math.floor(Math.random() * 60),
-                    disabled: false,
                   }
                   setSchool(previous => {
                     const next = { ...previous }
