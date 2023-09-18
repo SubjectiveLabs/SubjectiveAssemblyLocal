@@ -108,3 +108,38 @@ export const Heart = `
   A 0.666 0.666 0 0 1 8 13.333
   z
 `
+
+export const Bin = `
+  M 5 1
+  l 6 0
+  l 1 2
+  l 2 0
+  l 0 1
+  l -12 0
+  l 0 -1
+  l 2 0
+  z
+  M 3.5 5
+  l 9 0
+  l -0.5 9
+  l -8 0
+  z
+`
+
+export const Check = `
+  M 1.5 9
+  l 4 5
+  l 9 -12
+`
+
+export const Slash = `
+  M 12 1.5
+  l -8 13
+`
+
+export const Cross = `
+  M 2 2
+  l 12 12
+  m 0 -12
+  l -12 12
+`

@@ -2,6 +2,7 @@ import { useContext, useState } from 'react'
 import classNames from 'classNames'
 import { BellTime } from 'backend'
 import { AppContext } from 'App'
+import { Bin, Check, Cross, Slash } from 'components/Icons'
 
 const Bell = ({ bellTime }: { bellTime: BellTime }) => {
   const [deleting, setDeleting] = useState(false),
@@ -24,22 +25,7 @@ const Bell = ({ bellTime }: { bellTime: BellTime }) => {
     >
       <svg width={16} height={16} viewBox='0 0 16 16'>
         <path
-          d="
-            M 5 1
-            l 6 0
-            l 1 2
-            l 2 0
-            l 0 1
-            l -12 0
-            l 0 -1
-            l 2 0
-            z
-            M 3.5 5
-            l 9 0
-            l -0.5 9
-            l -8 0
-
-          "
+          d={Bin}
           className='fill-white'
         />
       </svg>
@@ -62,6 +48,47 @@ const Bell = ({ bellTime }: { bellTime: BellTime }) => {
           return next
         })
       }} />
+    <div className='bg-gray-200 flex p-1 rounded-xl h-full items-center divide-x divide-gray-300 [&>*]:px-1 [&>*:first-child]:pl-0 [&>*:first-child]:pr-1 [&>*:last-child]:pr-0 [&>*:last-child]:pl-1'>
+      {
+        [Check, Slash, Cross].map((icon, index) => <div key={index} className=''>
+          <button
+            className={classNames(
+              'p-1 rounded-lg transition',
+              bellTime.disabled === true && index === 0
+                ? 'bg-gray-300'
+                : bellTime.disabled === undefined && index === 1
+                  ? 'bg-gray-300'
+                  : bellTime.disabled === false && index === 2
+                    ? 'bg-gray-300'
+                    : ''
+            )}
+            onClick={() => {
+              setSchool(previous => {
+                const next = { ...previous }
+                next.bell_times = next.bell_times.map(day => day.map(period => {
+                  if (period.id === bellTime.id)
+                    return { ...period, disabled: index === 0 ? true : index === 1 ? undefined : false }
+                  return period
+                }))
+                return next
+              })
+            }}
+          >
+            <svg width={16} height={16} viewBox='0 0 16 16'>
+              <path
+                d={icon}
+                className={classNames(
+                  'fill-none stroke-[3px]',
+                  ['stroke-green-500', 'stroke-gray-500', 'stroke-red-500'][index]
+                )}
+                strokeLinejoin='round'
+                strokeLinecap='round'
+              />
+            </svg>
+          </button>
+        </div>)
+      }
+    </div>
     <div className='flex gap-1 items-center bg-gray-200 rounded-xl p-2 h-full'>
       <select
         className='appearance-none bg-gray-200'

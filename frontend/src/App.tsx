@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, createContext, useContext, useEffect, useRef, useState } from 'react'
-import Bell from 'Bell'
+import Bell from 'components/Bell'
 import Footer from 'Footer'
 import { v4 } from 'uuid'
 import classNames from 'utils/classNames'
@@ -8,7 +8,7 @@ import { Door, Exclamation, Heart, Key, Plus } from 'components/Icons'
 import Loading from 'Loading'
 import Password from 'Password'
 import Login from 'Login'
-import { Agent, AgentContext, School } from 'backend'
+import { Agent, AgentContext, BellTime, School } from 'backend'
 import Header from 'components/Header'
 import Link from 'components/Link'
 import Settings from 'components/Settings'
@@ -148,15 +148,16 @@ const App = () => {
                   'bg-black text-white flex p-2 gap-2 items-center rounded-full whitespace-nowrap grow shrink-0 basis-auto',
                 )}
                 onClick={(updateFailed && env.PROD) ? undefined : () => {
-                  const period = {
+                  const bellTime: BellTime = {
                     id: v4(),
                     name: 'New Bell',
                     hour: Math.floor(Math.random() * 24),
                     minute: Math.floor(Math.random() * 60),
+                    disabled: false,
                   }
                   setSchool(previous => {
                     const next = { ...previous }
-                    next.bell_times[day].push(period)
+                    next.bell_times[day].push(bellTime)
                     return next
                   })
                 }}
