@@ -59,7 +59,7 @@ const Header = () => {
           <div className="w-8 h-8"></div>
           <span className="invisible text-xl md:text-3xl">{name || 'School Name'}</span>
           <svg viewBox="0 0 16 16" width={24} height={24} className={classNames(
-            'shrink-0 bg-white',
+            'shrink-0 bg-gray-50',
             focused ? 'invisible' : ''
           )}>
             <path
