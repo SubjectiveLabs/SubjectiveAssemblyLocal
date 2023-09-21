@@ -54,7 +54,7 @@ const Bell = ({ bellTime }: { bellTime: BellTime }) => {
           <button
             className={classNames(
               'p-1 rounded-lg transition',
-              bellTime.enabled && index === 0 || !bellTime.enabled && index === 1
+              bellTime.enabled != !!index
                 ? 'bg-gray-300'
                 : ''
             )}
