@@ -53,7 +53,7 @@ use crate::{
 extern crate rocket;
 
 const ERROR_MESSAGES: &[&str] = &[
-    "At least this is better than the default error page.",
+    "You've taken a wrong turn.",
     "You're lost in the woods now.",
     "Uh oh, you're not supposed to be here.",
     "This is not the page you're looking for.",
@@ -65,14 +65,15 @@ const PASSWORD_PATH: &str = "static/password";
 const THANKS_PATH: &str = "static/thanks";
 
 #[catch(default)]
-fn catch_default(status: Status, _request: &Request) -> String {
+fn catch_default(status: Status, request: &Request) -> String {
+    let host = request.headers().get_one("host").unwrap_or("localhost");
     format!(
-        "{}
-({})",
+        "{}\n({})\nAre you looking for the Assembly dashboard? Try going to {}/app",
         ERROR_MESSAGES
             .choose(&mut rand::thread_rng())
             .unwrap_or(&"We couldn't even load an error message for this error page."),
-        status
+        status,
+        host
     )
 }
 
