@@ -26,7 +26,8 @@ pub struct BellTime {
     pub hour: u8,
     pub minute: u8,
     pub location: Option<String>,
-    pub disabled: Option<bool>,
+    pub enabled: bool,
+    pub user_created: bool,
 }
 
 #[derive(Serialize, Deserialize, Default, JsonSchema)]

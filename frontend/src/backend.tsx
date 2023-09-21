@@ -9,7 +9,8 @@ export type BellTime = {
   hour: number,
   minute: number,
   location?: string,
-  disabled?: boolean,
+  enabled: boolean,
+  userCreated: boolean,
 }
 export type Link = {
   id: string,

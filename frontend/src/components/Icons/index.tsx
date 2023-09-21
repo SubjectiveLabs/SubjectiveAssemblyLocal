@@ -132,11 +132,6 @@ export const Check = `
   l 9 -12
 `
 
-export const Slash = `
-  M 12 1.5
-  l -8 13
-`
-
 export const Cross = `
   M 2 2
   l 12 12

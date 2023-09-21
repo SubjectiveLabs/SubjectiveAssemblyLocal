@@ -2,7 +2,7 @@ import { useContext, useState } from 'react'
 import classNames from 'classNames'
 import { BellTime } from 'backend'
 import { AppContext } from 'App'
-import { Bin, Check, Cross, Slash } from 'components/Icons'
+import { Bin, Check, Cross } from 'components/Icons'
 
 const Bell = ({ bellTime }: { bellTime: BellTime }) => {
   const [deleting, setDeleting] = useState(false),
@@ -50,24 +50,20 @@ const Bell = ({ bellTime }: { bellTime: BellTime }) => {
       }} />
     <div className='bg-gray-200 flex p-1 rounded-xl h-full items-center divide-x divide-gray-300 [&>*]:px-1 [&>*:first-child]:pl-0 [&>*:first-child]:pr-1 [&>*:last-child]:pr-0 [&>*:last-child]:pl-1'>
       {
-        [Check, Slash, Cross].map((icon, index) => <div key={index} className=''>
+        [Check, Cross].map((icon, index) => <div key={index}>
           <button
             className={classNames(
               'p-1 rounded-lg transition',
-              bellTime.disabled === true && index === 0
+              bellTime.enabled && index === 0 || !bellTime.enabled && index === 1
                 ? 'bg-gray-300'
-                : bellTime.disabled === undefined && index === 1
-                  ? 'bg-gray-300'
-                  : bellTime.disabled === false && index === 2
-                    ? 'bg-gray-300'
-                    : ''
+                : ''
             )}
             onClick={() => {
               setSchool(previous => {
                 const next = { ...previous }
                 next.bell_times = next.bell_times.map(day => day.map(period => {
                   if (period.id === bellTime.id)
-                    return { ...period, disabled: index === 0 ? true : index === 1 ? undefined : false }
+                    return { ...period, enabled: !index }
                   return period
                 }))
                 return next
@@ -79,7 +75,7 @@ const Bell = ({ bellTime }: { bellTime: BellTime }) => {
                 d={icon}
                 className={classNames(
                   'fill-none stroke-[3px]',
-                  ['stroke-green-500', 'stroke-gray-500', 'stroke-red-500'][index]
+                  ['stroke-green-500', 'stroke-red-500'][index]
                 )}
                 strokeLinejoin='round'
                 strokeLinecap='round'
