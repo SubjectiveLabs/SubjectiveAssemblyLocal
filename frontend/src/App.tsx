@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, createContext, useContext, useEffect, useRef, useState } from 'react'
-import Bell from 'components/Bell'
+import BellIcon from 'components/Bell'
 import Footer from 'Footer'
 import { v4 } from 'uuid'
 import classNames from 'utils/classNames'
@@ -178,7 +178,7 @@ const App = () => {
           </div>
           <ul className='flex flex-col gap-4 overflow-y-auto rounded-2xl'>
             {
-              school.bell_times[day].map(period => <Bell
+              school.bell_times[day].map(period => <BellIcon
                 key={period.id}
                 bellTime={period}
               />)

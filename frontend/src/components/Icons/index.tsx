@@ -126,15 +126,23 @@ export const Bin = `
   z
 `
 
-export const Check = `
-  M 1.5 9
-  l 4 5
-  l 9 -12
-`
-
-export const Cross = `
-  M 2 2
-  l 12 12
-  m 0 -12
-  l -12 12
+export const BellIcon = `
+  M 8 2
+  q 4 0 4 4
+  l 0 3
+  q 0 2 2 2
+  a 1 1 0 0 1 0 2
+  l -12 0
+  a 1 1 0 0 1 0 -2
+  q 2 0 2 -2
+  l 0 -3
+  q 0 -4 4 -4
+  z
+  m -1 1
+  a 1.5 1.5 0 1 1 2 0
+  m -1 -1
+  z
+  m 0 12
+  l 2 0
+  a 2 2 0 0 1 -4 0
 `

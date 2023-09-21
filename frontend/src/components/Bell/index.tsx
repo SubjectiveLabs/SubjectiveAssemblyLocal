@@ -2,7 +2,7 @@ import { useContext, useState } from 'react'
 import classNames from 'classNames'
 import { BellTime } from 'backend'
 import { AppContext } from 'App'
-import { Bin, Check, Cross } from 'components/Icons'
+import { Bin, BellIcon } from 'components/Icons'
 
 const Bell = ({ bellTime }: { bellTime: BellTime }) => {
   const [deleting, setDeleting] = useState(false),
@@ -50,7 +50,7 @@ const Bell = ({ bellTime }: { bellTime: BellTime }) => {
       }} />
     <div className='bg-gray-200 flex p-1 rounded-xl h-full items-center divide-x divide-gray-300 [&>*]:px-1 [&>*:first-child]:pl-0 [&>*:first-child]:pr-1 [&>*:last-child]:pr-0 [&>*:last-child]:pl-1'>
       {
-        [Check, Cross].map((icon, index) => <div key={index}>
+        [0, 1].map(index => <div key={index}>
           <button
             className={classNames(
               'p-1 rounded-lg transition',
@@ -72,10 +72,39 @@ const Bell = ({ bellTime }: { bellTime: BellTime }) => {
           >
             <svg width={16} height={16} viewBox='0 0 16 16'>
               <path
-                d={icon}
+                d={BellIcon}
                 className={classNames(
-                  'fill-none stroke-[3px]',
-                  ['stroke-green-500', 'stroke-red-500'][index]
+                  ['fill-green-500', 'fill-red-500'][index]
+                )}
+                strokeLinejoin='round'
+                strokeLinecap='round'
+              />
+              <line
+                x1={16}
+                y1={0}
+                x2={0}
+                y2={16}
+                className={classNames(
+                  'transition',
+                  index ? 'stroke-[3px]' : 'stroke-none',
+                  index
+                    ? bellTime.enabled != !!index
+                      ? 'stroke-gray-300'
+                      : 'stroke-gray-200'
+                    : ''
+                )}
+              />
+              <line
+                x1={13}
+                y1={3}
+                x2={3}
+                y2={13}
+                className={classNames(
+                  'transition',
+                  index ? 'stroke-[2px]' : 'stroke-none',
+                  index
+                    ? 'stroke-red-500'
+                    : ''
                 )}
                 strokeLinejoin='round'
                 strokeLinecap='round'
