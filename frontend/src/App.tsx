@@ -34,7 +34,7 @@ const App = () => {
       day = 4
     return day
   },
-    [school, setSchool]: [School, Dispatch<SetStateAction<School>>] = useState<School>({ name: "", bell_times: [[], [], [], [], []], links: [] }),
+    [school, setSchool]: [School, Dispatch<SetStateAction<School>>] = useState<School>({ name: "", bellTimes: [[], [], [], [], []], links: [], notices: [], userCreated: false }),
     [day, setDay] = useState(getDefaultDay()),
     [active, setActive] = useState(0),
     [updateFailed, setUpdateFailed] = useState(false),
@@ -158,7 +158,7 @@ const App = () => {
                   }
                   setSchool(previous => {
                     const next = { ...previous }
-                    next.bell_times[day].push(bellTime)
+                    next.bellTimes[day].push(bellTime)
                     return next
                   })
                 }}
@@ -170,7 +170,7 @@ const App = () => {
             <span className='flex gap-2 flex-wrap whitespace-nowrap'>
               <Alert
                 text={`No bells found for ${days[day]}.`}
-                show={school.bell_times[day].length === 0}
+                show={school.bellTimes[day].length === 0}
                 colour='bg-red-500'
                 icon={<Exclamation />}
               />
@@ -178,7 +178,7 @@ const App = () => {
           </div>
           <ul className='flex flex-col gap-4 overflow-y-auto rounded-2xl'>
             {
-              school.bell_times[day].map(period => <BellIcon
+              school.bellTimes[day].map(period => <BellIcon
                 key={period.id}
                 bellTime={period}
               />)

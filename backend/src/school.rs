@@ -17,9 +17,19 @@ use uuid::Uuid;
 
 use crate::{auth::Password, PASSWORD_PATH, SCHOOL_PATH};
 
+#[derive(Serialize, Deserialize, Default, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct Notice {
+    pub id: Uuid,
+    pub title: String,
+    pub content: String,
+    pub priority: bool,
+}
+
 type Day = Vec<BellTime>;
 
 #[derive(Serialize, Deserialize, Default, JsonSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct BellTime {
     pub id: Uuid,
     pub name: String,
@@ -31,6 +41,7 @@ pub struct BellTime {
 }
 
 #[derive(Serialize, Deserialize, Default, JsonSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct Link {
     pub id: Uuid,
     pub title: String,
@@ -39,10 +50,13 @@ pub struct Link {
 }
 
 #[derive(Serialize, Deserialize, Default, JsonSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct School {
     pub name: String,
     pub bell_times: [Day; 5],
     pub links: Vec<Link>,
+    pub notices: Vec<Notice>,
+    pub user_created: bool,
 }
 
 impl School {

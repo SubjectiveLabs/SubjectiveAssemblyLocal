@@ -16,7 +16,7 @@ const Bell = ({ bellTime }: { bellTime: BellTime }) => {
         if (!deleting) {
           setSchool(previous => {
             const next = { ...previous }
-            next.bell_times = next.bell_times.map(day => day.filter(period => period.id !== bellTime.id))
+            next.bellTimes = next.bellTimes.map(day => day.filter(period => period.id !== bellTime.id))
             return next
           })
         }
@@ -40,7 +40,7 @@ const Bell = ({ bellTime }: { bellTime: BellTime }) => {
         const name = event.target.value
         setSchool(previous => {
           const next = { ...previous }
-          next.bell_times = next.bell_times.map(day => day.map(period => {
+          next.bellTimes = next.bellTimes.map(day => day.map(period => {
             if (period.id === bellTime.id)
               return { ...period, name }
             return period
@@ -61,7 +61,7 @@ const Bell = ({ bellTime }: { bellTime: BellTime }) => {
             onClick={() => {
               setSchool(previous => {
                 const next = { ...previous }
-                next.bell_times = next.bell_times.map(day => day.map(period => {
+                next.bellTimes = next.bellTimes.map(day => day.map(period => {
                   if (period.id === bellTime.id)
                     return { ...period, enabled: !index }
                   return period
@@ -122,7 +122,7 @@ const Bell = ({ bellTime }: { bellTime: BellTime }) => {
           const hour = parseInt(event.target.value, 10)
           setSchool(previous => {
             const next = { ...previous }
-            next.bell_times = next.bell_times.map(day => day.map(period => {
+            next.bellTimes = next.bellTimes.map(day => day.map(period => {
               if (period.id === bellTime.id)
                 return { ...period, hour }
               return period
@@ -146,7 +146,7 @@ const Bell = ({ bellTime }: { bellTime: BellTime }) => {
           const minute = parseInt(event.target.value, 10)
           setSchool(previous => {
             const next = { ...previous }
-            next.bell_times = next.bell_times.map(day => day.map(period => {
+            next.bellTimes = next.bellTimes.map(day => day.map(period => {
               if (period.id === bellTime.id)
                 return { ...period, minute }
               return period
