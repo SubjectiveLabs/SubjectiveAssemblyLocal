@@ -161,7 +161,10 @@ const App = () => {
                   })
                 }}
               >
-                <Plus />
+                <svg viewBox='0 0 16 16' width={16} height={16}>
+                  <circle cx={8} cy={8} r={8} className='fill-white' />
+                  <path d={Plus} />
+                </svg>
                 Add Bell
               </button>
             </span>
@@ -211,7 +214,10 @@ const App = () => {
                   })
                 }}
               >
-                <Plus />
+                <svg viewBox='0 0 16 16' width={16} height={16}>
+                  <circle cx={8} cy={8} r={8} className='fill-white' />
+                  <path d={Plus} />
+                </svg>
                 Add Link
               </button>
             </div>
