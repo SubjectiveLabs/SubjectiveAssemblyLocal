@@ -23,28 +23,26 @@ export const ThreeDots = () => <svg viewBox='0 0 16 16' width={16} height={16}>
   />)}
 </svg>
 
-export const Plus = () => <svg viewBox='0 0 16 16' width={16} height={16}>
-  <circle cx={8} cy={8} r={8} className='fill-white' />
-  <path d='
-    M 8 2.5
-    q 1.25 0 1.25 1.25
-    v 3
-    h 3
-    q 1.25 0 1.25 1.25
-    t -1.25 1.25
-    h -3
-    v 3
-    q 0 1.25 -1.25 1.25
-    t -1.25 -1.25
-    v -3
-    h -3
-    q -1.25 0 -1.25 -1.25
-    t 1.25 -1.25
-    h 3
-    v -3
-    q 0 -1.25 1.25 -1.25
-    z'/>
-</svg>
+export const Plus = `
+  M 8 2.5
+  q 1.25 0 1.25 1.25
+  v 3
+  h 3
+  q 1.25 0 1.25 1.25
+  t -1.25 1.25
+  h -3
+  v 3
+  q 0 1.25 -1.25 1.25
+  t -1.25 -1.25
+  v -3
+  h -3
+  q -1.25 0 -1.25 -1.25
+  t 1.25 -1.25
+  h 3
+  v -3
+  q 0 -1.25 1.25 -1.25
+  z
+`
 
 export const Key = `
   M 1 15
@@ -107,4 +105,16 @@ export const Heart = `
   c 0 4.431 -5.475 7.152 -5.708 7.27
   A 0.666 0.666 0 0 1 8 13.333
   z
+`
+export const Pages = `
+  M 4.5 9.5
+  l -3 0
+  l 0 -8
+  l 7 0
+  l 0 2
+  m 0 3
+  l 6 0
+  l 0 8
+  l -7 0
+  l 0 -8
 `
