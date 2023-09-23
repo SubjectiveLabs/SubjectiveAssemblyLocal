@@ -76,7 +76,7 @@ const App = () => {
       (
         [...Array(days.length)]
           .map((_, index) => index)
-          .filter(index => index != day)
+          .filter(index => index != day && school.bell_times[index].length > 0)
       )[Math.floor(Math.random() * (days.length - 1))]
     ),
     [hoverClone, setHoverClone] = useState(false)
@@ -152,9 +152,7 @@ const App = () => {
                 </select>
               </span>
               <button
-                className={classNames(
-                  'bg-black text-white flex p-2 gap-2 items-center rounded-full whitespace-nowrap grow shrink-0 basis-auto',
-                )}
+                className='bg-black text-white flex p-2 gap-2 items-center rounded-full whitespace-nowrap grow shrink-0 basis-auto'
                 onClick={(updateFailed && env.PROD) ? undefined : () => {
                   const period = {
                     id: v4(),
@@ -175,52 +173,56 @@ const App = () => {
                 </svg>
                 Add Bell
               </button>
-              <button
-                className={classNames(
-                  'bg-black text-white flex p-1 px-2 gap-2 items-center rounded-full whitespace-nowrap grow shrink-0 basis-auto',
-                )}
-                onClick={(updateFailed && env.PROD) ? undefined : () => {
-                  setSchool(previous => {
-                    const next = { ...previous }
-                    next.bell_times[day] = [...next.bell_times[day], ...next.bell_times[cloneFrom].map(period => {
-                      const next = { ...period }
-                      next.id = v4()
+              {days
+                .map((day, index) => [day, index])
+                .filter((_, index) => index != day && school.bell_times[index].length > 0).length > 0 && <button
+                  className='bg-black text-white flex p-1 px-2 gap-2 items-center rounded-full whitespace-nowrap grow shrink-0 basis-auto'
+                  onClick={(updateFailed && env.PROD) ? undefined : () => {
+                    setSchool(previous => {
+                      const next = { ...previous }
+                      next.bell_times[day] = [...next.bell_times[day], ...next.bell_times[cloneFrom].map(period => {
+                        const next = { ...period }
+                        next.id = v4()
+                        return next
+                      })]
                       return next
-                    })]
-                    return next
-                  })
-                }}
-                onMouseEnter={() => {
-                  setHoverClone(true)
-                }}
-                onMouseLeave={() => {
-                  setHoverClone(false)
-                }}
-              >
-                <svg viewBox='0 0 16 16' width={16} height={16}>
-                  <circle cx={8} cy={8} r={8} className='fill-white' />
-                  <path d={Pages} className='stroke-black stroke-2 fill-none scale-75 origin-center' strokeLinecap='round' strokeLinejoin='round' />
-                </svg>
-                Clone from
-                <select
-                  className='text-black appearance-none bg-white p-1 rounded-lg'
-                  onChange={event => {
-                    setCloneFrom(parseInt(event.target.value, 10))
+                    })
+                  }}
+                  onMouseEnter={() => {
+                    setHoverClone(true)
+                  }}
+                  onMouseLeave={() => {
+                    setHoverClone(false)
                   }}
                 >
-                  {
-                    days
-                      .map((day, index) => [day, index])
-                      .filter((_, index) => index != day)
-                      .map(([day, index]) => <option
-                        key={index}
-                        value={index}
-                      >
-                        {day}
-                      </option>)
-                  }
-                </select>
-              </button>
+                  <svg viewBox='0 0 16 16' width={16} height={16}>
+                    <circle cx={8} cy={8} r={8} className='fill-white' />
+                    <path d={Pages} className='stroke-black stroke-2 fill-none scale-75 origin-center' strokeLinecap='round' strokeLinejoin='round' />
+                  </svg>
+                  Clone from
+                  <select
+                    className='text-black appearance-none bg-white p-1 rounded-lg'
+                    defaultValue={cloneFrom}
+                    onChange={event => {
+                      setCloneFrom(parseInt(event.target.value, 10))
+                    }}
+                    onClick={event => {
+                      event.stopPropagation()
+                    }}
+                  >
+                    {
+                      days
+                        .map((day, index) => [day, index])
+                        .filter((_, index) => index != day && school.bell_times[index].length > 0)
+                        .map(([day, index]) => <option
+                          key={index}
+                          value={index}
+                        >
+                          {day}
+                        </option>)
+                    }
+                  </select>
+                </button>}
             </span>
             <span className='flex gap-2 flex-wrap whitespace-nowrap'>
               <Alert
@@ -239,7 +241,7 @@ const App = () => {
               />)
             }
             {
-              school.bell_times[cloneFrom].map(bell => <div className={classNames(
+              school.bell_times[cloneFrom]?.map(bell => <div className={classNames(
                 'pointer-events-none transition duration-500',
                 hoverClone
                   ? 'opacity-50'
