@@ -107,5 +107,14 @@ export const Heart = `
   z
 `
 export const Pages = `
-  
+  M 4.5 9.5
+  l -3 0
+  l 0 -8
+  l 7 0
+  l 0 2
+  m 0 3
+  l 6 0
+  l 0 8
+  l -7 0
+  l 0 -8
 `
