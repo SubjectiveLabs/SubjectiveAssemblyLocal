@@ -4,7 +4,7 @@ import Footer from 'Footer'
 import { v4 } from 'uuid'
 import classNames from 'utils/classNames'
 import Alert from 'Alert'
-import { Door, Exclamation, Heart, Key, Plus } from 'components/Icons'
+import { Door, Exclamation, Heart, Key, Pages, Plus } from 'components/Icons'
 import Loading from 'Loading'
 import Password from 'Password'
 import Login from 'Login'
@@ -14,6 +14,7 @@ import Link from 'components/Link'
 import Settings from 'components/Settings'
 import { Duration } from 'luxon'
 import Message from 'components/Message'
+import Bell from 'components/Bell'
 
 export type Context = {
   school: [School, Dispatch<SetStateAction<School>>],
@@ -72,7 +73,15 @@ const App = () => {
       })
     },
     [autoRefresh, setAutoRefresh] = useState(true),
-    [refreshInterval, setRefreshInterval] = useState(Duration.fromObject({ minutes: 60 }))
+    [refreshInterval, setRefreshInterval] = useState(Duration.fromObject({ minutes: 60 })),
+    [cloneFrom, setCloneFrom] = useState(
+      (
+        [...Array(days.length)]
+          .map((_, index) => index)
+          .filter(index => index != day && school.bellTimes[index].length > 0)
+      )[Math.floor(Math.random() * (days.length - 1))]
+    ),
+    [hoverClone, setHoverClone] = useState(false)
   useEffect(update, [day])
   useEffect(() => {
     agent.putSchool(school, password)
@@ -145,9 +154,7 @@ const App = () => {
                 </select>
               </span>
               <button
-                className={classNames(
-                  'bg-black text-white flex p-2 gap-2 items-center rounded-full whitespace-nowrap grow shrink-0 basis-auto',
-                )}
+                className='bg-black text-white flex p-2 gap-2 items-center rounded-full whitespace-nowrap grow shrink-0 basis-auto'
                 onClick={(updateFailed && env.PROD) ? undefined : () => {
                   const bellTime: BellTime = {
                     id: v4(),
@@ -164,9 +171,62 @@ const App = () => {
                   })
                 }}
               >
-                <Plus />
+                <svg viewBox='0 0 16 16' width={16} height={16}>
+                  <circle cx={8} cy={8} r={8} className='fill-white' />
+                  <path d={Plus} />
+                </svg>
                 Add Bell
               </button>
+              {days
+                .map((day, index) => [day, index])
+                .filter((_, index) => index != day && school.bellTimes[index].length > 0).length > 0 && <button
+                  className='bg-black text-white flex p-1 px-2 gap-2 items-center rounded-full whitespace-nowrap grow shrink-0 basis-auto'
+                  onClick={(updateFailed && env.PROD) ? undefined : () => {
+                    setSchool(previous => {
+                      const next = { ...previous }
+                      next.bellTimes[day] = [...next.bellTimes[day], ...next.bellTimes[cloneFrom].map(period => {
+                        const next = { ...period }
+                        next.id = v4()
+                        return next
+                      })]
+                      return next
+                    })
+                  }}
+                  onMouseEnter={() => {
+                    setHoverClone(true)
+                  }}
+                  onMouseLeave={() => {
+                    setHoverClone(false)
+                  }}
+                >
+                  <svg viewBox='0 0 16 16' width={16} height={16}>
+                    <circle cx={8} cy={8} r={8} className='fill-white' />
+                    <path d={Pages} className='stroke-black stroke-2 fill-none scale-75 origin-center' strokeLinecap='round' strokeLinejoin='round' />
+                  </svg>
+                  Clone from
+                  <select
+                    className='text-black appearance-none bg-white p-1 rounded-lg'
+                    defaultValue={cloneFrom}
+                    onChange={event => {
+                      setCloneFrom(parseInt(event.target.value, 10))
+                    }}
+                    onClick={event => {
+                      event.stopPropagation()
+                    }}
+                  >
+                    {
+                      days
+                        .map((day, index) => [day, index])
+                        .filter((_, index) => index != day && school.bellTimes[index].length > 0)
+                        .map(([day, index]) => <option
+                          key={index}
+                          value={index}
+                        >
+                          {day}
+                        </option>)
+                    }
+                  </select>
+                </button>}
             </span>
             <span className='flex gap-2 flex-wrap whitespace-nowrap'>
               <Alert
@@ -179,10 +239,23 @@ const App = () => {
           </div>
           <ul className='flex flex-col gap-4 rounded-2xl overflow-y-auto'>
             {
-              school.bellTimes[day].map(period => <BellIcon
-                key={period.id}
-                bellTime={period}
+              school.bellTimes[day].map(bell => <BellIcon
+                key={bell.id}
+                bellTime={bell}
               />)
+            }
+            {
+              school.bellTimes[cloneFrom]?.map(bell => <div className={classNames(
+                'pointer-events-none transition duration-500',
+                hoverClone
+                  ? 'opacity-50'
+                  : 'opacity-0'
+              )}>
+                <Bell
+                  key={bell.id}
+                  bellTime={bell}
+                />
+              </div>)
             }
           </ul>
         </div>
@@ -213,7 +286,10 @@ const App = () => {
                 })
               }}
             >
-              <Plus />
+              <svg viewBox='0 0 16 16' width={16} height={16}>
+                <circle cx={8} cy={8} r={8} className='fill-white' />
+                <path d={Plus} />
+              </svg>
               Add Link
             </button>
           </div>
@@ -250,7 +326,10 @@ const App = () => {
                 })
               }}
             >
-              <Plus />
+              <svg viewBox='0 0 16 16' width={16} height={16}>
+                <circle cx={8} cy={8} r={8} className='fill-white' />
+                <path d={Plus} />
+              </svg>
               Add Notice
             </button>
           </div>
