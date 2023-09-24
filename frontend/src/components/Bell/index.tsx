@@ -55,7 +55,6 @@ const Bell = ({ bellTime }: { bellTime: BellTime }) => {
       type='text'
       defaultValue={bellTime.name}
       className='bg-gray-200 rounded-xl p-1 w-full transition peer duration-300 h-full px-2'
-      maxLength={127}
       required
       onBlur={event => {
         const name = event.target.value
@@ -68,7 +67,8 @@ const Bell = ({ bellTime }: { bellTime: BellTime }) => {
           }))
           return next
         })
-      }} />
+      }}
+    />
     <div className='bg-gray-200 flex p-1 rounded-xl h-full items-center divide-x divide-gray-300 [&>*]:px-1 [&>*:first-child]:pl-0 [&>*:first-child]:pr-1 [&>*:last-child]:pr-0 [&>*:last-child]:pl-1'>
       {
         [0, 1].map(index => <div key={index}>
