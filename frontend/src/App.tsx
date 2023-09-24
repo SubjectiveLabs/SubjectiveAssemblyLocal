@@ -313,11 +313,12 @@ const App = () => {
                   : ''
               )}
               onClick={(updateFailed && env.PROD) ? undefined : () => {
+                const priority = Math.random() > 0.5
                 const notice: Notice = {
                   id: v4(),
                   title: 'New Notice',
-                  content: 'This is a new notice.',
-                  priority: Math.random() > 0.5,
+                  content: priority ? 'This is an important new notice.' : 'This is a new notice.',
+                  priority,
                 }
                 setSchool(previous => {
                   const next = { ...previous }

@@ -10,7 +10,7 @@ const Message = ({ notice }: { notice: Notice }) => <div className='border round
     }
     {notice.title}
   </h2>
-  <p className='text-gray-600 text-xm'>{notice.content}</p>
+  <p className='text-gray-600'>{notice.content}</p>
 </div>
 
 export default Message
