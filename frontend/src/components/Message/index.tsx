@@ -1,5 +1,6 @@
 import { AppContext } from "App"
 import { Notice } from "backend"
+import { Bin } from "components/Icons"
 import { useContext } from "react"
 import classNames from "utils/classNames"
 
@@ -11,7 +12,26 @@ const Message = ({ notice }: { notice: Notice }) => {
     <h2 className='font-bold flex gap-4 items-center'>
       <button
         className={classNames(
-          'bg-red-500 text-white rounded-xl px-2 flex items-center gap-1 transition duration-500',
+          'inline-flex bg-red-500 p-2 rounded-xl aspect-square',
+        )}
+        onClick={() => {
+          setSchool(previous => {
+            const next = { ...previous }
+            next.notices = next.notices.filter(({ id }) => id !== notice.id)
+            return next
+          })
+        }}
+      >
+        <svg width={16} height={16} viewBox='0 0 16 16'>
+          <path
+            d={Bin}
+            className='fill-white'
+          />
+        </svg>
+      </button>
+      <button
+        className={classNames(
+          'bg-red-500 text-white rounded-xl px-2 flex items-center gap-1 transition duration-500 h-full',
           notice.priority ? '' : 'opacity-50',
         )}
         onClick={() => {
