@@ -8,11 +8,12 @@ import { Door, Exclamation, Heart, Key, Plus } from 'components/Icons'
 import Loading from 'Loading'
 import Password from 'Password'
 import Login from 'Login'
-import { Agent, AgentContext, BellTime, School } from 'backend'
+import { Agent, AgentContext, BellTime, Notice, School } from 'backend'
 import Header from 'components/Header'
 import Link from 'components/Link'
 import Settings from 'components/Settings'
 import { Duration } from 'luxon'
+import Message from 'components/Message'
 
 export type Context = {
   school: [School, Dispatch<SetStateAction<School>>],
@@ -108,7 +109,7 @@ const App = () => {
   }}>
     <div className='py-4 bg-gray-50 h-full flex flex-col gap-2 font-semibold tracking-tighter leading-none md:pb-0'>
       <Header />
-      <div className='flex h-full overflow-x-auto snap-mandatory snap-x scroll-smooth md:p-4 md:grid md:grid-cols-2 md:gap-4 no-scrollbar' onScroll={event => {
+      <div className='flex h-full overflow-x-auto overflow-y-hidden snap-mandatory snap-x scroll-smooth md:p-4 md:grid md:grid-cols-3 md:gap-4 no-scrollbar' onScroll={event => {
         const scroll = event.currentTarget.scrollLeft / event.currentTarget.scrollWidth * 3
         if (Math.abs(scroll - Math.round(scroll)) < 20)
           setActive(Math.round(scroll))
@@ -176,7 +177,7 @@ const App = () => {
               />
             </span>
           </div>
-          <ul className='flex flex-col gap-4 overflow-y-auto rounded-2xl'>
+          <ul className='flex flex-col gap-4 rounded-2xl overflow-y-auto'>
             {
               school.bellTimes[day].map(period => <BellIcon
                 key={period.id}
@@ -185,149 +186,181 @@ const App = () => {
             }
           </ul>
         </div>
-        <div className="grow shrink-0 basis-auto snap-center flex flex-col gap-4 w-full">
-          <div className='md:border md:shadow-lg md:rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full bg-white overflow-auto'>
-            <div className='gap-2 items-center flex text-xl'>
-              <span className='w-6 h-6 inline-flex border-[6px] border-black rounded-full'></span>
-              Links
-            </div>
-            <div className='flex gap-2 justify-between pb-2 flex-col'>
-              <button
-                className={classNames(
-                  'bg-black text-white flex p-2 gap-2 items-center rounded-full whitespace-nowrap',
-                  updateFailed && env.PROD
-                    ? 'opacity-50 pointer-events-none'
-                    : ''
-                )}
-                onClick={(updateFailed && env.PROD) ? undefined : () => {
-                  const link = {
-                    id: v4(),
-                    title: 'New Link',
-                    destination: 'https://example.com',
-                    icon: 'link',
-                  }
-                  setSchool(previous => {
-                    const next = { ...previous }
-                    next.links.push(link)
-                    return next
-                  })
-                }}
-              >
-                <Plus />
-                Add Link
-              </button>
-            </div>
-            <ul className='flex flex-col gap-4 overflow-y-auto rounded-2xl'>
-              {
-                school.links.map(link => <Link link={link} />)
-              }
-            </ul>
+        <div className='md:border md:shadow-lg md:rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full snap-center bg-white'>
+          <div className='gap-2 items-center flex text-xl'>
+            <span className='w-6 h-6 inline-flex border-[6px] border-black rounded-full'></span>
+            Links
           </div>
-        </div>
-        <div className="grow shrink-0 basis-auto snap-center flex flex-col gap-4 w-full md:hidden">
-          <div className='md:border md:shadow-lg md:rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full bg-white overflow-auto'>
-            <div className='gap-2 items-center flex text-xl'>
-              <span className='w-4 h-4 inline-flex flex-col gap-1'>
-                {
-                  [...Array(3)].map((_, index) => <span className='bg-black grow rounded-full' key={index}></span>)
-                }
-              </span>
-              Menu
-            </div>
-            <div className='bg-pink-500 p-4 text-white rounded-xl flex gap-4 items-center'>
-              <svg width={72} height={72} viewBox="0 0 16 16">
-                <path
-                  d={Heart}
-                  className="fill-white"
-                />
-              </svg>
-              <div className='flex flex-col'>
-                <span className='text-4xl font-extrabold'>{thanks || 0}</span>
-                <span className='text-xl'>thanks recieved.</span>
-              </div>
-            </div>
+          <div className='flex gap-2 justify-between pb-2 flex-col'>
             <button
-              className='p-4 shadow-lg border rounded-xl flex gap-2 items-center'
-              onClick={() => {
-                setShowSettings(true)
+              className={classNames(
+                'bg-black text-white flex p-2 gap-2 items-center rounded-full whitespace-nowrap',
+                updateFailed && env.PROD
+                  ? 'opacity-50 pointer-events-none'
+                  : ''
+              )}
+              onClick={(updateFailed && env.PROD) ? undefined : () => {
+                const link = {
+                  id: v4(),
+                  title: 'New Link',
+                  destination: 'https://example.com',
+                  icon: 'link',
+                }
+                setSchool(previous => {
+                  const next = { ...previous }
+                  next.links.push(link)
+                  return next
+                })
               }}
             >
-              <svg
-                viewBox="0 0 16 16"
-                width={32}
-                height={32}
-                className="bg-black rounded-xl p-2"
-              >
-                <path
-                  d={Key}
-                  className="fill-white"
-                />
-              </svg>
-              Change Password
-            </button>
-            <button
-              className='p-4 shadow-lg border rounded-xl flex gap-2 items-center text-red-500'
-              onClick={location.reload.bind(location)}
-            >
-              <svg
-                viewBox="0 0 16 16"
-                width={32}
-                height={32}
-                className='bg-red-500 rounded-xl p-2'
-              >
-                <path
-                  d={Door}
-                  fillRule="evenodd"
-                  className="fill-white"
-                />
-              </svg>
-              Log Out
+              <Plus />
+              Add Link
             </button>
           </div>
+          <ul className='flex flex-col gap-4 rounded-2xl overflow-y-auto'>
+            {
+              school.links.map(link => <Link link={link} />)
+            }
+          </ul>
+        </div>
+        <div className='md:border md:shadow-lg md:rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full snap-center bg-white'>
+          <div className='gap-2 items-center flex text-xl'>
+            <span className='w-6 h-6 inline-flex bg-black rounded-full rounded-bl-none'></span>
+            Notices
+          </div>
+          <div className='flex gap-2 justify-between pb-2 flex-col'>
+            <button
+              className={classNames(
+                'bg-black text-white flex p-2 gap-2 items-center rounded-full whitespace-nowrap',
+                updateFailed && env.PROD
+                  ? 'opacity-50 pointer-events-none'
+                  : ''
+              )}
+              onClick={(updateFailed && env.PROD) ? undefined : () => {
+                const notice: Notice = {
+                  id: v4(),
+                  title: 'New Notice',
+                  content: 'This is a new notice.',
+                  priority: Math.random() > 0.5,
+                }
+                setSchool(previous => {
+                  const next = { ...previous }
+                  next.notices.push(notice)
+                  return next
+                })
+              }}
+            >
+              <Plus />
+              Add Notice
+            </button>
+          </div>
+          <ul className='flex flex-col gap-4 rounded-2xl overflow-y-auto'>
+            {
+              school.notices.map(notice => <Message notice={notice} key={notice.id} />)
+            }
+          </ul>
+        </div>
+        <div className='md:border md:shadow-lg md:rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full snap-center bg-white md:hidden'>
+          <div className='gap-2 items-center flex text-xl'>
+            <span className='w-4 h-4 inline-flex flex-col gap-1'>
+              {
+                [...Array(3)].map((_, index) => <span className='bg-black grow rounded-full' key={index}></span>)
+              }
+            </span>
+            Menu
+          </div>
+          <div className='bg-pink-500 p-4 text-white rounded-xl flex gap-4 items-center'>
+            <svg width={72} height={72} viewBox="0 0 16 16">
+              <path
+                d={Heart}
+                className="fill-white"
+              />
+            </svg>
+            <div className='flex flex-col'>
+              <span className='text-4xl font-extrabold'>{thanks || 0}</span>
+              <span className='text-xl'>thanks recieved.</span>
+            </div>
+          </div>
+          <button
+            className='p-4 shadow-lg border rounded-xl flex gap-2 items-center'
+            onClick={() => {
+              setShowSettings(true)
+            }}
+          >
+            <svg
+              viewBox="0 0 16 16"
+              width={32}
+              height={32}
+              className="bg-black rounded-xl p-2"
+            >
+              <path
+                d={Key}
+                className="fill-white"
+              />
+            </svg>
+            Change Password
+          </button>
+          <button
+            className='p-4 shadow-lg border rounded-xl flex gap-2 items-center text-red-500'
+            onClick={location.reload.bind(location)}
+          >
+            <svg
+              viewBox="0 0 16 16"
+              width={32}
+              height={32}
+              className='bg-red-500 rounded-xl p-2'
+            >
+              <path
+                d={Door}
+                fillRule="evenodd"
+                className="fill-white"
+              />
+            </svg>
+            Log Out
+          </button>
+        </div>
+        <div className='shrink grow-0 basis-auto md:hidden'>
+          <Footer active={active} select={index => {
+            scroll.current?.children[index].scrollIntoView()
+          }} />
         </div>
       </div>
-      <div className='shrink grow-0 basis-auto md:hidden'>
-        <Footer active={active} select={index => {
-          scroll.current?.children[index].scrollIntoView()
-        }} />
-      </div>
+      <Loading show={loading && env.PROD} items={loadingItems} />
+      <Password show={showPassword && env.PROD} inProgress={waitingForPassword} putPassword={next => {
+        setWaitingForPassword(true)
+        agent.putPassword(password, next).then(() => {
+          setShowPassword(false)
+          setWaitingForPassword(false)
+          setPassword(next)
+          addLoadingItem('Password set.')
+          setLoading(false)
+        })
+      }} />
+      <Settings show={showSettings && env.PROD} inProgress={waitingForPassword} putPassword={next => {
+        setWaitingForPassword(true)
+        agent.putPassword(password, next).then(() => {
+          setShowPassword(false)
+          setWaitingForPassword(false)
+          setPassword(next)
+          addLoadingItem('Password set.')
+          setLoading(false)
+        })
+      }} />
+      <Login show={showLogin && env.PROD} inProgress={waitingForLogin} login={async password => {
+        setWaitingForLogin(true)
+        setPassword(password)
+        const [, correct] = await agent.getPassword(password)
+        if (correct) {
+          addLoadingItem('Password set.')
+          setLoading(false)
+          setShowLogin(false)
+        } else {
+          addLoadingItem('Wrong password.')
+        }
+        setWaitingForLogin(false)
+        return correct
+      }} />
     </div>
-    <Loading show={loading && env.PROD} items={loadingItems} />
-    <Password show={showPassword && env.PROD} inProgress={waitingForPassword} putPassword={next => {
-      setWaitingForPassword(true)
-      agent.putPassword(password, next).then(() => {
-        setShowPassword(false)
-        setWaitingForPassword(false)
-        setPassword(next)
-        addLoadingItem('Password set.')
-        setLoading(false)
-      })
-    }} />
-    <Settings show={showSettings && env.PROD} inProgress={waitingForPassword} putPassword={next => {
-      setWaitingForPassword(true)
-      agent.putPassword(password, next).then(() => {
-        setShowPassword(false)
-        setWaitingForPassword(false)
-        setPassword(next)
-        addLoadingItem('Password set.')
-        setLoading(false)
-      })
-    }} />
-    <Login show={showLogin && env.PROD} inProgress={waitingForLogin} login={async password => {
-      setWaitingForLogin(true)
-      setPassword(password)
-      const [, correct] = await agent.getPassword(password)
-      if (correct) {
-        addLoadingItem('Password set.')
-        setLoading(false)
-        setShowLogin(false)
-      } else {
-        addLoadingItem('Wrong password.')
-      }
-      setWaitingForLogin(false)
-      return correct
-    }} />
-
   </AppContext.Provider>
 }
 
