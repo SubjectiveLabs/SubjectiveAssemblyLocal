@@ -23,28 +23,26 @@ export const ThreeDots = () => <svg viewBox='0 0 16 16' width={16} height={16}>
   />)}
 </svg>
 
-export const Plus = () => <svg viewBox='0 0 16 16' width={16} height={16}>
-  <circle cx={8} cy={8} r={8} className='fill-white' />
-  <path d='
-    M 8 2.5
-    q 1.25 0 1.25 1.25
-    v 3
-    h 3
-    q 1.25 0 1.25 1.25
-    t -1.25 1.25
-    h -3
-    v 3
-    q 0 1.25 -1.25 1.25
-    t -1.25 -1.25
-    v -3
-    h -3
-    q -1.25 0 -1.25 -1.25
-    t 1.25 -1.25
-    h 3
-    v -3
-    q 0 -1.25 1.25 -1.25
-    z'/>
-</svg>
+export const Plus = `
+  M 8 2.5
+  q 1.25 0 1.25 1.25
+  v 3
+  h 3
+  q 1.25 0 1.25 1.25
+  t -1.25 1.25
+  h -3
+  v 3
+  q 0 1.25 -1.25 1.25
+  t -1.25 -1.25
+  v -3
+  h -3
+  q -1.25 0 -1.25 -1.25
+  t 1.25 -1.25
+  h 3
+  v -3
+  q 0 -1.25 1.25 -1.25
+  z
+`
 
 export const Key = `
   M 1 15

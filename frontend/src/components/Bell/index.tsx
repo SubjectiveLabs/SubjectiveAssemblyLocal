@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useContext } from 'react'
 import classNames from 'classNames'
 import { BellTime } from 'backend'
 import { AppContext } from 'App'
@@ -7,8 +7,7 @@ import { Pages } from 'components/Icons'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'components/Tooltip'
 
 const Bell = ({ bellTime }: { bellTime: BellTime }) => {
-  const [deleting, setDeleting] = useState(false),
-    { school: [, setSchool] } = useContext(AppContext)
+  const { school: [, setSchool] } = useContext(AppContext)
   return <div className='border rounded-2xl p-4 flex gap-4 items-center'>
     <Tooltip>
       <TooltipTrigger>
@@ -17,14 +16,11 @@ const Bell = ({ bellTime }: { bellTime: BellTime }) => {
             'inline-flex bg-red-500 p-2 rounded-xl aspect-square',
           )}
           onClick={() => {
-            if (!deleting) {
-              setSchool(previous => {
-                const next = { ...previous }
-                next.bell_times = next.bell_times.map(day => day.filter(period => period.id !== bellTime.id))
-                return next
-              })
-            }
-            setDeleting(true)
+            setSchool(previous => {
+              const next = { ...previous }
+              next.bell_times = next.bell_times.map(day => day.filter(period => period.id !== bellTime.id))
+              return next
+            })
           }}
         >
           <svg width={16} height={16} viewBox='0 0 16 16'>
