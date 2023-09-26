@@ -1,43 +1,14 @@
-import { useContext, useRef, useState } from 'react'
+import { useContext, useState } from 'react'
 import classNames from 'classNames'
 import { BellTime } from 'backend'
 import { AppContext } from 'App'
 import { v4 } from 'uuid'
 import { Pages } from 'components/Icons'
-import { arrow, autoUpdate, useFloating, useHover, useInteractions } from '@floating-ui/react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'components/Tooltip'
 
 const Bell = ({ bellTime }: { bellTime: BellTime }) => {
   const [deleting, setDeleting] = useState(false),
-    { school: [, setSchool] } = useContext(AppContext),
-    [deleteOpen, setDeleteOpen] = useState(false),
-    [duplicateOpen, setDuplicateOpen] = useState(false),
-    deleteArrow = useRef(null),
-    duplicateArrow = useRef(null),
-    deleteFloating = useFloating({
-      open: deleteOpen,
-      onOpenChange: setDeleteOpen,
-      middleware: [
-        arrow({
-          element: deleteArrow,
-        })
-      ],
-      whileElementsMounted: autoUpdate,
-    }),
-    duplicateFloating = useFloating({
-      open: duplicateOpen,
-      onOpenChange: setDuplicateOpen,
-      middleware: [
-        arrow({
-          element: duplicateArrow,
-        })
-      ],
-      whileElementsMounted: autoUpdate,
-    }),
-    deleteHover = useHover(deleteFloating.context),
-    duplicateHover = useHover(duplicateFloating.context),
-    deleteProps = useInteractions([deleteHover]),
-    duplicateProps = useInteractions([duplicateHover])
+    { school: [, setSchool] } = useContext(AppContext)
   return <div className='border rounded-2xl p-4 flex gap-4 items-center'>
     <Tooltip>
       <TooltipTrigger>
@@ -55,8 +26,6 @@ const Bell = ({ bellTime }: { bellTime: BellTime }) => {
             }
             setDeleting(true)
           }}
-          ref={deleteFloating.refs.setReference}
-          {...deleteProps.getReferenceProps()}
         >
           <svg width={16} height={16} viewBox='0 0 16 16'>
             <path
@@ -127,8 +96,6 @@ const Bell = ({ bellTime }: { bellTime: BellTime }) => {
               return next
             })
           }}
-          ref={duplicateFloating.refs.setReference}
-          {...duplicateProps.getReferenceProps()}
         >
           <svg viewBox='0 0 16 16' width={16} height={16}>
             <path
