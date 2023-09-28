@@ -358,7 +358,7 @@ const App = () => {
                 <circle cx={8} cy={8} r={6} />
                 <circle cx={8} cy={8} r={3} className="fill-black" />
               </svg>
-              Change Password
+              Open Settings
             </button>
             <button
               className='p-4 shadow-lg border rounded-xl flex gap-2 items-center text-red-500'
