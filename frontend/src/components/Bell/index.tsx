@@ -4,67 +4,119 @@ import { BellTime } from 'backend'
 import { AppContext } from 'App'
 import { v4 } from 'uuid'
 import { Pages } from 'components/Icons'
+import { Tooltip, TooltipContent, TooltipTrigger } from 'components/Tooltip'
 
 const Bell = ({ bellTime }: { bellTime: BellTime }) => {
   const { school: [, setSchool] } = useContext(AppContext)
   return <div className='border rounded-2xl p-4 flex gap-4 items-center'>
-    <button
-      className={classNames(
-        'inline-flex bg-red-500 p-2 rounded-xl aspect-square',
-      )}
-      onClick={() => {
-        setSchool(previous => {
-          const next = { ...previous }
-          next.bell_times = next.bell_times.map(day => day.filter(period => period.id !== bellTime.id))
-          return next
-        })
-      }}
-    >
-      <svg width={16} height={16} viewBox='0 0 16 16'>
-        <path
-          d="
-            M 5 1
-            l 6 0
-            l 1 2
-            l 2 0
-            l 0 1
-            l -12 0
-            l 0 -1
-            l 2 0
-            z
-            M 3.5 5
-            l 9 0
-            l -0.5 9
-            l -8 0
-          "
-          className='fill-white'
-        />
-      </svg>
-    </button>
-    <button
-      className={classNames(
-        'inline-flex bg-black p-2 rounded-xl aspect-square',
-      )}
-      onClick={() => {
-        setSchool(previous => {
-          const next = { ...previous }
-          next.bell_times = next.bell_times.map(day => {
-            const index = day.findIndex(value => value.id == bellTime.id)
-            if (index != -1) {
-              const copy = {...day[index]}
-              copy.id = v4()
-              day = [...day.slice(0, index), day[index], copy, ...day.slice(index + 1)]
-            }
-            return day
-          })
-          return next
-        })
-      }}
-    >
-      <svg viewBox='0 0 16 16' width={16} height={16}>
-        <path d={Pages} className='stroke-white stroke-2 fill-none' strokeLinecap='round' strokeLinejoin='round' />
-      </svg>
-    </button>
+    <Tooltip>
+      <TooltipTrigger>
+        <button
+          className={classNames(
+            'inline-flex bg-red-500 p-2 rounded-xl aspect-square',
+          )}
+          onClick={() => {
+            setSchool(previous => {
+              const next = { ...previous }
+              next.bell_times = next.bell_times.map(day => day.filter(period => period.id !== bellTime.id))
+              return next
+            })
+          }}
+        >
+          <svg width={16} height={16} viewBox='0 0 16 16'>
+            <path
+              d="
+                M 5 1
+                l 6 0
+                l 1 2
+                l 2 0
+                l 0 1
+                l -12 0
+                l 0 -1
+                l 2 0
+                z
+                M 3.5 5
+                l 9 0
+                l -0.5 9
+                l -8 0
+              "
+              className='fill-white'
+            />
+          </svg>
+        </button>
+      </TooltipTrigger>
+      <TooltipContent>
+        <div className="p-2 backdrop-blur-sm bg-black/80 text-white rounded-xl font-semibold flex items-center gap-2">
+          <svg width={16} height={16} viewBox='0 0 16 16'>
+            <path
+              d="
+                M 5 1
+                l 6 0
+                l 1 2
+                l 2 0
+                l 0 1
+                l -12 0
+                l 0 -1
+                l 2 0
+                z
+                M 3.5 5
+                l 9 0
+                l -0.5 9
+                l -8 0
+              "
+              className='fill-white'
+            />
+          </svg>
+          Delete bell
+        </div>
+      </TooltipContent>
+    </Tooltip>
+    <Tooltip>
+      <TooltipTrigger>
+        <button
+          className={classNames(
+            'inline-flex bg-black p-2 rounded-xl aspect-square',
+          )}
+          onClick={() => {
+            setSchool(previous => {
+              const next = { ...previous }
+              next.bell_times = next.bell_times.map(day => {
+                const index = day.findIndex(value => value.id == bellTime.id)
+                if (index != -1) {
+                  const copy = { ...day[index] }
+                  copy.id = v4()
+                  day = [...day.slice(0, index), day[index], copy, ...day.slice(index + 1)]
+                }
+                return day
+              })
+              return next
+            })
+          }}
+        >
+          <svg viewBox='0 0 16 16' width={16} height={16}>
+            <path
+              d={Pages}
+              className='stroke-white stroke-2 fill-none'
+              strokeLinecap='round'
+              strokeLinejoin='round'
+            />
+          </svg>
+        </button>
+      </TooltipTrigger>
+      <TooltipContent>
+        <div className="p-2 backdrop-blur-sm bg-black/80 text-white rounded-xl font-semibold flex items-center gap-2">
+          <svg viewBox='0 0 16 16' width={16} height={16}>
+            <path
+              d={Pages}
+              className='stroke-white stroke-2 fill-none'
+              strokeLinecap='round'
+              strokeLinejoin='round'
+            />
+          </svg>
+          Duplicate bell
+        </div>
+      </TooltipContent>
+    </Tooltip>
     <input
       type='text'
       defaultValue={bellTime.name}
