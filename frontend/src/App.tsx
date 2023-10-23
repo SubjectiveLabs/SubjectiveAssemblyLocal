@@ -4,7 +4,7 @@ import Footer from 'Footer'
 import { v4 } from 'uuid'
 import classNames from 'utils/classNames'
 import Alert from 'Alert'
-import { Door, Exclamation, Heart, Key, Pages, Plus } from 'components/Icons'
+import { Door, Exclamation, GearTooth, Heart, Pages, Plus } from 'components/Icons'
 import Loading from 'Loading'
 import Password from 'Password'
 import Login from 'Login'
@@ -371,18 +371,40 @@ const App = () => {
               setShowSettings(true)
             }}
           >
-            <svg
+            {/* <svg
               viewBox="0 0 16 16"
               width={32}
               height={32}
               className="bg-black rounded-xl p-2"
             >
               <path
-                d={Key}
+                d={Gear}
                 className="fill-white"
               />
+              </svg> */}
+              <svg
+                viewBox="0 0 16 16"
+                width={32}
+                height={32}
+                className="cursor-pointer hover:opacity-75 transition fill-white bg-black rounded-xl p-2"
+                onClick={() => {
+                  setShowSettings(true)
+                }}
+              >
+                {
+                  [...Array(8)].map((_, index) => <path
+                    d={GearTooth}
+                    className="origin-center"
+                    style={{
+                      transform: `rotate(${index * 45}deg)`,
+                    }}
+                    key={index}
+                  />)
+                }
+                <circle cx={8} cy={8} r={6} />
+                <circle cx={8} cy={8} r={3} className="fill-black" />
             </svg>
-            Change Password
+            Open Settings
           </button>
           <button
             className='p-4 shadow-lg border rounded-xl flex gap-2 items-center text-red-500'
