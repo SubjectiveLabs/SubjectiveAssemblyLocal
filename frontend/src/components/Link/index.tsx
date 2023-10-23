@@ -1,42 +1,73 @@
 import { useContext } from 'react'
 import { AppContext } from 'App'
 import { Link } from 'backend'
+import { Tooltip, TooltipContent, TooltipTrigger } from 'components/Tooltip'
 
 const Link = ({ link }: { link: Link }) => {
   const { school: [, setSchool] } = useContext(AppContext)
   return <div className='border rounded-2xl p-4 flex gap-4 items-center'>
-    <button
-      className='inline-flex bg-red-500 p-2 rounded-xl aspect-square'
-      onClick={() => {
-        setSchool(previous => {
-          const next = { ...previous }
-          next.links = next.links.filter(l => l.id !== link.id)
-          return next
-        })
-      }}
-    >
-      <svg width={16} height={16} viewBox='0 0 16 16'>
-        <path
-          d="
-            M 5 1
-            l 6 0
-            l 1 2
-            l 2 0
-            l 0 1
-            l -12 0
-            l 0 -1
-            l 2 0
-            z
-            M 3.5 5
-            l 9 0
-            l -0.5 9
-            l -8 0
-            z
-          "
-          className='fill-white'
-        />
-      </svg>
-    </button>
+    <Tooltip>
+      <TooltipTrigger>
+        <button
+          className='inline-flex bg-red-500 p-2 rounded-xl aspect-square'
+          onClick={() => {
+            setSchool(previous => {
+              const next = { ...previous }
+              next.links = next.links.filter(l => l.id !== link.id)
+              return next
+            })
+          }}
+        >
+          <svg width={16} height={16} viewBox='0 0 16 16'>
+            <path
+              d="
+                M 5 1
+                l 6 0
+                l 1 2
+                l 2 0
+                l 0 1
+                l -12 0
+                l 0 -1
+                l 2 0
+                z
+                M 3.5 5
+                l 9 0
+                l -0.5 9
+                l -8 0
+                z
+              "
+              className='fill-white'
+            />
+          </svg>
+        </button>
+      </TooltipTrigger>
+      <TooltipContent>
+        <div className="p-2 backdrop-blur-sm bg-black/80 text-white rounded-xl font-semibold flex items-center gap-2">
+          <svg viewBox='0 0 16 16' width={16} height={16}>
+            <path
+              d="
+                M 5 1
+                l 6 0
+                l 1 2
+                l 2 0
+                l 0 1
+                l -12 0
+                l 0 -1
+                l 2 0
+                z
+                M 3.5 5
+                l 9 0
+                l -0.5 9
+                l -8 0
+                z
+              "
+              className='fill-white'
+            />
+          </svg>
+          Delete link
+        </div>
+      </TooltipContent>
+    </Tooltip>
     <input
       type='text'
       defaultValue={link.title}
