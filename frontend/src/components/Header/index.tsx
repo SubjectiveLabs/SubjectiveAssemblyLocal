@@ -1,5 +1,5 @@
 import { AppContext } from "App"
-import { Door, Heart, Key, Pencil } from "Icons";
+import { Door, Heart, GearTooth, Pencil } from "Icons";
 import { useContext, useEffect, useRef, useState } from "react"
 import classNames from "classNames";
 import { Tooltip, TooltipContent, TooltipTrigger } from "components/Tooltip";
@@ -101,24 +101,48 @@ const Header = () => {
             viewBox="0 0 16 16"
             width={32}
             height={32}
-            className="cursor-pointer hover:opacity-75 transition"
+            className="cursor-pointer hover:opacity-75 transition fill-neutral-500"
             onClick={() => {
               setShowSettings(true)
             }}
           >
-            <path
-              d={Key}
-              className="fill-neutral-500"
-            />
+            {
+              [...Array(8)].map((_, index) => <path
+                d={GearTooth}
+                className="origin-center"
+                style={{
+                  transform: `rotate(${index * 45}deg)`,
+                }}
+                key={index}
+              />)
+            }
+            <circle cx={8} cy={8} r={6} />
+            <circle cx={8} cy={8} r={3} className="fill-white" />
           </svg>
         </TooltipTrigger>
         <TooltipContent>
           <div className="p-2 backdrop-blur-sm bg-black/80 text-white rounded-xl font-semibold flex items-center gap-2">
-            <svg viewBox='0 0 16 16' width={16} height={16}>
-              <path
-                d={Key}
-                className='fill-white'
-              />
+            <svg
+              viewBox="0 0 16 16"
+              width={16}
+              height={16}
+              className="cursor-pointer hover:opacity-75 transition fill-white"
+              onClick={() => {
+                setShowSettings(true)
+              }}
+            >
+              {
+                [...Array(8)].map((_, index) => <path
+                  d={GearTooth}
+                  className="origin-center"
+                  style={{
+                    transform: `rotate(${index * 45}deg)`,
+                  }}
+                  key={index}
+                />)
+              }
+              <circle cx={8} cy={8} r={6} />
+              <circle cx={8} cy={8} r={3} className="fill-black/80" />
             </svg>
             Open settings
           </div>
