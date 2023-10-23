@@ -44,21 +44,14 @@ export const Plus = `
   z
 `
 
-export const Key = `
-  M 1 15
-  l 5 0
-  l 0 -1.5
-  l 1.5 0
-  l 0 -1.5
-  l 1.5 0
-  l 0 -1.5
-  a 4.5 4.5 0 1 0 -3 -3
-  l -5 5
-  M 12.5 5
-  a 1 1 0 0 1 -1 1
-  a 1 1 0 0 1 -1 -1
-  a 1 1 0 0 1 1 -1
+export const GearTooth = `
+  M 8 0
+  l 0.5 0
   a 1 1 0 0 1 1 1
+  l 0.5 3
+  l -4 0
+  l 0.5 -3
+  a 1 1 0 0 1 1 -1
   z
 `
 
