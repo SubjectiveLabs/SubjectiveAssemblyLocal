@@ -60,6 +60,12 @@ const App = () => {
       })
     },
     update = () => {
+      setCloneFrom((() => {
+        const available = [...Array(days.length)]
+          .map((_, index) => index)
+          .filter(index => index != day && school.bell_times[index].length > 0)
+        return (available)[Math.floor(Math.random() * (available.length - 1))]
+      })())
       setUpdateFailed(false)
       agent.getThanks().then(thanks => {
         setThanks(thanks)
@@ -75,11 +81,13 @@ const App = () => {
     [autoRefresh, setAutoRefresh] = useState(true),
     [refreshInterval, setRefreshInterval] = useState(Duration.fromObject({ minutes: 60 })),
     [cloneFrom, setCloneFrom] = useState(
-      (
-        [...Array(days.length)]
+      (() => {
+        const available = [...Array(days.length)]
           .map((_, index) => index)
-          .filter(index => index != day && school.bellTimes[index].length > 0)
-      )[Math.floor(Math.random() * (days.length - 1))]
+
+          .filter(index => index != day && school.bell_times[index].length > 0)
+        return (available)[Math.floor(Math.random() * (available.length - 1))]
+      })()
     ),
     [hoverClone, setHoverClone] = useState(false)
   useEffect(update, [day])
