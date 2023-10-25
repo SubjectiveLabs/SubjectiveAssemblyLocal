@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, createContext, useContext, useEffect, useRef, useState } from 'react'
-import BellIcon from 'components/Bell'
+import Bell from 'Bell'
 import Footer from 'Footer'
 import { v4 } from 'uuid'
 import classNames from 'utils/classNames'
@@ -8,13 +8,11 @@ import { Door, Exclamation, GearTooth, Heart, Pages, Plus } from 'components/Ico
 import Loading from 'Loading'
 import Password from 'Password'
 import Login from 'Login'
-import { Agent, AgentContext, BellTime, Notice, School } from 'backend'
+import { Agent, AgentContext, School } from 'backend'
 import Header from 'components/Header'
 import Link from 'components/Link'
 import Settings from 'components/Settings'
 import { Duration } from 'luxon'
-import Message from 'components/Message'
-import Bell from 'components/Bell'
 
 export type Context = {
   school: [School, Dispatch<SetStateAction<School>>],
@@ -36,7 +34,7 @@ const App = () => {
       day = 4
     return day
   },
-    [school, setSchool]: [School, Dispatch<SetStateAction<School>>] = useState<School>({ name: "", bellTimes: [[], [], [], [], []], links: [], notices: [], userCreated: false }),
+    [school, setSchool]: [School, Dispatch<SetStateAction<School>>] = useState<School>({ name: "", bell_times: [[], [], [], [], []], links: [] }),
     [day, setDay] = useState(getDefaultDay()),
     [active, setActive] = useState(0),
     [updateFailed, setUpdateFailed] = useState(false),
@@ -84,7 +82,6 @@ const App = () => {
       (() => {
         const available = [...Array(days.length)]
           .map((_, index) => index)
-
           .filter(index => index != day && school.bell_times[index].length > 0)
         return (available)[Math.floor(Math.random() * (available.length - 1))]
       })()
@@ -126,16 +123,12 @@ const App = () => {
   }}>
     <div className='py-4 bg-gray-50 h-full flex flex-col gap-2 font-semibold tracking-tighter leading-none md:pb-0'>
       <Header />
-      <div
-        className='flex h-full overflow-auto snap-mandatory snap-x scroll-smooth md:p-4 md:grid md:grid-cols-2 md:gap-4 no-scrollbar'
-        onScroll={event => {
-          const scroll = event.currentTarget.scrollLeft / event.currentTarget.scrollWidth * 3
-          if (Math.abs(scroll - Math.round(scroll)) < 20)
-            setActive(Math.round(scroll))
-        }}
-        ref={scroll}
-      >
-        <div className='md:border md:shadow-lg md:rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full snap-center bg-white row-span-2 overflow-auto'>
+      <div className='flex h-full overflow-x-auto snap-mandatory snap-x scroll-smooth md:p-4 md:grid md:grid-cols-2 md:gap-4 no-scrollbar' onScroll={event => {
+        const scroll = event.currentTarget.scrollLeft / event.currentTarget.scrollWidth * 3
+        if (Math.abs(scroll - Math.round(scroll)) < 20)
+          setActive(Math.round(scroll))
+      }} ref={scroll}>
+        <div className='md:border md:shadow-lg md:rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full snap-center bg-white'>
           <div className='gap-2 items-center flex text-xl'>
             <span className='bg-black w-4 h-4 inline-flex rotate-45'></span>
             Bell Times
@@ -168,17 +161,15 @@ const App = () => {
               <button
                 className='bg-black text-white flex p-2 gap-2 items-center rounded-full whitespace-nowrap grow shrink-0 basis-auto'
                 onClick={(updateFailed && env.PROD) ? undefined : () => {
-                  const bellTime: BellTime = {
+                  const period = {
                     id: v4(),
                     name: 'New Bell',
                     hour: Math.floor(Math.random() * 24),
                     minute: Math.floor(Math.random() * 60),
-                    enabled: true,
-                    userCreated: false,
                   }
                   setSchool(previous => {
                     const next = { ...previous }
-                    next.bellTimes[day].push(bellTime)
+                    next.bell_times[day].push(period)
                     return next
                   })
                 }}
@@ -191,12 +182,12 @@ const App = () => {
               </button>
               {days
                 .map((day, index) => [day, index])
-                .filter((_, index) => index != day && school.bellTimes[index].length > 0).length > 0 && <button
+                .filter((_, index) => index != day && school.bell_times[index].length > 0).length > 0 && <button
                   className='bg-black text-white flex p-1 px-2 gap-2 items-center rounded-full whitespace-nowrap grow shrink-0 basis-auto'
                   onClick={(updateFailed && env.PROD) ? undefined : () => {
                     setSchool(previous => {
                       const next = { ...previous }
-                      next.bellTimes[day] = [...next.bellTimes[day], ...next.bellTimes[cloneFrom].map(period => {
+                      next.bell_times[day] = [...next.bell_times[day], ...next.bell_times[cloneFrom].map(period => {
                         const next = { ...period }
                         next.id = v4()
                         return next
@@ -229,7 +220,7 @@ const App = () => {
                     {
                       days
                         .map((day, index) => [day, index])
-                        .filter((_, index) => index != day && school.bellTimes[index].length > 0)
+                        .filter((_, index) => index != day && school.bell_times[index].length > 0)
                         .map(([day, index]) => <option
                           key={index}
                           value={index}
@@ -243,21 +234,21 @@ const App = () => {
             <span className='flex gap-2 flex-wrap whitespace-nowrap'>
               <Alert
                 text={`No bells found for ${days[day]}.`}
-                show={school.bellTimes[day].length === 0}
+                show={school.bell_times[day].length === 0}
                 colour='bg-red-500'
                 icon={<Exclamation />}
               />
             </span>
           </div>
-          <ul className='flex flex-col gap-4 rounded-2xl overflow-auto'>
+          <ul className='flex flex-col gap-4 overflow-y-auto rounded-2xl'>
             {
-              school.bellTimes[day].map(bell => <BellIcon
+              school.bell_times[day].map(bell => <Bell
                 key={bell.id}
                 bellTime={bell}
               />)
             }
             {
-              school.bellTimes[cloneFrom]?.map(bell => <div className={classNames(
+              school.bell_times[cloneFrom]?.map(bell => <div className={classNames(
                 'pointer-events-none transition duration-500',
                 hoverClone
                   ? 'opacity-50'
@@ -271,124 +262,86 @@ const App = () => {
             }
           </ul>
         </div>
-        <div className='md:border md:shadow-lg md:rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full snap-center bg-white overflow-auto'>
-          <div className='gap-2 items-center flex text-xl'>
-            <span className='w-6 h-6 inline-flex bg-black rounded-full rounded-bl-none'></span>
-            Notices
-          </div>
-          <div className='flex gap-2 justify-between pb-2 flex-col'>
-            <button
-              className={classNames(
-                'bg-black text-white flex p-2 gap-2 items-center rounded-full whitespace-nowrap',
-                updateFailed && env.PROD
-                  ? 'opacity-50 pointer-events-none'
-                  : ''
-              )}
-              onClick={(updateFailed && env.PROD) ? undefined : () => {
-                const priority = Math.random() > 0.5
-                const notice: Notice = {
-                  id: v4(),
-                  title: 'New Notice',
-                  content: priority ? 'This is an important new notice.' : 'This is a new notice.',
-                  priority,
-                }
-                setSchool(previous => {
-                  const next = { ...previous }
-                  next.notices.push(notice)
-                  return next
-                })
-              }}
-            >
-              <svg viewBox='0 0 16 16' width={16} height={16}>
-                <circle cx={8} cy={8} r={8} className='fill-white' />
-                <path d={Plus} />
-              </svg>
-              Add Notice
-            </button>
-          </div>
-          <ul className='flex flex-col gap-4 rounded-2xl overflow-auto'>
-            {
-              school.notices.map(notice => <Message notice={notice} key={notice.id} />)
-            }
-          </ul>
-        </div>
-        <div className='md:border md:shadow-lg md:rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full snap-center bg-white overflow-auto'>
-          <div className='gap-2 items-center flex text-xl'>
-            <span className='w-6 h-6 inline-flex border-[6px] border-black rounded-full'></span>
-            Links
-          </div>
-          <div className='flex gap-2 justify-between pb-2 flex-col'>
-            <button
-              className={classNames(
-                'bg-black text-white flex p-2 gap-2 items-center rounded-full whitespace-nowrap',
-                updateFailed && env.PROD
-                  ? 'opacity-50 pointer-events-none'
-                  : ''
-              )}
-              onClick={(updateFailed && env.PROD) ? undefined : () => {
-                const link = {
-                  id: v4(),
-                  title: 'New Link',
-                  destination: 'https://example.com',
-                  icon: 'link',
-                }
-                setSchool(previous => {
-                  const next = { ...previous }
-                  next.links.push(link)
-                  return next
-                })
-              }}
-            >
-              <svg viewBox='0 0 16 16' width={16} height={16}>
-                <circle cx={8} cy={8} r={8} className='fill-white' />
-                <path d={Plus} />
-              </svg>
-              Add Link
-            </button>
-          </div>
-          <ul className='flex flex-col gap-4 rounded-2xl overflow-auto'>
-            {
-              school.links.map(link => <Link link={link} />)
-            }
-          </ul>
-        </div>
-        <div className='md:border md:shadow-lg md:rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full snap-center bg-white md:hidden'>
-          <div className='gap-2 items-center flex text-xl'>
-            <span className='w-4 h-4 inline-flex flex-col gap-1'>
-              {
-                [...Array(3)].map((_, index) => <span className='bg-black grow rounded-full' key={index}></span>)
-              }
-            </span>
-            Menu
-          </div>
-          <div className='bg-pink-500 p-4 text-white rounded-xl flex gap-4 items-center'>
-            <svg width={72} height={72} viewBox="0 0 16 16">
-              <path
-                d={Heart}
-                className="fill-white"
-              />
-            </svg>
-            <div className='flex flex-col'>
-              <span className='text-4xl font-extrabold'>{thanks || 0}</span>
-              <span className='text-xl'>thanks recieved.</span>
+        <div className="grow shrink-0 basis-auto snap-center flex flex-col gap-4 w-full">
+          <div className='md:border md:shadow-lg md:rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full bg-white overflow-auto'>
+            <div className='gap-2 items-center flex text-xl'>
+              <span className='w-6 h-6 inline-flex border-[6px] border-black rounded-full'></span>
+              Links
             </div>
+            <div className='flex gap-2 justify-between pb-2 flex-col'>
+              <button
+                className={classNames(
+                  'bg-black text-white flex p-2 gap-2 items-center rounded-full whitespace-nowrap',
+                  updateFailed && env.PROD
+                    ? 'opacity-50 pointer-events-none'
+                    : ''
+                )}
+                onClick={(updateFailed && env.PROD) ? undefined : () => {
+                  const link = {
+                    id: v4(),
+                    title: 'New Link',
+                    destination: 'https://example.com',
+                    icon: 'link',
+                  }
+                  setSchool(previous => {
+                    const next = { ...previous }
+                    next.links.push(link)
+                    return next
+                  })
+                }}
+              >
+                <svg viewBox='0 0 16 16' width={16} height={16}>
+                  <circle cx={8} cy={8} r={8} className='fill-white' />
+                  <path d={Plus} />
+                </svg>
+                Add Link
+              </button>
+            </div>
+            <ul className='flex flex-col gap-4 overflow-y-auto rounded-2xl'>
+              {
+                school.links.map(link => <Link link={link} />)
+              }
+            </ul>
           </div>
-          <button
-            className='p-4 shadow-lg border rounded-xl flex gap-2 items-center'
-            onClick={() => {
-              setShowSettings(true)
-            }}
-          >
-            {/* <svg
-              viewBox="0 0 16 16"
-              width={32}
-              height={32}
-              className="bg-black rounded-xl p-2"
+        </div>
+        <div className="grow shrink-0 basis-auto snap-center flex flex-col gap-4 w-full md:hidden">
+          <div className='md:border md:shadow-lg md:rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full bg-white overflow-auto'>
+            <div className='gap-2 items-center flex text-xl'>
+              <span className='w-4 h-4 inline-flex flex-col gap-1'>
+                {
+                  [...Array(3)].map((_, index) => <span className='bg-black grow rounded-full' key={index}></span>)
+                }
+              </span>
+              Menu
+            </div>
+            <div className='bg-pink-500 p-4 text-white rounded-xl flex gap-4 items-center'>
+              <svg width={72} height={72} viewBox="0 0 16 16">
+                <path
+                  d={Heart}
+                  className="fill-white"
+                />
+              </svg>
+              <div className='flex flex-col'>
+                <span className='text-4xl font-extrabold'>{thanks || 0}</span>
+                <span className='text-xl'>thanks recieved.</span>
+              </div>
+            </div>
+            <button
+              className='p-4 shadow-lg border rounded-xl flex gap-2 items-center'
+              onClick={() => {
+                setShowSettings(true)
+              }}
             >
-              <path
-                d={Gear}
-                className="fill-white"
-              />
+              {/* <svg
+                viewBox="0 0 16 16"
+                width={32}
+                height={32}
+                className="bg-black rounded-xl p-2"
+              >
+                <path
+                  d={Gear}
+                  className="fill-white"
+                />
               </svg> */}
               <svg
                 viewBox="0 0 16 16"
@@ -411,70 +364,72 @@ const App = () => {
                 }
                 <circle cx={8} cy={8} r={6} />
                 <circle cx={8} cy={8} r={3} className="fill-black" />
-            </svg>
-            Open Settings
-          </button>
-          <button
-            className='p-4 shadow-lg border rounded-xl flex gap-2 items-center text-red-500'
-            onClick={location.reload.bind(location)}
-          >
-            <svg
-              viewBox="0 0 16 16"
-              width={32}
-              height={32}
-              className='bg-red-500 rounded-xl p-2'
+              </svg>
+              Open Settings
+            </button>
+            <button
+              className='p-4 shadow-lg border rounded-xl flex gap-2 items-center text-red-500'
+              onClick={location.reload.bind(location)}
             >
-              <path
-                d={Door}
-                fillRule="evenodd"
-                className="fill-white"
-              />
-            </svg>
-            Log Out
-          </button>
-        </div>
-        <div className='shrink grow-0 basis-auto md:hidden'>
-          <Footer active={active} select={index => {
-            scroll.current?.children[index].scrollIntoView()
-          }} />
+              <svg
+                viewBox="0 0 16 16"
+                width={32}
+                height={32}
+                className='bg-red-500 rounded-xl p-2'
+              >
+                <path
+                  d={Door}
+                  fillRule="evenodd"
+                  className="fill-white"
+                />
+              </svg>
+              Log Out
+            </button>
+          </div>
         </div>
       </div>
-      <Loading show={loading && env.PROD} items={loadingItems} />
-      <Password show={showPassword && env.PROD} inProgress={waitingForPassword} putPassword={next => {
-        setWaitingForPassword(true)
-        agent.putPassword(password, next).then(() => {
-          setShowPassword(false)
-          setWaitingForPassword(false)
-          setPassword(next)
-          addLoadingItem('Password set.')
-          setLoading(false)
-        })
-      }} />
-      <Settings show={showSettings && env.PROD} inProgress={waitingForPassword} putPassword={next => {
-        setWaitingForPassword(true)
-        agent.putPassword(password, next).then(() => {
-          setShowPassword(false)
-          setWaitingForPassword(false)
-          setPassword(next)
-          addLoadingItem('Password set.')
-          setLoading(false)
-        })
-      }} />
-      <Login show={showLogin && env.PROD} inProgress={waitingForLogin} login={async password => {
-        setWaitingForLogin(true)
-        setPassword(password)
-        const [, correct] = await agent.getPassword(password)
-        if (correct) {
-          addLoadingItem('Password set.')
-          setLoading(false)
-          setShowLogin(false)
-        } else {
-          addLoadingItem('Wrong password.')
-        }
-        setWaitingForLogin(false)
-        return correct
-      }} />
+      <div className='shrink grow-0 basis-auto md:hidden'>
+        <Footer active={active} select={index => {
+          scroll.current?.children[index].scrollIntoView()
+        }} />
+      </div>
     </div>
+    <Loading show={loading && env.PROD} items={loadingItems} />
+    <Password show={showPassword && env.PROD} inProgress={waitingForPassword} putPassword={next => {
+      setWaitingForPassword(true)
+      agent.putPassword(password, next).then(() => {
+        setShowPassword(false)
+        setWaitingForPassword(false)
+        setPassword(next)
+        addLoadingItem('Password set.')
+        setLoading(false)
+      })
+    }} />
+    <Settings show={showSettings && env.PROD} inProgress={waitingForPassword} putPassword={next => {
+      setWaitingForPassword(true)
+      agent.putPassword(password, next).then(() => {
+        setShowPassword(false)
+        setWaitingForPassword(false)
+        setPassword(next)
+        addLoadingItem('Password set.')
+        setLoading(false)
+      })
+    }} />
+    <Login show={showLogin && env.PROD} inProgress={waitingForLogin} login={async password => {
+      setWaitingForLogin(true)
+      setPassword(password)
+      const [, correct] = await agent.getPassword(password)
+      if (correct) {
+        addLoadingItem('Password set.')
+        setLoading(false)
+        setShowLogin(false)
+      } else {
+        addLoadingItem('Wrong password.')
+      }
+      setWaitingForLogin(false)
+      return correct
+    }} />
+
   </AppContext.Provider>
 }
 

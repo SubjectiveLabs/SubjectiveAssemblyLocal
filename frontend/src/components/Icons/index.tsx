@@ -99,45 +99,6 @@ export const Heart = `
   A 0.666 0.666 0 0 1 8 13.333
   z
 `
-
-export const Bin = `
-  M 5 1
-  l 6 0
-  l 1 2
-  l 2 0
-  l 0 1
-  l -12 0
-  l 0 -1
-  l 2 0
-  z
-  M 3.5 5
-  l 9 0
-  l -0.5 9
-  l -8 0
-  z
-`
-
-export const BellIcon = `
-  M 8 2
-  q 4 0 4 4
-  l 0 3
-  q 0 2 2 2
-  a 1 1 0 0 1 0 2
-  l -12 0
-  a 1 1 0 0 1 0 -2
-  q 2 0 2 -2
-  l 0 -3
-  q 0 -4 4 -4
-  z
-  m -1 1
-  a 1.5 1.5 0 1 1 2 0
-  m -1 -1
-  z
-  m 0 12
-  l 2 0
-  a 2 2 0 0 1 -4 0
-`
-
 export const Pages = `
   M 4.5 9.5
   l -3 0

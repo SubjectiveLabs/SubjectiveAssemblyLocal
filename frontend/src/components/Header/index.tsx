@@ -35,7 +35,7 @@ const Header = () => {
         />
       </svg>
       <div className="flex flex-col text-left text-xl">
-        <span className="text-pink-500 whitespace-nowrap">Thanks Received</span>
+        <span className="text-pink-500 whitespace-nowrap">Thanks Recieved</span>
         <span className="text-3xl">{thanks || 0}</span>
       </div>
     </div>

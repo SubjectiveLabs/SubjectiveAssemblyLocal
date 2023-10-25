@@ -9,8 +9,6 @@ export type BellTime = {
   hour: number,
   minute: number,
   location?: string,
-  enabled: boolean,
-  userCreated: boolean,
 }
 export type Link = {
   id: string,
@@ -18,18 +16,10 @@ export type Link = {
   destination: string,
   icon: string,
 }
-export type Notice = {
-  id: string,
-  title: string,
-  content: string,
-  priority: boolean,
-}
 export type School = {
   name: string,
-  bellTimes: Day[],
+  bell_times: Day[],
   links: Link[],
-  notices: Notice[],
-  userCreated: boolean,
 }
 
 export type Agent = {
