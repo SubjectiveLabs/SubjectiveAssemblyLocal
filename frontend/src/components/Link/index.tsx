@@ -72,7 +72,6 @@ const Link = ({ link }: { link: Link }) => {
       type='text'
       defaultValue={link.title}
       className='bg-gray-200 rounded-xl p-1 w-full transition peer duration-300 h-full px-2'
-      maxLength={127}
       required
       onBlur={event => {
         const name = event.target.value
@@ -90,7 +89,6 @@ const Link = ({ link }: { link: Link }) => {
       type='text'
       defaultValue={link.destination}
       className='bg-gray-200 rounded-xl p-1 w-full transition peer duration-300 h-full px-2'
-      maxLength={127}
       required
       onBlur={event => {
         const name = event.target.value
