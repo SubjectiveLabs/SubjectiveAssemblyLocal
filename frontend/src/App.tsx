@@ -63,7 +63,7 @@ const App = () => {
       setCloneFrom((() => {
         const available = [...Array(days.length)]
           .map((_, index) => index)
-          .filter(index => index != day && school.bell_times[index].length > 0)
+          .filter(index => index != day && school.bellTimes[index].length > 0)
         return (available)[Math.floor(Math.random() * (available.length - 1))]
       })())
       setUpdateFailed(false)
@@ -84,8 +84,7 @@ const App = () => {
       (() => {
         const available = [...Array(days.length)]
           .map((_, index) => index)
-
-          .filter(index => index != day && school.bell_times[index].length > 0)
+          .filter(index => index != day && school.bellTimes[index].length > 0)
         return (available)[Math.floor(Math.random() * (available.length - 1))]
       })()
     ),
