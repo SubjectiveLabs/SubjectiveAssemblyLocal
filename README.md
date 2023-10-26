@@ -1,7 +1,8 @@
 # Subjective Assembly
 
-Create, manage and host student timetables and school bell times for Subjective: the **school-driven, student-centric** iOS class and learning organisation app.
-Use this repository to self-host Assembly with the source code.
+Open-source platform for schools to make live, synchronised school bell times, student notices and site bookmarks available to Subjective students connected to the school's server either on the web or local network.
+
+Learn more about [Subjective: the **school-driven, student-centric** iOS class and learning organisation app](https://bit.ly/subjectiveapp).
 
 ## Usage
 
@@ -21,6 +22,6 @@ Use this repository to self-host Assembly with the source code.
 
     Run `docker pull ghcr.io/SubjectiveLabs/subjective-assembly:latest` to pull the image.
 
-3. Connect to the server with Subjective.
-    If your school is public on Subjective Discovery, changes to your school'll be reflected to all students of your school on the next cache clear.
-    If not, Assembly's share link can be input in Subjective to retrieve your school's bell time data.
+3. Configure your school's bell times, notices, and links by opening Assembly (if you are accessing it directly on your server, it is most likely localhost/app), otherwise it will be *[server-address]*/app
+
+4. Connect to the server with Subjective by inputting the host link of Assembly, this would be the server's local IP address, or if the server is on the web, it's web address.
