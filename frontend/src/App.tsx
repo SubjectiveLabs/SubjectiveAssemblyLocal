@@ -91,7 +91,8 @@ const App = () => {
       })()
     ),
     [hoverClone, setHoverClone] = useState(false),
-    qrCodeCanvas = useRef<HTMLCanvasElement>(null)
+    qrCodeCanvas = useRef<HTMLCanvasElement>(null),
+    [showQRCode, setShowQRCode] = useState(false)
 
   useEffect(update, [day])
   useEffect(() => {
@@ -129,9 +130,9 @@ const App = () => {
     refreshInterval: [refreshInterval, setRefreshInterval],
   }}>
     <div className='py-4 bg-gray-50 h-full flex flex-col gap-2 font-semibold tracking-tighter leading-none md:pb-0'>
-      <Header />
+      <Header setShowQRCode={setShowQRCode} />
       <div
-        className='flex h-full overflow-auto snap-mandatory snap-x scroll-smooth md:p-4 md:grid md:grid-cols-4 md:gap-4 no-scrollbar'
+        className='flex h-full overflow-auto snap-mandatory snap-x scroll-smooth md:p-4 md:grid md:grid-cols-2 md:gap-4 no-scrollbar'
         onScroll={event => {
           const scroll = event.currentTarget.scrollLeft / event.currentTarget.scrollWidth * 3
           if (Math.abs(scroll - Math.round(scroll)) < 20)
@@ -139,7 +140,7 @@ const App = () => {
         }}
         ref={scroll}
       >
-        <div className='md:border md:shadow-lg md:rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full snap-center bg-white row-span-4 col-span-2 overflow-auto'>
+        <div className='md:border md:shadow-lg md:rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full snap-center bg-white row-span-2 overflow-auto'>
           <div className='gap-2 items-center flex text-xl'>
             <span className='bg-black w-4 h-4 inline-flex rotate-45'></span>
             Bell Times
@@ -275,7 +276,7 @@ const App = () => {
             }
           </ul>
         </div>
-        <div className='md:border md:shadow-lg md:rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full snap-center bg-white row-span-2 col-span-2 overflow-auto'>
+        <div className='md:border md:shadow-lg md:rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full snap-center bg-white overflow-auto'>
           <div className='gap-2 items-center flex text-xl'>
             <span className='w-6 h-6 inline-flex bg-black rounded-full rounded-bl-none'></span>
             Notices
@@ -316,7 +317,7 @@ const App = () => {
             }
           </ul>
         </div>
-        <div className='md:border md:shadow-lg md:rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full snap-center bg-white row-span-2 overflow-auto'>
+        <div className='md:border md:shadow-lg md:rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full snap-center bg-white overflow-auto'>
           <div className='gap-2 items-center flex text-xl'>
             <span className='w-6 h-6 inline-flex border-[6px] border-black rounded-full'></span>
             Links
@@ -355,41 +356,6 @@ const App = () => {
               school.links.map(link => <Link link={link} />)
             }
           </ul>
-        </div>
-        <div className='md:border md:shadow-lg md:rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full snap-center bg-white row-span-2 overflow-auto'>
-          <div className='gap-2 items-center flex text-xl'>
-            <QrCodeIcon className='w-6 h-6' />
-            QR Code
-          </div>
-          <canvas ref={qrCodeCanvas} className='hidden'></canvas>
-          <img src={qrCodeCanvas.current?.toDataURL()} alt="Assembly QR Code" className='[image-rendering:pixelated]' />
-          <div className='flex flex-col gap-2'>
-            <button
-              className='bg-black text-white flex p-2 gap-2 items-center rounded-full whitespace-nowrap grow shrink-0 basis-auto'
-              onClick={() => {
-                navigator.clipboard.writeText(window.location.host)
-              }}
-            >
-              <svg viewBox='0 0 16 16' width={16} height={16}>
-                <circle cx={8} cy={8} r={8} className='fill-white' />
-                <path d={Pages} className='stroke-black stroke-2 fill-none scale-75 origin-center' strokeLinecap='round' strokeLinejoin='round' />
-              </svg>
-              Copy Link
-            </button>
-            <button
-              className='bg-black text-white flex p-2 gap-2 items-center rounded-full whitespace-nowrap grow shrink-0 basis-auto'
-              onClick={() => {
-                const downloadButton = document.createElement('a')
-                downloadButton.href = qrCodeCanvas.current?.toDataURL() || ''
-                downloadButton.download = 'Assembly QR Code.png'
-                downloadButton.click()
-                downloadButton.remove()
-              }}
-            >
-              <ArrowDownIcon className='w-4 h-4 bg-white text-black rounded-full' />
-              Save Image
-            </button>
-          </div>
         </div>
         <div className='md:border md:shadow-lg md:rounded-2xl grow shrink-0 basis-auto p-4 flex flex-col gap-2 w-full snap-center bg-white md:hidden'>
           <div className='gap-2 items-center flex text-xl'>
@@ -502,8 +468,50 @@ const App = () => {
         setWaitingForLogin(false)
         return correct
       }} />
+      <div className={classNames(
+        'w-full h-full absolute top-0 left-0 z-20 backdrop-blur-3xl flex flex-col justify-center transition duration-1000',
+        showQRCode
+          ? 'opacity-100'
+          : 'opacity-0 pointer-events-none'
+      )}>
+        <div className='bg-white p-8 rounded-2xl border shadow-xl flex flex-col w-1/3 m-auto'>
+          <div className='gap-2 items-center flex text-xl'>
+            <QrCodeIcon className='w-6 h-6' />
+            QR Code
+          </div>
+          <canvas ref={qrCodeCanvas} className='hidden'></canvas>
+          <img src={qrCodeCanvas.current?.toDataURL()} alt="Assembly QR Code" className='[image-rendering:pixelated]' />
+          <div className='flex flex-col gap-2'>
+            <button
+              className='bg-black text-white flex p-2 gap-2 items-center rounded-full whitespace-nowrap grow shrink-0 basis-auto'
+              onClick={() => {
+                navigator.clipboard.writeText(window.location.host)
+              }}
+            >
+              <svg viewBox='0 0 16 16' width={16} height={16}>
+                <circle cx={8} cy={8} r={8} className='fill-white' />
+                <path d={Pages} className='stroke-black stroke-2 fill-none scale-75 origin-center' strokeLinecap='round' strokeLinejoin='round' />
+              </svg>
+              Copy Link
+            </button>
+            <button
+              className='bg-black text-white flex p-2 gap-2 items-center rounded-full whitespace-nowrap grow shrink-0 basis-auto'
+              onClick={() => {
+                const downloadButton = document.createElement('a')
+                downloadButton.href = qrCodeCanvas.current?.toDataURL() || ''
+                downloadButton.download = 'Assembly QR Code.png'
+                downloadButton.click()
+                downloadButton.remove()
+              }}
+            >
+              <ArrowDownIcon className='w-4 h-4 bg-white text-black rounded-full' />
+              Save Image
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
-  </AppContext.Provider >
+  </AppContext.Provider>
 }
 
 export default App
