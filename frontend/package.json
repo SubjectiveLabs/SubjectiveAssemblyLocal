@@ -24,7 +24,7 @@
     "@types/uuid": "^9.0.6",
     "@types/luxon": "^3.3.3",
     "@types/react-dom": "^18.2.14",
-    "@types/react": "^18.2.33",
+    "@types/react": "^18.2.34",
     "@typescript-eslint/parser": "^6.8.0",
     "@typescript-eslint/eslint-plugin": "^6.9.1",
     "@vitejs/plugin-react-swc": "^3.4.0",
