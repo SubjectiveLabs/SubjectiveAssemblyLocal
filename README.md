@@ -24,4 +24,4 @@ Learn more about [Subjective: the **school-driven, student-centric** iOS class a
 
 3. Configure your school's bell times, notices, and links by opening Assembly (if you are accessing it directly on your server, it is most likely localhost/app), otherwise it will be *[server-address]*/app
 
-4. Connect to the server with Subjective by inputting the host link of Assembly, this would be the server's local IP address, or if the server is on the web, it's web address.
+4. Connect to the server with Subjective by inputting the host link of Assembly. This would be the server's local IP address, or if the server is on the web, its web address.
