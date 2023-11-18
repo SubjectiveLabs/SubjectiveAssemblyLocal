@@ -13,7 +13,7 @@
     "@floating-ui/react": "^0.26.2",
     "bcryptjs": "^2.4.3",
     "crypto-js": "^4.2.0",
-    "luxon": "^3.4.3",
+    "luxon": "^3.4.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "uuid": "^9.0.1"
