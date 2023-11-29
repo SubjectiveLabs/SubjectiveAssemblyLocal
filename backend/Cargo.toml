@@ -22,7 +22,7 @@ schemars = { version = "0.8.16", features = ["uuid1"] }
 serde = { version = "1.0.192", features = ["derive"] }
 serde_json = "1.0.108"
 sha2 = "0.10.8"
-uuid = { version = "1.5.0", features = [
+uuid = { version = "1.6.1", features = [
     "v4",
     "macro-diagnostics",
     "fast-rng",
