@@ -1,10 +1,11 @@
 import { AppContext } from "App"
 import { Door, Heart, GearTooth, Pencil } from "Icons";
-import { useContext, useEffect, useRef, useState } from "react"
+import { Dispatch, SetStateAction, useContext, useEffect, useRef, useState } from "react"
 import classNames from "classNames";
 import { Tooltip, TooltipContent, TooltipTrigger } from "components/Tooltip";
+import { QrCodeIcon } from "@heroicons/react/20/solid";
 
-const Header = () => {
+const Header = ({ setShowQRCode }: { setShowQRCode: Dispatch<SetStateAction<boolean>> }) => {
   const {
     school: [school, setSchool],
     thanks,
@@ -95,6 +96,22 @@ const Header = () => {
       </div>
     </div>
     <div className="hidden gap-4 w-72 justify-end md:flex">
+      <Tooltip>
+        <TooltipTrigger>
+          <QrCodeIcon
+            className="w-8 h-8 cursor-pointer hover:opacity-75 transition"
+            onClick={() => {
+              setShowQRCode(true)
+            }}
+          />
+        </TooltipTrigger>
+        <TooltipContent>
+          <div className="p-2 backdrop-blur-sm bg-black/80 text-white rounded-xl font-semibold flex items-center gap-2">
+            <QrCodeIcon className="w-4 h-4" />
+            View QR code
+          </div>
+        </TooltipContent>
+      </Tooltip>
       <Tooltip>
         <TooltipTrigger>
           <svg
