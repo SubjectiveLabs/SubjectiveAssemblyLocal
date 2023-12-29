@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@floating-ui/react": "^0.26.4",
-    "@heroicons/react": "^2.0.18",
+    "@heroicons/react": "^2.1.1",
     "@types/qrcode": "^1.5.4",
     "bcryptjs": "^2.4.3",
     "crypto-js": "^4.2.0",
