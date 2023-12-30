@@ -10,7 +10,7 @@ name = "subjective-assembly"
 path = "src/main.rs"
 
 [dependencies]
-anyhow = "1.0.76"
+anyhow = "1.0.77"
 bcrypt = "0.15.0"
 hmac = "0.12.1"
 jwt = "0.16.0"
