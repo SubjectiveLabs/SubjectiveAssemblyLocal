@@ -1,5 +1,7 @@
 # Subjective Assembly
 
+> This version of Assembly is now deprecated, contact us for the all-new Subjective for Education with the Subjective ID powered Assembly.
+
 Open-source platform for schools to make live, synchronised school bell times, student notices and site bookmarks available to Subjective students connected to the school's server either on the web or local network.
 
 Learn more about [Subjective: the **school-driven, student-centric** iOS class and learning organisation app](https://bit.ly/subjectiveapp).
